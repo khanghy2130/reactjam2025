@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"
+    />
+    <title>Vite + React + TS</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        display: flex;
+        overflow: hidden;
+        min-height: 100vh;
+        background: linear-gradient(
+          -71deg,
+          #262626 25%,
+          transparent 26%,
+          transparent 74%,
+          #262626 75%
+        );
+        background-size: 30vw 30vw;
+        background-color: #202020;
+        opacity: 1;
+      }
+      main {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div id="root"></div>
+    </main>
+    <script type="module" src="/src/logic.ts"></script>
+    <script type="module" src="/src/client.tsx"></script>
+  </body>
+</html>

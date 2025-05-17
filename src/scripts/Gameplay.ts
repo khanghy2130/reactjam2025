@@ -1,16 +1,13 @@
 import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
 import GameClient from "./GameClient"
-import Gameplay from "./Gameplay"
 
-export default class Render {
+export default class Gameplay {
   gc: GameClient
+
+  round: number
 
   constructor(gameClient: GameClient) {
     this.gc = gameClient
-  }
-
-  draw(p5: P5, gameplay: Gameplay) {
-    p5.background(100)
-    p5.rect(this.gc.mx, this.gc.my, 100, 100)
+    this.round = 0
   }
 }

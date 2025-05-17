@@ -1,8 +1,8 @@
 import type { SketchProps } from "react-p5"
-import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
 
-import { GameState } from "../logic.ts"
 import Render from "./Render.ts"
+import Gameplay from "./Gameplay.ts"
+import runeInit from "./runeInit.ts"
 
 export default class GameClient {
   setup: SketchProps["setup"]
@@ -14,12 +14,15 @@ export default class GameClient {
   // rescaled mouse position (0 to 500 width)
   mx: number
   my: number
+  touchCountdown: number
 
   constructor() {
     this.mx = 0
     this.my = 0
+    this.touchCountdown = 0
 
     const render = new Render(this)
+    const gameplay = new Gameplay(this)
 
     const getCanvasSize = () => {
       const HEIGHT_RATIO = 1.6
@@ -45,30 +48,35 @@ export default class GameClient {
       const [w, h] = getCanvasSize()
       p5.createCanvas(w, h).parent(canvasParentRef)
 
-      // sketch configs
+      // p5 configs
       p5.textAlign(p5.CENTER, p5.CENTER)
       p5.rectMode(p5.CENTER)
       p5.imageMode(p5.CENTER)
       p5.angleMode(p5.DEGREES)
       p5.strokeJoin(p5.ROUND)
 
-      // this ends Rune initial loading
-      // should not start gameplay until onChange is called
-      Rune.initClient({
-        onChange: ({ game, action, yourPlayerId }) => {},
-      })
+      runeInit(gameplay)
     }
 
     this.draw = (p5) => {
-      // rescale mouse position
+      // rescale canvas and mouse position
       this.mx = (p5.mouseX * 500) / p5.width
       this.my = (p5.mouseY * 500) / p5.width
       p5.scale(p5.width / 500)
-      p5.background(100)
-      p5.rect(this.mx, this.my, 100, 100)
+
+      this.touchCountdown-- // update
+
+      render.draw(p5, gameplay)
     }
 
-    this.touchStarted = (p5) => {}
-    this.touchEnded = (p5) => {}
+    this.touchStarted = (p5) => {
+      // prevent clicking too fast
+      if (this.touchCountdown > 0) return
+      else this.touchCountdown = 5
+    }
+
+    this.touchEnded = (p5) => {
+      // only to end dragging
+    }
   }
 }

@@ -11,40 +11,39 @@ export default class GameClient {
   touchEnded: SketchProps["draw"]
   windowResized: SketchProps["windowResized"]
 
-  myVar: number
+  // rescaled mouse position (0 to 500 width)
+  mx: number
+  my: number
 
   constructor() {
-    this.myVar = 0
+    this.mx = 0
+    this.my = 0
 
     const render = new Render(this)
 
-    const HEIGHT_RATIO = 1.6
-    this.windowResized = (p5) => {
+    const getCanvasSize = () => {
+      const HEIGHT_RATIO = 1.6
       const CANVAS_WIDTH = Math.min(
         document.documentElement.clientWidth,
         document.documentElement.clientHeight / HEIGHT_RATIO
       )
-      p5.resizeCanvas(
+      return [
         CANVAS_WIDTH,
         Math.max(
           CANVAS_WIDTH * HEIGHT_RATIO,
           document.documentElement.clientHeight
-        )
-      )
+        ),
+      ]
+    }
+
+    this.windowResized = (p5) => {
+      const [w, h] = getCanvasSize()
+      p5.resizeCanvas(w, h)
     }
 
     this.setup = (p5, canvasParentRef) => {
-      const CANVAS_WIDTH = Math.min(
-        document.documentElement.clientWidth,
-        document.documentElement.clientHeight / HEIGHT_RATIO
-      )
-      p5.createCanvas(
-        CANVAS_WIDTH,
-        Math.max(
-          CANVAS_WIDTH * HEIGHT_RATIO,
-          document.documentElement.clientHeight
-        )
-      ).parent(canvasParentRef)
+      const [w, h] = getCanvasSize()
+      p5.createCanvas(w, h).parent(canvasParentRef)
 
       // sketch configs
       p5.textAlign(p5.CENTER, p5.CENTER)
@@ -61,9 +60,12 @@ export default class GameClient {
     }
 
     this.draw = (p5) => {
+      // rescale mouse position
+      this.mx = (p5.mouseX * 500) / p5.width
+      this.my = (p5.mouseY * 500) / p5.width
+      p5.scale(p5.width / 500)
       p5.background(100)
-      render.drawSquare(p5)
-      this.myVar = p5.mouseX
+      p5.rect(this.mx, this.my, 100, 100)
     }
 
     this.touchStarted = (p5) => {}

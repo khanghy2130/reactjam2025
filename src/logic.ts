@@ -1,11 +1,13 @@
 import type { PlayerId, RuneClient } from "rune-sdk"
 
+type CardID = number | null
+
 export interface GameState {
   playerIds: PlayerId[]
 }
 
 type GameActions = {
-  claimCell: (cellIndex: number) => void
+  confirmRound: (collection: CardID[][]) => void
 }
 
 declare global {
@@ -13,12 +15,12 @@ declare global {
 }
 
 Rune.initLogic({
-  minPlayers: 1,
+  minPlayers: 4,
   maxPlayers: 4,
   setup: (allPlayerIds) => ({
     playerIds: allPlayerIds,
   }),
   actions: {
-    claimCell: (cellIndex, { game, playerId, allPlayerIds }) => {},
+    confirmRound: (collection, { game, playerId, allPlayerIds }) => {},
   },
 })

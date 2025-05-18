@@ -1,10 +1,15 @@
 import type { SketchProps } from "react-p5"
+import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
 
 import Render from "./Render.ts"
 import Gameplay from "./Gameplay.ts"
 import runeInit from "./runeInit.ts"
 
+import sheetPath from "../assets/sheet.webp"
+import fontPath from "../assets/font.ttf"
+
 export default class GameClient {
+  preload: SketchProps["preload"]
   setup: SketchProps["setup"]
   draw: SketchProps["draw"]
   touchStarted: SketchProps["draw"]
@@ -23,6 +28,12 @@ export default class GameClient {
 
     const render = new Render(this)
     const gameplay = new Gameplay(this)
+
+    let globalFont: P5.Font | undefined
+    this.preload = (p5) => {
+      render.sheet = p5.loadImage(sheetPath)
+      globalFont = p5.loadFont(fontPath)
+    }
 
     const getCanvasSize = () => {
       const HEIGHT_RATIO = 1.6
@@ -54,6 +65,7 @@ export default class GameClient {
       p5.imageMode(p5.CENTER)
       p5.angleMode(p5.DEGREES)
       p5.strokeJoin(p5.ROUND)
+      if (globalFont) p5.textFont(globalFont)
 
       runeInit(gameplay)
     }

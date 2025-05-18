@@ -8,6 +8,7 @@ function App() {
 
   return (
     <Sketch
+      preload={gameClient.preload}
       setup={gameClient.setup}
       draw={gameClient.draw}
       touchStarted={gameClient.touchStarted}

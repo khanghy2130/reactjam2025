@@ -7,6 +7,7 @@ import runeInit from "./runeInit.ts"
 
 import sheetPath from "../assets/sheet.webp"
 import fontPath from "../assets/font.ttf"
+import createButtons from "./createButtons.ts"
 
 export default class GameClient {
   preload: SketchProps["preload"]
@@ -20,11 +21,13 @@ export default class GameClient {
   mx: number
   my: number
   touchCountdown: number
+  isPressing: boolean
 
   constructor() {
     this.mx = 0
     this.my = 0
     this.touchCountdown = 0
+    this.isPressing = false
 
     const render = new Render(this)
     const gameplay = new Gameplay(this)
@@ -68,7 +71,12 @@ export default class GameClient {
       p5.strokeJoin(p5.ROUND)
       if (globalFont) p5.textFont(globalFont)
 
-      runeInit(gameplay)
+      // connect instances
+      render.p5 = p5
+      gameplay.render = render
+
+      createButtons(p5, gameplay, render)
+      runeInit(gameplay) // start game
     }
 
     this.draw = (p5) => {
@@ -79,17 +87,21 @@ export default class GameClient {
 
       this.touchCountdown-- // update
 
-      render.draw(p5, gameplay)
+      p5.clear(0, 0, 0, 0)
+      render.draw()
     }
 
-    this.touchStarted = (p5) => {
+    this.touchStarted = () => {
       // prevent clicking too fast
       if (this.touchCountdown > 0) return
       else this.touchCountdown = 5
+      this.isPressing = true
+      render.click()
     }
 
-    this.touchEnded = (p5) => {
-      // only to end dragging
+    this.touchEnded = () => {
+      // this event is called many times, no other action should be here beside to end pressing
+      this.isPressing = false
     }
   }
 }

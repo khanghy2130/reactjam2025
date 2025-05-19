@@ -1,12 +1,14 @@
 import type { PlayerId, RuneClient } from "rune-sdk"
 
-type CardId = number | null
-type Collection = CardId[][]
+type CardItem = number | null
+type Collection = CardItem[][]
 
 interface Player {
   id: PlayerId
-  score: number
-  prevScore: number
+  prevYinPts: number
+  prevYangPts: number
+  yinPts: number
+  yangPts: number
   isReady: boolean
   rng: number[]
   collection: Collection
@@ -49,8 +51,10 @@ Rune.initLogic({
     players: allPlayerIds.map(
       (playerId): Player => ({
         id: playerId,
-        score: 0,
-        prevScore: 0,
+        prevYinPts: 0,
+        prevYangPts: 0,
+        yinPts: 0,
+        yangPts: 0,
         isReady: false,
         rng: generateRNG(),
         collection: Array.from({ length: 4 }, () => Array(4).fill(null)),

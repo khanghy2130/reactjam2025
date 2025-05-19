@@ -10,7 +10,7 @@ interface Player {
   isReady: boolean
   rng: number[]
   collection: Collection
-  lastPlayedCards: CardId[]
+  playedPositions: [number, number][] | null
 }
 
 export interface GameState {
@@ -19,7 +19,7 @@ export interface GameState {
 }
 
 type GameActions = {
-  confirmRound: (collection: Collection) => void
+  becomeReady: (collection: Collection) => void
 }
 
 declare global {
@@ -27,7 +27,10 @@ declare global {
 }
 
 // randomness for each player per round
-const generateRNG = () => [Math.random(), Math.random()]
+const generateRNG = () => {
+  const r = Math.random
+  return [r(), r(), r(), r()]
+}
 
 function checkToEndRound() {
   /// check if all players are ready
@@ -51,12 +54,12 @@ Rune.initLogic({
         isReady: false,
         rng: generateRNG(),
         collection: Array.from({ length: 4 }, () => Array(4).fill(null)),
-        lastPlayedCards: [null, null],
+        playedPositions: null,
       })
     ),
   }),
   actions: {
-    confirmRound: (collection, { game, playerId, allPlayerIds }) => {
+    becomeReady: (collection, { game, playerId, allPlayerIds }) => {
       /// update this player collection, lastPlayedCards, and isReady
       /// checkToEndRound()
     },

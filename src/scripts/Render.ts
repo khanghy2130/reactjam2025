@@ -13,7 +13,17 @@ export default class Render {
   draw(p5: P5, gameplay: Gameplay) {
     p5.background(100)
 
-    p5.image(this.sheet, 250, 350, 150 * 2, 200 * 2, 0, 0, 150, 200)
+    p5.image(
+      this.sheet,
+      250,
+      350,
+      150 * 2,
+      200 * 2,
+      150 * Math.floor(p5.frameCount / 60),
+      0,
+      150,
+      200
+    )
 
     p5.textSize(100)
     p5.fill(255)

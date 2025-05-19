@@ -56,6 +56,7 @@ export default class GameClient {
     }
 
     this.setup = (p5, canvasParentRef) => {
+      canvasParentRef.innerHTML = "" // clear previous canvas
       const [w, h] = getCanvasSize()
       p5.createCanvas(w, h).parent(canvasParentRef)
 

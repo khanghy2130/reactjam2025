@@ -2,9 +2,16 @@ import ReactDOM from "react-dom/client"
 import Sketch from "react-p5"
 
 import GameClient from "./scripts/GameClient.ts"
+import { useRef, StrictMode } from "react"
 
 function App() {
-  const gameClient = new GameClient()
+  const gameClientRef = useRef<GameClient>()
+
+  // Only instantiate once
+  if (!gameClientRef.current) {
+    gameClientRef.current = new GameClient()
+  }
+  const gameClient = gameClientRef.current
 
   return (
     <Sketch
@@ -19,5 +26,7 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <App />
+  <StrictMode>
+    <App />
+  </StrictMode>
 )

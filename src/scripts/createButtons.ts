@@ -4,13 +4,12 @@ import Render from "./Render"
 import Button from "./Button"
 import GameClient from "./GameClient"
 
-export default function createButtons(
+const createButtons = (
   gc: GameClient,
   p5: P5,
   gameplay: Gameplay,
   render: Render
-) {
-  // dummy button
+) => {
   render.buttons = {
     getAnimalsButton: new Button(
       [250, 300, 200, 100],
@@ -28,3 +27,5 @@ export default function createButtons(
     ),
   }
 }
+
+export default createButtons

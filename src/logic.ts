@@ -1,7 +1,7 @@
 import type { PlayerId, RuneClient } from "rune-sdk"
 
 type CardItem = number | null
-type Collection = CardItem[][]
+export type Collection = CardItem[][]
 
 interface Player {
   id: PlayerId

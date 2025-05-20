@@ -20,10 +20,7 @@ export default class Button {
   clicked: () => void
 
   constructor(
-    x: number,
-    y: number,
-    w: number,
-    h: number,
+    [x, y, w, h]: [number, number, number, number],
     bc: P5.Color,
     renderContent: () => void,
     clicked: () => void

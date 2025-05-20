@@ -8,6 +8,7 @@ import runeInit from "./runeInit.ts"
 import sheetPath from "../assets/sheet.webp"
 import fontPath from "../assets/font.ttf"
 import createButtons from "./createButtons.ts"
+import { Translation, translations } from "./locales.ts"
 
 export default class GameClient {
   preload: SketchProps["preload"]
@@ -22,12 +23,14 @@ export default class GameClient {
   my: number
   touchCountdown: number
   isPressing: boolean
+  translatedTexts: Translation
 
   constructor() {
     this.mx = 0
     this.my = 0
     this.touchCountdown = 0
     this.isPressing = false
+    this.translatedTexts = translations["en"]
 
     const render = new Render(this)
     const gameplay = new Gameplay(this)
@@ -73,9 +76,10 @@ export default class GameClient {
 
       // connect instances
       render.p5 = p5
+      render.gameplay = gameplay
       gameplay.render = render
 
-      createButtons(p5, gameplay, render)
+      createButtons(this, p5, gameplay, render)
       runeInit(gameplay) // start game
     }
 

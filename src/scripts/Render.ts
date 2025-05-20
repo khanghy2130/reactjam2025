@@ -3,13 +3,17 @@ import GameClient from "./GameClient"
 import Gameplay from "./Gameplay"
 import Button from "./Button"
 
+interface Buttons {
+  getAnimalsButton: Button
+}
+
 export default class Render {
   gc: GameClient
   sheet!: P5.Image
   p5!: P5
   gameplay!: Gameplay
 
-  dummyButton!: Button
+  buttons!: Buttons
 
   constructor(gameClient: GameClient) {
     this.gc = gameClient
@@ -17,8 +21,14 @@ export default class Render {
 
   draw() {
     const p5 = this.p5
+    const gp = this.gameplay
 
-    this.dummyButton.render(p5)
+    // render get-animals button if !hasTakenCards
+    if (!gp.hasTakenCards) {
+      ///
+    }
+
+    this.buttons.getAnimalsButton.render(p5)
 
     /// p5.image(this.sheet, 250, 350, 150 * 2, 200 * 2, 0, 0, 150, 200)
   }
@@ -30,8 +40,8 @@ export default class Render {
     /// button...
     /// start dragging card... (check when gc.isPressing = false to release)
 
-    if (this.dummyButton.checkHover(mx, my)) {
-      this.dummyButton.clicked()
+    if (this.buttons.getAnimalsButton.checkHover(mx, my)) {
+      this.buttons.getAnimalsButton.clicked()
     }
   }
 }

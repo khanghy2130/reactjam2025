@@ -15,11 +15,14 @@ export default class Gameplay {
   render!: Render
 
   isSpectator: boolean
+  viewingPlayer!: PlayerId
   phase: "SCORING" | "GET" | "PLAY" | "READY"
+
   localCards: null | [LocalCard, LocalCard]
   hasRerolled: boolean
   hasTakenCards: boolean
-  viewingPlayer!: PlayerId
+
+  /// ready phase: no render local card if already there
 
   constructor(gameClient: GameClient) {
     this.isSpectator = false

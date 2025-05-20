@@ -60,11 +60,11 @@ export default class Button {
       this.ap = 0.08
     }
     let scaleFactor = easeOutElastic(this.ap, p5)
-    scaleFactor *= 0.3 // animated range
-    p5.scale(0.7 + scaleFactor, 1.3 - scaleFactor) // 1 - or + range
+    scaleFactor *= 0.35 // animated range
+    p5.scale(0.65 + scaleFactor, 1.35 - scaleFactor) // 1 - or + range
 
     p5.noStroke()
-    p5.fill(this.bc)
+    p5.fill(p5.lerpColor(p5.color(200), this.bc, this.ap * 2))
     p5.rect(0, 0, this.w, this.h, 8)
     this.renderContent()
     p5.pop()

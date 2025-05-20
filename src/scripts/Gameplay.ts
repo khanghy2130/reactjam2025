@@ -5,13 +5,27 @@ import { GameState } from "../logic"
 import Render from "./Render"
 import { Card, CARDS_TABLE } from "./cards"
 
+interface CardHolder {
+  flips: number // x to 0
+  ap: number // 1 to 0 (to 0.5 on last flip)
+  card: Card
+}
+
 interface Shop {
   yinPool: Card[]
   yangPool: Card[]
   openBtnHintCountdown: number
   isOpened: boolean
   availableCards: null | [Card, Card]
-  openAP: number
+  cardHolders: null | [CardHolder, CardHolder]
+  holdersY: {
+    DEFAULT: 350
+    REROLL: 200
+    REROLL_START: 500
+    start: number
+    end: number
+    ap: number // 0 to 1
+  }
   hasRerolled: boolean
   hasTaken: boolean
 }
@@ -45,10 +59,23 @@ export default class Gameplay {
       openBtnHintCountdown: 0,
       isOpened: false,
       availableCards: null,
-      openAP: 0,
+      cardHolders: null,
+      holdersY: {
+        DEFAULT: 350,
+        REROLL: 200,
+        REROLL_START: 500,
+        start: 0,
+        end: 0,
+        ap: 0,
+      },
       hasRerolled: false,
       hasTaken: false,
     }
+  }
+
+  getRandomCard(isYin: boolean, seed: number) {
+    const pool = isYin ? this.shop.yinPool : this.shop.yangPool
+    return pool[Math.floor(pool.length * seed)]
   }
 
   startScoringPhase() {
@@ -76,17 +103,21 @@ export default class Gameplay {
 
     // get new cards
     shop.availableCards = [
-      this.shop.yangPool[
-        Math.floor(this.shop.yangPool.length * thisPlayer.rng[0])
-      ],
-      this.shop.yinPool[
-        Math.floor(this.shop.yinPool.length * thisPlayer.rng[1])
-      ],
+      this.getRandomCard(false, thisPlayer.rng[0]),
+      this.getRandomCard(true, thisPlayer.rng[1]),
+    ]
+    console.log(shop.availableCards)
+    shop.cardHolders = [
+      // first card has less flips
+      { flips: 6, ap: 1, card: this.getRandomCard(false, Math.random()) },
+      { flips: 8, ap: 1, card: this.getRandomCard(true, Math.random()) },
     ]
     shop.isOpened = false
-    shop.openAP = 0
     shop.hasRerolled = false
     shop.hasTaken = false
+    shop.holdersY.start = -100
+    shop.holdersY.end = shop.holdersY.DEFAULT
+    shop.holdersY.ap = 0
 
     // last round? show result popup
     if (this.gs.round > 5) {

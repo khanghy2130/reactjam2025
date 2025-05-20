@@ -10,7 +10,7 @@ export type Translation = {
 export const translations: Record<Language, Translation> = {
   en: {
     short: {
-      getanimals: "Get animals!",
+      getanimals: "Get animals",
     },
   },
 }

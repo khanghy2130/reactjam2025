@@ -10,7 +10,7 @@ function easeOutElastic(x: number, p5: P5) {
 }
 
 export default class Button {
-  animateProgress: number // 0 to 1
+  ap: number // 0 to 1
   x: number
   y: number
   w: number
@@ -25,7 +25,7 @@ export default class Button {
     renderContent: () => void,
     clicked: () => void
   ) {
-    this.animateProgress = 1
+    this.ap = 1
     this.x = x
     this.y = y
     this.w = w
@@ -33,7 +33,7 @@ export default class Button {
     this.bc = bc
     this.renderContent = renderContent
     this.clicked = () => {
-      this.animateProgress = 0 // start animation
+      this.ap = 0 // start animation
       clicked()
     }
   }
@@ -50,16 +50,16 @@ export default class Button {
   }
 
   render(p5: P5) {
-    if (this.animateProgress < 1) {
-      this.animateProgress = Math.min(this.animateProgress + 0.01, 1)
+    if (this.ap < 1) {
+      this.ap = Math.min(this.ap + 0.01, 1)
     }
     // render button
     p5.push()
     p5.translate(this.x, this.y)
-    if (this.animateProgress < 0.08) {
-      this.animateProgress = 0.08
+    if (this.ap < 0.08) {
+      this.ap = 0.08
     }
-    let scaleFactor = easeOutElastic(this.animateProgress, p5)
+    let scaleFactor = easeOutElastic(this.ap, p5)
     scaleFactor *= 0.3 // animated range
     p5.scale(0.7 + scaleFactor, 1.3 - scaleFactor) // 1 - or + range
 

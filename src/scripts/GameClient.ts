@@ -42,7 +42,7 @@ export default class GameClient {
     }
 
     const getCanvasSize = () => {
-      const HEIGHT_RATIO = 1.6
+      const HEIGHT_RATIO = 1.65
       const CANVAS_WIDTH = Math.min(
         document.documentElement.clientWidth,
         document.documentElement.clientHeight / HEIGHT_RATIO
@@ -72,6 +72,7 @@ export default class GameClient {
       p5.imageMode(p5.CENTER)
       p5.angleMode(p5.DEGREES)
       p5.strokeJoin(p5.ROUND)
+      p5.frameRate(60)
       if (globalFont) p5.textFont(globalFont)
 
       // connect instances
@@ -96,16 +97,16 @@ export default class GameClient {
     }
 
     this.touchStarted = () => {
-      // prevent clicking too fast
-      if (this.touchCountdown > 0) return
-      else this.touchCountdown = 5
       this.isPressing = true
-      render.click()
     }
 
     this.touchEnded = () => {
-      // this event is called many times, no other action should be here beside to end pressing
       this.isPressing = false
+
+      if (this.touchCountdown > 0) return
+      else this.touchCountdown = 10
+
+      render.click()
     }
   }
 }

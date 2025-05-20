@@ -5,8 +5,9 @@ export default function runeInit(gameplay: Gameplay) {
   Rune.initClient({
     //// would restart work automatically at any round?
     onChange: ({ game, yourPlayerId }) => {
-      // initial set up: isSpectator and initial viewingPlayer
-      if (yourPlayerId === undefined) gameplay.isSpectator = true
+      gameplay.myPlayerId = yourPlayerId // sync playerId
+
+      // inital viewingPlayer (self, or first player if is spectator)
       if (gameplay.viewingPlayer === undefined) {
         if (yourPlayerId) gameplay.viewingPlayer = yourPlayerId
         else gameplay.viewingPlayer = game.players[0].id

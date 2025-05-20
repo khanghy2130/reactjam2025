@@ -11,18 +11,20 @@ const createButtons = (
   render: Render
 ) => {
   render.buttons = {
-    getAnimalsButton: new Button(
-      [250, 300, 200, 100],
+    openShop: new Button(
+      [250, 760, 400, 70],
       p5.color(65, 148, 59),
       function () {
         p5.fill(255, 255, 255)
         p5.stroke(0)
-        p5.strokeWeight(10)
-        p5.textSize(30)
-        p5.text(gc.translatedTexts.short.getanimals, 0, 0)
+        p5.strokeWeight(8)
+        p5.textSize(36)
+        p5.text(gc.translatedTexts.short.getanimals, 0, -5)
       },
       function () {
-        console.log("click")
+        const shop = gameplay.shop
+        shop.openBtnHintCountdown = 200
+        shop.isOpened = true
       }
     ),
   }

@@ -36,7 +36,7 @@ export interface Card {
   ability: Ability
 }
 
-const CARDS_TABLE: Card[] = [
+export const CARDS_TABLE: Card[] = [
   {
     id: 0,
     animal: "RAT",
@@ -506,8 +506,6 @@ const CARDS_TABLE: Card[] = [
     },
   },
 ]
-
-export default CARDS_TABLE
 
 type EA = (collection: Collection, targetPosition: [number, number]) => number
 export const evaluateAbility: EA = (collection, targetPosition) => {

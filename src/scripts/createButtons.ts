@@ -14,7 +14,7 @@ const createButtons = (
 
   render.buttons = {
     openShop: new Button(
-      [250, 760, 400, 70],
+      [250, 800, 400, 70],
       p5.color(65, 148, 59),
       function () {
         p5.fill(255, 255, 255)

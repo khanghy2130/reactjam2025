@@ -28,6 +28,21 @@ export default class Render {
     const gp = this.gameplay
     const buttons = this.buttons
 
+    // card: 105 x 140
+    //// test layout
+    p5.background(0, 100)
+    p5.strokeWeight(1)
+    p5.stroke(255)
+    p5.fill(0)
+    const fac = 0.7
+    const cw = 150 * fac
+    const ch = 200 * fac
+    for (let y = 0; y < 4; y++) {
+      for (let x = 0; x < 4; x++) {
+        p5.rect(92.5 + cw * x, 250 + ch * y, cw, ch)
+      }
+    }
+
     // GET phase
     if (gp.phase === "GET") {
       const shop = gp.shop
@@ -125,8 +140,8 @@ export default class Render {
     )
     const sx1 = (holder1.ap < 0.5 ? holder1.ap : 1 - holder1.ap) * 2
     const sx2 = (holder2.ap < 0.5 ? holder2.ap : 1 - holder2.ap) * 2
-    this.renderCard(holder1.card, 140, realY, sx1, 1)
-    this.renderCard(holder2.card, 360, realY, sx2, 1)
+    this.renderTransformCard(holder1.card, 140, realY, sx1 * 1.5, 1.5)
+    this.renderTransformCard(holder2.card, 360, realY, sx2 * 1.5, 1.5)
 
     // render other than holders if they are not flipping
     if (!isFlipping) {
@@ -152,7 +167,13 @@ export default class Render {
     }
   }
 
-  renderCard(card: Card, x: number, y: number, sx: number, sy: number) {
+  renderTransformCard(
+    card: Card,
+    x: number,
+    y: number,
+    sx: number,
+    sy: number
+  ) {
     const p5 = this.p5
     p5.push()
     p5.translate(x, y)
@@ -162,16 +183,18 @@ export default class Render {
       this.sheet,
       0,
       0,
-      150,
-      200,
+      105,
+      140,
       150 * (card.id - indexY * 6),
       200 * indexY,
       150,
       200
     )
-    p5.fill(255, 255, 0)
-    p5.textSize(40)
-    p5.text(Math.floor(p5.frameRate()), 0, 20)
+    p5.fill(255)
+    p5.stroke(0)
+    p5.strokeWeight(5)
+    p5.textSize(16)
+    p5.text("2/ Chicken\nDragon", 0, 40)
     p5.pop()
   }
 

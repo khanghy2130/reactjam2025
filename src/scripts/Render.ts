@@ -6,6 +6,9 @@ import { Card } from "./cards"
 
 interface Buttons {
   openShop: Button
+  acceptCards: Button
+  rerollEle: Button
+  rerollType: Button
 }
 
 export default class Render {
@@ -23,19 +26,20 @@ export default class Render {
   draw() {
     const p5 = this.p5
     const gp = this.gameplay
+    const buttons = this.buttons
 
-    const shop = gp.shop
-
-    // render open shop button if no cards taken yet
-    if (!shop.hasTaken) {
-      this.buttons.openShop.render(p5)
+    // GET phase
+    if (gp.phase === "GET") {
+      const shop = gp.shop
 
       if (shop.isOpened) this.renderShop(p5, gp)
       // shop closed? update hint countdown
       else {
+        // render open shop button
+        buttons.openShop.render(p5)
         if (shop.openBtnHintCountdown <= 0) {
-          this.buttons.openShop.ap = 0
-          shop.openBtnHintCountdown = 200
+          buttons.openShop.ap = 0
+          shop.openBtnHintCountdown = 120
         } else shop.openBtnHintCountdown--
       }
     }
@@ -43,25 +47,30 @@ export default class Render {
 
   renderShop(p5: P5, gp: Gameplay) {
     const shop = gp.shop
+    const buttons = this.buttons
 
     // shop modal bg
     p5.noStroke()
-    p5.fill(0, 150)
+    p5.fill(0, 200)
     const h = (p5.height / p5.width) * 500
     p5.rect(250, h / 2, 500, h)
 
-    // update flipping card if the second holder flips > 0 && ap > 0.5
     const holder1 = shop.cardHolders![0]
     const holder2 = shop.cardHolders![1]
-    if (holder2.flips > 0 || holder2.ap > 0.5) {
-      holder1.ap -= holder1.flips * 0.008 + 0.015
+    const isFlipping = holder2.flips > 0 || holder2.ap > 0.5
+    // update flipping
+    if (isFlipping) {
+      holder1.ap -= holder1.flips * 0.012 + 0.02
       if (holder1.flips > 0) {
         if (holder1.ap <= 0) {
           holder1.flips--
           holder1.ap = 1 + holder1.ap // spillover
           // set random card or real card
           if (holder1.flips > 0) {
-            holder1.card = gp.getRandomCard(false, Math.random())
+            holder1.card =
+              shop.flipYangPool[
+                Math.floor(shop.flipYangPool.length * Math.random())
+              ]
           } else {
             if (shop.availableCards === null)
               throw "shop has no available cards"
@@ -73,14 +82,17 @@ export default class Render {
         holder1.ap = Math.max(holder1.ap, 0.5)
       }
 
-      holder2.ap -= holder2.flips * 0.008 + 0.015
+      holder2.ap -= holder2.flips * 0.012 + 0.02
       if (holder2.flips > 0) {
         if (holder2.ap <= 0) {
           holder2.flips--
           holder2.ap = 1 + holder2.ap // spillover
           // set random card or real card
           if (holder2.flips > 0) {
-            holder2.card = gp.getRandomCard(false, Math.random())
+            holder2.card =
+              shop.flipYinPool[
+                Math.floor(shop.flipYinPool.length * Math.random())
+              ]
           } else {
             if (shop.availableCards === null)
               throw "shop has no available cards"
@@ -90,12 +102,18 @@ export default class Render {
       } else {
         // flips is at 0, showing real card, keep at 0.5
         holder2.ap = Math.max(holder2.ap, 0.5)
+        // bounce in other buttons
+        if (holder2.ap === 0.5) {
+          buttons.acceptCards.ap = 0
+          buttons.rerollEle.ap = 0
+          buttons.rerollType.ap = 0
+        }
       }
     }
 
     // update holdersY
     if (shop.holdersY.ap < 1) {
-      shop.holdersY.ap = Math.min(1, shop.holdersY.ap + 0.01)
+      shop.holdersY.ap = Math.min(1, shop.holdersY.ap + 0.02)
     }
     // draw holders
     const realY = p5.map(
@@ -105,12 +123,33 @@ export default class Render {
       shop.holdersY.start,
       shop.holdersY.end
     )
-
     const sx1 = (holder1.ap < 0.5 ? holder1.ap : 1 - holder1.ap) * 2
     const sx2 = (holder2.ap < 0.5 ? holder2.ap : 1 - holder2.ap) * 2
+    this.renderCard(holder1.card, 140, realY, sx1, 1)
+    this.renderCard(holder2.card, 360, realY, sx2, 1)
 
-    this.renderCard(holder1.card, 150, realY, sx1, 1)
-    this.renderCard(holder2.card, 350, realY, sx2, 1)
+    // render other than holders if they are not flipping
+    if (!isFlipping) {
+      // render condition based on menuType
+      if (shop.menuType === "DEFAULT") {
+        // render buttons
+        buttons.acceptCards.render(p5)
+        buttons.rerollEle.render(p5)
+        buttons.rerollType.render(p5)
+      } else {
+        // reroll menu
+        // render changing arrows
+        p5.stroke(240)
+        p5.strokeWeight(8)
+        p5.line(140, 280, 140, 350)
+        p5.line(140, 350, 120, 330)
+        p5.line(140, 350, 160, 330)
+
+        p5.line(360, 280, 360, 350)
+        p5.line(360, 350, 340, 330)
+        p5.line(360, 350, 380, 330)
+      }
+    }
   }
 
   renderCard(card: Card, x: number, y: number, sx: number, sy: number) {
@@ -137,17 +176,68 @@ export default class Render {
   }
 
   click() {
-    /// if viewing card then exit
+    const gp = this.gameplay
+    const buttons = this.buttons
+
+    /// if is inspecting card then exit
 
     const mx = this.gc.mx
     const my = this.gc.my
 
-    // open shop button
-    if (
-      !this.gameplay.shop.isOpened &&
-      this.buttons.openShop.checkHover(mx, my)
-    ) {
-      this.buttons.openShop.clicked()
+    // get cards phase
+    if (gp.phase === "GET") {
+      const shop = gp.shop
+      // shop is opened?
+      if (gp.shop.isOpened) {
+        const holder1 = shop.cardHolders![0]
+        const holder2 = shop.cardHolders![1]
+        const isFlipping = holder2.flips > 0 || holder2.ap > 0.5
+        if (isFlipping) return
+
+        // check click to inspect holders
+        if (
+          mx > 140 - 75 &&
+          mx < 140 + 75 &&
+          my > shop.holdersY.end - 100 &&
+          my < shop.holdersY.end + 100
+        ) {
+          console.log("click card 1")
+          return
+        } else if (
+          mx > 360 - 75 &&
+          mx < 360 + 75 &&
+          my > shop.holdersY.end - 100 &&
+          my < shop.holdersY.end + 100
+        ) {
+          console.log("click card 2")
+          return
+        }
+
+        if (shop.menuType == "DEFAULT") {
+          // default menu buttons
+          if (buttons.acceptCards.checkHover(mx, my)) {
+            return buttons.acceptCards.clicked()
+          }
+          if (buttons.rerollEle.checkHover(mx, my)) {
+            return buttons.rerollEle.clicked()
+          }
+          if (buttons.rerollType.checkHover(mx, my)) {
+            return buttons.rerollType.clicked()
+          }
+        } else {
+          //// reroll menu buttons
+          //// also check click to inspect reroll previews
+        }
+      }
+      // shop is closed?
+      else {
+        // check click open shop button
+        if (buttons.openShop.checkHover(mx, my)) {
+          return buttons.openShop.clicked()
+        }
+      }
     }
+
+    //// SPECTATE phase can switch between views, similar to READY?
   }
 }

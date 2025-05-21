@@ -5,6 +5,16 @@ import { GameState } from "../logic"
 import Render from "./Render"
 import { Card, CARDS_TABLE } from "./cards"
 
+interface Inspect {
+  isOpened: boolean
+  isOpening: boolean
+  card: Card
+  ox: number
+  oy: number
+  os: number
+  ap: number
+}
+
 interface CardHolder {
   flips: number // x to 0
   ap: number // 1 to 0 (to 0.5 on last flip)
@@ -14,24 +24,28 @@ interface CardHolder {
 interface Shop {
   yinPool: Card[]
   yangPool: Card[]
+  flipYinPool: Card[]
+  flipYangPool: Card[]
   openBtnHintCountdown: number
   isOpened: boolean
   availableCards: null | [Card, Card]
   cardHolders: null | [CardHolder, CardHolder]
   holdersY: {
-    DEFAULT: 350
-    REROLL: 200
-    REROLL_START: 500
+    DEFAULT: 300
+    REROLL: 150
+    AFTER_REROLL: 500
     start: number
     end: number
     ap: number // 0 to 1
   }
   hasRerolled: boolean
-  hasTaken: boolean
+  menuType: "DEFAULT" | "CHANGE_ELEMENT" | "CHANGE_TYPE"
+
+  inspect: Inspect
 }
 
 interface LocalCard {
-  id: number
+  card: Card
   position: null | [number, number]
 }
 
@@ -42,7 +56,7 @@ export default class Gameplay {
 
   myPlayerId?: PlayerId
   viewingPlayer!: PlayerId
-  phase: "SCORING" | "GET" | "PLAY" | "READY"
+  phase: "SCORING" | "GET" | "PLAY" | "READY" | "SPECTATE"
 
   shop: Shop
   localCards: null | [LocalCard, LocalCard]
@@ -56,21 +70,37 @@ export default class Gameplay {
     this.shop = {
       yinPool: CARDS_TABLE.filter((c) => c.isYin),
       yangPool: CARDS_TABLE.filter((c) => !c.isYin),
+      flipYinPool: [],
+      flipYangPool: [],
       openBtnHintCountdown: 0,
       isOpened: false,
       availableCards: null,
       cardHolders: null,
       holdersY: {
-        DEFAULT: 350,
-        REROLL: 200,
-        REROLL_START: 500,
+        DEFAULT: 300,
+        REROLL: 150,
+        AFTER_REROLL: 500,
         start: 0,
         end: 0,
         ap: 0,
       },
       hasRerolled: false,
-      hasTaken: false,
+      menuType: "DEFAULT",
+
+      inspect: {
+        isOpened: false,
+        isOpening: false,
+        card: CARDS_TABLE[0],
+        ox: 0,
+        oy: 0,
+        os: 0,
+        ap: 0,
+      },
     }
+  }
+
+  inspectCard(card: Card, ox: number, oy: number, os: number) {
+    //// exit conditions here
   }
 
   getRandomCard(isYin: boolean, seed: number) {
@@ -88,9 +118,9 @@ export default class Gameplay {
   }
 
   startGetPhase() {
-    // spectator skips this phase
+    // spectator skips this and PLAY phases
     if (this.myPlayerId === undefined) {
-      this.phase = "READY"
+      this.phase = "SPECTATE"
       if (this.gs.round > 5) Rune.showGameOverPopUp()
       return
     }
@@ -106,7 +136,7 @@ export default class Gameplay {
       this.getRandomCard(false, thisPlayer.rng[0]),
       this.getRandomCard(true, thisPlayer.rng[1]),
     ]
-    console.log(shop.availableCards)
+
     shop.cardHolders = [
       // first card has less flips
       { flips: 6, ap: 1, card: this.getRandomCard(false, Math.random()) },
@@ -114,10 +144,12 @@ export default class Gameplay {
     ]
     shop.isOpened = false
     shop.hasRerolled = false
-    shop.hasTaken = false
+    shop.menuType = "DEFAULT"
     shop.holdersY.start = -100
     shop.holdersY.end = shop.holdersY.DEFAULT
     shop.holdersY.ap = 0
+    shop.flipYinPool = shop.yinPool
+    shop.flipYangPool = shop.yangPool
 
     // last round? show result popup
     if (this.gs.round > 5) {

@@ -72,7 +72,7 @@ export default class GameClient {
       p5.imageMode(p5.CENTER)
       p5.angleMode(p5.DEGREES)
       p5.strokeJoin(p5.ROUND)
-      p5.frameRate(60)
+      p5.frameRate(30)
       if (globalFont) p5.textFont(globalFont)
 
       // connect instances

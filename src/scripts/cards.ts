@@ -1,3 +1,4 @@
+import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
 import { Collection } from "../logic"
 
 export type Animal =
@@ -504,6 +505,13 @@ export const CARDS_TABLE: Card[] = [
         special: "FLUX",
       },
     },
+  },
+]
+
+// match indices with card ids
+export const renderMiniAbilityFunctions = [
+  (p5: P5) => {
+    ///
   },
 ]
 

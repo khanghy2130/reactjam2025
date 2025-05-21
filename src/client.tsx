@@ -2,7 +2,7 @@ import ReactDOM from "react-dom/client"
 import Sketch from "react-p5"
 
 import GameClient from "./scripts/GameClient.ts"
-import { useRef, StrictMode } from "react"
+import { useRef } from "react"
 
 function App() {
   const gameClientRef = useRef<GameClient>()
@@ -26,7 +26,5 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+  <App />
 )

@@ -115,11 +115,6 @@ export default class Gameplay {
     //// exit conditions here
   }
 
-  getRandomCard(isYin: boolean, seed: number) {
-    const pool = isYin ? this.shop.yinPool : this.shop.yangPool
-    return pool[Math.floor(pool.length * seed)]
-  }
-
   startScoringPhase() {
     // skip scoring phase on 1st round
     if (this.gs.round === 1) {
@@ -145,14 +140,14 @@ export default class Gameplay {
 
     // get new cards
     shop.availableCards = [
-      this.getRandomCard(false, thisPlayer.rng[0]),
-      this.getRandomCard(true, thisPlayer.rng[1]),
+      shop.yangPool[Math.floor(shop.yangPool.length * thisPlayer.rng[0])],
+      shop.yinPool[Math.floor(shop.yinPool.length * thisPlayer.rng[1])],
     ]
 
     shop.cardHolders = [
       // first card has less flips
-      { flips: 6, ap: 1, card: this.getRandomCard(false, Math.random()) },
-      { flips: 8, ap: 1, card: this.getRandomCard(true, Math.random()) },
+      { flips: 6, ap: 1, card: shop.availableCards[0] },
+      { flips: 8, ap: 1, card: shop.availableCards[1] },
     ]
     shop.isOpened = false
     shop.hasRerolled = false

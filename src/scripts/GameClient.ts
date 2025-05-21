@@ -85,6 +85,7 @@ export default class GameClient {
     }
 
     this.draw = (p5) => {
+      // console.log("Mouse:", p5.mouseX, p5.mouseY)
       // rescale canvas and mouse position
       this.mx = (p5.mouseX * 500) / p5.width
       this.my = (p5.mouseY * 500) / p5.width
@@ -105,7 +106,6 @@ export default class GameClient {
 
       if (this.touchCountdown > 0) return
       else this.touchCountdown = 10
-
       render.click()
     }
   }

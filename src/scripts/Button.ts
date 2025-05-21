@@ -51,7 +51,7 @@ export default class Button {
 
   render(p5: P5) {
     if (this.ap < 1) {
-      this.ap = Math.min(this.ap + 0.014, 1)
+      this.ap = Math.min(this.ap + 0.022, 1)
     }
     // render button
     p5.push()

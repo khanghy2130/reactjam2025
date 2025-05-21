@@ -79,17 +79,21 @@ export default class Render {
     const isFlipping = holder2.flips > 0 || holder2.ap > 0.5
     // update flipping
     if (isFlipping) {
-      holder1.ap -= holder1.flips * 0.012 + 0.02
+      holder1.ap -= holder1.flips * 0.015 + 0.04
       if (holder1.flips > 0) {
         if (holder1.ap <= 0) {
           holder1.flips--
           holder1.ap = 1 + holder1.ap // spillover
           // set random card or real card
           if (holder1.flips > 0) {
-            holder1.card =
-              shop.flipYangPool[
-                Math.floor(shop.flipYangPool.length * Math.random())
-              ]
+            // make sure not repeating the same card
+            const prevCard = holder1.card
+            while (holder1.card === prevCard) {
+              holder1.card =
+                shop.flipYangPool[
+                  Math.floor(shop.flipYangPool.length * Math.random())
+                ]
+            }
           } else {
             if (shop.availableCards === null)
               throw "shop has no available cards"
@@ -101,17 +105,21 @@ export default class Render {
         holder1.ap = Math.max(holder1.ap, 0.5)
       }
 
-      holder2.ap -= holder2.flips * 0.012 + 0.02
+      holder2.ap -= holder2.flips * 0.015 + 0.04
       if (holder2.flips > 0) {
         if (holder2.ap <= 0) {
           holder2.flips--
           holder2.ap = 1 + holder2.ap // spillover
           // set random card or real card
           if (holder2.flips > 0) {
-            holder2.card =
-              shop.flipYinPool[
-                Math.floor(shop.flipYinPool.length * Math.random())
-              ]
+            // make sure not repeating the same card
+            const prevCard = holder2.card
+            while (holder2.card === prevCard) {
+              holder2.card =
+                shop.flipYinPool[
+                  Math.floor(shop.flipYinPool.length * Math.random())
+                ]
+            }
           } else {
             if (shop.availableCards === null)
               throw "shop has no available cards"
@@ -121,18 +129,12 @@ export default class Render {
       } else {
         // flips is at 0, showing real card, keep at 0.5
         holder2.ap = Math.max(holder2.ap, 0.5)
-        // bounce in other buttons
-        if (holder2.ap === 0.5) {
-          buttons.acceptCards.ap = 0
-          buttons.rerollEle.ap = 0
-          buttons.rerollType.ap = 0
-        }
       }
     }
 
     // update holdersY
     if (shop.holdersY.ap < 1) {
-      shop.holdersY.ap = Math.min(1, shop.holdersY.ap + 0.03)
+      shop.holdersY.ap = Math.min(1, shop.holdersY.ap + 0.07)
     }
     // draw holders
     const realY = p5.map(
@@ -157,11 +159,7 @@ export default class Render {
         if (!shop.hasRerolled) {
           buttons.rerollEle.render(p5)
           buttons.rerollType.render(p5)
-          // close shop button (hidden if has rerolled or is round 1)
-          /////if (gp.gs.round !== 1) {
-          if (buttons) {
-            buttons.closeShop.render(p5)
-          }
+          buttons.closeShop.render(p5)
         }
 
         // render inspect hint
@@ -191,7 +189,7 @@ export default class Render {
         const rp = shop.rerollPreviews
         // update changing previews
         if (rp.countdown-- < 0) {
-          rp.countdown = 100
+          rp.countdown = 40
           rp.showingIndex = rp.showingIndex === 0 ? 1 : 0
         }
         // render preview cards
@@ -311,12 +309,8 @@ export default class Render {
             if (buttons.rerollType.checkHover(mx, my)) {
               return buttons.rerollType.clicked()
             }
-            // close shop button (hidden if has rerolled or is round 1)
-            ////if (gp.gs.round !== 1) {
-            if (buttons) {
-              if (buttons.closeShop.checkHover(mx, my)) {
-                return buttons.closeShop.clicked()
-              }
+            if (buttons.closeShop.checkHover(mx, my)) {
+              return buttons.closeShop.clicked()
             }
           }
         } else {
@@ -328,7 +322,24 @@ export default class Render {
             return buttons.rerollNo.clicked()
           }
 
-          //// also check click to inspect reroll previews
+          // check click to inspect reroll previews
+          if (
+            mx > 140 - 75 &&
+            mx < 140 + 75 &&
+            my > shop.holdersY.AFTER_REROLL - 100 &&
+            my < shop.holdersY.AFTER_REROLL + 100
+          ) {
+            console.log("click preview card 1")
+            return
+          } else if (
+            mx > 360 - 75 &&
+            mx < 360 + 75 &&
+            my > shop.holdersY.AFTER_REROLL - 100 &&
+            my < shop.holdersY.AFTER_REROLL + 100
+          ) {
+            console.log("click preview card 2")
+            return
+          }
         }
       }
       // shop is closed?

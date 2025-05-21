@@ -26,6 +26,9 @@ const createButtons = (
       function () {
         shop.openBtnHintCountdown = 150
         shop.isOpened = true
+        render.buttons.acceptCards.ap = 0
+        render.buttons.rerollEle.ap = 0
+        render.buttons.rerollType.ap = 0
       }
     ),
 
@@ -76,12 +79,12 @@ const createButtons = (
         shop.holdersY.ap = 0
 
         const rp = shop.rerollPreviews
-        rp.countdown = 100
-        const yinCard = shop.cardHolders![1].card
+        rp.countdown = 29
+        const yinCard = shop.availableCards![1]
         rp.yinPool = shop.yinPool.filter(
           (card) => card.animal === yinCard.animal && card !== yinCard
         )
-        const yangCard = shop.cardHolders![0].card
+        const yangCard = shop.availableCards![0]
         rp.yangPool = shop.yangPool.filter(
           (card) => card.animal === yangCard.animal && card !== yangCard
         )
@@ -109,12 +112,12 @@ const createButtons = (
         shop.holdersY.ap = 0
 
         const rp = shop.rerollPreviews
-        rp.countdown = 100
-        const yinCard = shop.cardHolders![1].card
+        rp.countdown = 29
+        const yinCard = shop.availableCards![1]
         rp.yinPool = shop.yinPool.filter(
           (card) => card.ele === yinCard.ele && card !== yinCard
         )
-        const yangCard = shop.cardHolders![0].card
+        const yangCard = shop.availableCards![0]
         rp.yangPool = shop.yangPool.filter(
           (card) => card.ele === yangCard.ele && card !== yangCard
         )
@@ -125,7 +128,7 @@ const createButtons = (
     ),
 
     rerollYes: new Button(
-      [140, 760, 140, 50],
+      [140, 760, 140, 60],
       p5.color(65, 150, 60),
       function () {
         p5.fill(255, 255, 255)
@@ -135,13 +138,40 @@ const createButtons = (
         p5.text(gc.translatedTexts.short.yes, 0, -5)
       },
       function () {
+        const thisPlayer = gameplay.gs.players.find(
+          (p) => p.id === gameplay.myPlayerId
+        )
+        if (!thisPlayer) throw "Can't find this player data"
+
         render.buttons.rerollYes.ap = 1
-        ///
+        shop.menuType = "DEFAULT"
+        shop.holdersY.start = shop.holdersY.end
+        shop.holdersY.end = shop.holdersY.DEFAULT
+        shop.holdersY.ap = 0
+        shop.flipYangPool = shop.rerollPreviews.yangPool
+        shop.flipYinPool = shop.rerollPreviews.yinPool
+        shop.hasRerolled = true
+
+        // get new cards (from flip pools as they are just assigned above)
+        shop.availableCards = [
+          shop.flipYangPool[
+            Math.floor(shop.flipYangPool.length * thisPlayer.rng[2])
+          ],
+          shop.flipYinPool[
+            Math.floor(shop.flipYinPool.length * thisPlayer.rng[3])
+          ],
+        ]
+
+        shop.cardHolders = [
+          // first card has less flips
+          { flips: 6, ap: 1, card: shop.availableCards[0] },
+          { flips: 8, ap: 1, card: shop.availableCards[1] },
+        ]
       }
     ),
 
     rerollNo: new Button(
-      [360, 760, 140, 50],
+      [360, 760, 140, 60],
       p5.color(240, 70, 60),
       function () {
         p5.fill(255, 255, 255)

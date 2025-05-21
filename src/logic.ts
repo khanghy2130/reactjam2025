@@ -44,7 +44,7 @@ function startNewRound() {
 }
 
 Rune.initLogic({
-  minPlayers: 2,
+  minPlayers: 1,
   maxPlayers: 4,
   setup: (allPlayerIds) => ({
     round: 1,

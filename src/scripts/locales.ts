@@ -7,6 +7,11 @@ export type Translation = {
     acceeptcards: string
     changeelement: string
     changetype: string
+    clicktoinspect: string
+    changeeleques: string
+    changetypeques: string
+    yes: string
+    no: string
   }
   carddesc: string[]
 }
@@ -18,6 +23,11 @@ export const translations: Record<Language, Translation> = {
       acceeptcards: "Accept",
       changeelement: "Change element?",
       changetype: "Change type?",
+      clicktoinspect: "Click to inspect",
+      changeeleques: "Keep type and\nchange element?",
+      changetypeques: "Keep element and\nchange type?",
+      yes: "Yes",
+      no: "No",
     },
     carddesc: [
       "0: dummy desc\ntext long text an text long\n line 3",

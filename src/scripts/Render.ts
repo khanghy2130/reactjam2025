@@ -7,8 +7,12 @@ import { Card } from "./cards"
 interface Buttons {
   openShop: Button
   acceptCards: Button
+  closeShop: Button
   rerollEle: Button
   rerollType: Button
+
+  rerollYes: Button
+  rerollNo: Button
 }
 
 export default class Render {
@@ -128,7 +132,7 @@ export default class Render {
 
     // update holdersY
     if (shop.holdersY.ap < 1) {
-      shop.holdersY.ap = Math.min(1, shop.holdersY.ap + 0.02)
+      shop.holdersY.ap = Math.min(1, shop.holdersY.ap + 0.03)
     }
     // draw holders
     const realY = p5.map(
@@ -149,20 +153,78 @@ export default class Render {
       if (shop.menuType === "DEFAULT") {
         // render buttons
         buttons.acceptCards.render(p5)
-        buttons.rerollEle.render(p5)
-        buttons.rerollType.render(p5)
-      } else {
-        // reroll menu
+
+        if (!shop.hasRerolled) {
+          buttons.rerollEle.render(p5)
+          buttons.rerollType.render(p5)
+          // close shop button (hidden if has rerolled or is round 1)
+          /////if (gp.gs.round !== 1) {
+          if (buttons) {
+            buttons.closeShop.render(p5)
+          }
+        }
+
+        // render inspect hint
+        p5.noStroke()
+        p5.fill(255)
+        p5.textSize(26)
+        p5.text(this.gc.translatedTexts.short.clicktoinspect, 140, 80)
+        p5.stroke(255)
+        p5.strokeWeight(5)
+        p5.line(140, 120, 140, 170)
+        p5.line(140, 170, 130, 155)
+        p5.line(140, 170, 150, 155)
+      }
+      // reroll menu
+      else {
         // render changing arrows
         p5.stroke(240)
-        p5.strokeWeight(8)
+        p5.strokeWeight(6)
         p5.line(140, 280, 140, 350)
-        p5.line(140, 350, 120, 330)
-        p5.line(140, 350, 160, 330)
+        p5.line(140, 350, 125, 330)
+        p5.line(140, 350, 155, 330)
 
         p5.line(360, 280, 360, 350)
-        p5.line(360, 350, 340, 330)
-        p5.line(360, 350, 380, 330)
+        p5.line(360, 350, 345, 330)
+        p5.line(360, 350, 375, 330)
+
+        const rp = shop.rerollPreviews
+        // update changing previews
+        if (rp.countdown-- < 0) {
+          rp.countdown = 100
+          rp.showingIndex = rp.showingIndex === 0 ? 1 : 0
+        }
+        // render preview cards
+        this.renderTransformCard(
+          rp.yangPool[rp.showingIndex],
+          140,
+          shop.holdersY.AFTER_REROLL,
+          1.5,
+          1.5
+        )
+        this.renderTransformCard(
+          rp.yinPool[rp.showingIndex],
+          360,
+          shop.holdersY.AFTER_REROLL,
+          1.5,
+          1.5
+        )
+
+        p5.stroke(0)
+        p5.strokeWeight(5)
+        p5.textSize(28)
+        p5.fill(255)
+        p5.text(
+          shop.menuType === "CHANGE_ELEMENT"
+            ? this.gc.translatedTexts.short.changeeleques
+            : this.gc.translatedTexts.short.changetypeques,
+          250,
+          660
+        )
+
+        // render button
+        buttons.rerollYes.render(p5)
+        buttons.rerollNo.render(p5)
       }
     }
   }
@@ -194,7 +256,7 @@ export default class Render {
     p5.stroke(0)
     p5.strokeWeight(5)
     p5.textSize(16)
-    p5.text("2/ Chicken\nDragon", 0, 40)
+    p5.text("2 / Chicken\nDragon", 0, 40)
     p5.pop()
   }
 
@@ -241,14 +303,31 @@ export default class Render {
           if (buttons.acceptCards.checkHover(mx, my)) {
             return buttons.acceptCards.clicked()
           }
-          if (buttons.rerollEle.checkHover(mx, my)) {
-            return buttons.rerollEle.clicked()
-          }
-          if (buttons.rerollType.checkHover(mx, my)) {
-            return buttons.rerollType.clicked()
+
+          if (!shop.hasRerolled) {
+            if (buttons.rerollEle.checkHover(mx, my)) {
+              return buttons.rerollEle.clicked()
+            }
+            if (buttons.rerollType.checkHover(mx, my)) {
+              return buttons.rerollType.clicked()
+            }
+            // close shop button (hidden if has rerolled or is round 1)
+            ////if (gp.gs.round !== 1) {
+            if (buttons) {
+              if (buttons.closeShop.checkHover(mx, my)) {
+                return buttons.closeShop.clicked()
+              }
+            }
           }
         } else {
-          //// reroll menu buttons
+          // reroll menu buttons
+          if (buttons.rerollYes.checkHover(mx, my)) {
+            return buttons.rerollYes.clicked()
+          }
+          if (buttons.rerollNo.checkHover(mx, my)) {
+            return buttons.rerollNo.clicked()
+          }
+
           //// also check click to inspect reroll previews
         }
       }

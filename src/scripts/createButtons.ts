@@ -15,7 +15,7 @@ const createButtons = (
   render.buttons = {
     openShop: new Button(
       [250, 800, 400, 70],
-      p5.color(65, 148, 59),
+      p5.color(65, 150, 60),
       function () {
         p5.fill(255, 255, 255)
         p5.stroke(0)
@@ -43,6 +43,20 @@ const createButtons = (
         ///
       }
     ),
+    closeShop: new Button(
+      [430, 70, 70, 50],
+      p5.color(240, 70, 60),
+      function () {
+        p5.fill(255)
+        p5.noStroke()
+        p5.textSize(30)
+        p5.text("X", 0, -4)
+      },
+      function () {
+        shop.isOpened = false
+        render.buttons.closeShop.ap = 1
+      }
+    ),
     rerollEle: new Button(
       [250, 500, 300, 50],
       p5.color(65, 150, 60),
@@ -54,10 +68,26 @@ const createButtons = (
         p5.text(gc.translatedTexts.short.changeelement, 0, -4)
       },
       function () {
+        render.buttons.rerollYes.ap = 0
+        render.buttons.rerollNo.ap = 0
         shop.menuType = "CHANGE_ELEMENT"
         shop.holdersY.start = shop.holdersY.end
         shop.holdersY.end = shop.holdersY.REROLL
         shop.holdersY.ap = 0
+
+        const rp = shop.rerollPreviews
+        rp.countdown = 100
+        const yinCard = shop.cardHolders![1].card
+        rp.yinPool = shop.yinPool.filter(
+          (card) => card.animal === yinCard.animal && card !== yinCard
+        )
+        const yangCard = shop.cardHolders![0].card
+        rp.yangPool = shop.yangPool.filter(
+          (card) => card.animal === yangCard.animal && card !== yangCard
+        )
+        if (rp.yangPool.length !== 2 || rp.yinPool.length !== 2) {
+          throw "reroll pool size isn't 2"
+        }
       }
     ),
     rerollType: new Button(
@@ -71,9 +101,63 @@ const createButtons = (
         p5.text(gc.translatedTexts.short.changetype, 0, -4)
       },
       function () {
+        render.buttons.rerollYes.ap = 0
+        render.buttons.rerollNo.ap = 0
         shop.menuType = "CHANGE_TYPE"
         shop.holdersY.start = shop.holdersY.end
         shop.holdersY.end = shop.holdersY.REROLL
+        shop.holdersY.ap = 0
+
+        const rp = shop.rerollPreviews
+        rp.countdown = 100
+        const yinCard = shop.cardHolders![1].card
+        rp.yinPool = shop.yinPool.filter(
+          (card) => card.ele === yinCard.ele && card !== yinCard
+        )
+        const yangCard = shop.cardHolders![0].card
+        rp.yangPool = shop.yangPool.filter(
+          (card) => card.ele === yangCard.ele && card !== yangCard
+        )
+        if (rp.yangPool.length !== 2 || rp.yinPool.length !== 2) {
+          throw "reroll pool size isn't 2"
+        }
+      }
+    ),
+
+    rerollYes: new Button(
+      [140, 760, 140, 50],
+      p5.color(65, 150, 60),
+      function () {
+        p5.fill(255, 255, 255)
+        p5.stroke(0)
+        p5.strokeWeight(8)
+        p5.textSize(28)
+        p5.text(gc.translatedTexts.short.yes, 0, -5)
+      },
+      function () {
+        render.buttons.rerollYes.ap = 1
+        ///
+      }
+    ),
+
+    rerollNo: new Button(
+      [360, 760, 140, 50],
+      p5.color(240, 70, 60),
+      function () {
+        p5.fill(255, 255, 255)
+        p5.stroke(0)
+        p5.strokeWeight(8)
+        p5.textSize(28)
+        p5.text(gc.translatedTexts.short.no, 0, -5)
+      },
+      function () {
+        render.buttons.rerollNo.ap = 1
+        render.buttons.acceptCards.ap = 0
+        render.buttons.rerollEle.ap = 0
+        render.buttons.rerollType.ap = 0
+        shop.menuType = "DEFAULT"
+        shop.holdersY.start = shop.holdersY.end
+        shop.holdersY.end = shop.holdersY.DEFAULT
         shop.holdersY.ap = 0
       }
     ),

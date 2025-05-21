@@ -33,10 +33,16 @@ interface Shop {
   holdersY: {
     DEFAULT: 300
     REROLL: 150
-    AFTER_REROLL: 500
+    AFTER_REROLL: 480
     start: number
     end: number
     ap: number // 0 to 1
+  }
+  rerollPreviews: {
+    yinPool: Card[]
+    yangPool: Card[]
+    countdown: number
+    showingIndex: 0 | 1
   }
   hasRerolled: boolean
   menuType: "DEFAULT" | "CHANGE_ELEMENT" | "CHANGE_TYPE"
@@ -79,10 +85,16 @@ export default class Gameplay {
       holdersY: {
         DEFAULT: 300,
         REROLL: 150,
-        AFTER_REROLL: 500,
+        AFTER_REROLL: 480,
         start: 0,
         end: 0,
         ap: 0,
+      },
+      rerollPreviews: {
+        yinPool: [],
+        yangPool: [],
+        countdown: 0,
+        showingIndex: 0,
       },
       hasRerolled: false,
       menuType: "DEFAULT",

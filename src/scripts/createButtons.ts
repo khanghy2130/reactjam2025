@@ -14,7 +14,7 @@ const createButtons = (
 
   render.buttons = {
     openShop: new Button(
-      [250, 800, 400, 70],
+      [250, 805, 400, 70],
       p5.color(65, 150, 60),
       function () {
         p5.fill(255, 255, 255)
@@ -165,7 +165,7 @@ const createButtons = (
         render.buttons.rerollYes.ap = 1
         render.buttons.acceptCards.ap = 0
         shop.menuType = "DEFAULT"
-        shop.holdersY.start = shop.holdersY.end
+        shop.holdersY.start = shop.holdersY.AFTER_REROLL
         shop.holdersY.end = shop.holdersY.DEFAULT
         shop.holdersY.ap = 0
         shop.flipYangPool = shop.rerollPreviews.yangPool

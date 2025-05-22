@@ -4,6 +4,7 @@ import Gameplay from "./Gameplay"
 import Button from "./Button"
 import { Card } from "./cards"
 import { Translation } from "./locales"
+import { Collection } from "../logic"
 
 interface Buttons {
   openShop: Button
@@ -28,28 +29,54 @@ export default class Render {
     this.gc = gameClient
   }
 
+  getGridCenter(collection: Collection): [number, number] {
+    // find max rows and cols
+    let rows = 0,
+      cols = 0
+    for (let y = 3; y >= 0; y--) {
+      for (let x = 3; x >= 0; x--) {
+        // not empty?
+        if (collection[y][x]) {
+          cols = Math.max(cols, y)
+          rows = Math.max(rows, x)
+        }
+      }
+    }
+
+    return [92.5 + (3 - rows) * 52.5, 250 + (3 - cols) * 75]
+  }
+
   draw() {
     const p5 = this.p5
     const gp = this.gameplay
     const buttons = this.buttons
     const tt = this.gc.translatedTexts
 
-    // card: 105 x 140
-    //// test layout
-    p5.background(0, 100)
+    //// any phase rendering: collection, players, lang menu
+
+    // render collection border
+    p5.strokeWeight(5)
+    p5.stroke(150)
+    p5.noFill()
+    p5.rect(250, 460, 440, 580, 15)
+
+    // render collection
+    const ld = gp.localDisplay
+    const [targetGridX, targetGridY] = this.getGridCenter(ld.collection)
+    // update grid position
+    ld.x += (targetGridX - ld.x) * 0.2
+    ld.y += (targetGridY - ld.y) * 0.2
+
+    //// test render grid layout
     p5.strokeWeight(1)
     p5.stroke(255)
-    p5.fill(0)
-    const fac = 0.7
-    const cw = 150 * fac
-    const ch = 200 * fac
+    p5.noFill()
     for (let y = 0; y < 4; y++) {
       for (let x = 0; x < 4; x++) {
-        p5.rect(92.5 + cw * x, 250 + ch * y, cw, ch)
+        p5.rect(ld.x + 105 * x, ld.y + 140 * y, 105, 140)
+        /////// render card here
       }
     }
-
-    //// any phase: collection, players, lang menu
 
     // GET phase
     if (gp.phase === "GET") {
@@ -124,12 +151,20 @@ export default class Render {
         }
       }
 
+      // is dragging?
+      if (lc1.isDragging || lc2.isDragging) {
+        //// make a list of possible placement
+      }
       // render hint drag arrow
-      if (gp.gs.round === 1 && !lc1.isDragging && !lc2.isDragging) {
+      else if (
+        gp.gs.round === 1 &&
+        gp.localCards![0].placedPos === null &&
+        gp.localCards![1].placedPos === null
+      ) {
         p5.push()
         const ap = p5.cos(p5.frameCount * 4)
         p5.translate(320 + 30 * ap, 660 + 80 * ap)
-        p5.rotate(-25)
+        p5.rotate(-22)
         p5.stroke(0)
         p5.strokeWeight(18)
         p5.line(0, 0, 0, -80)
@@ -196,7 +231,7 @@ export default class Render {
     const isFlipping = holder2.flips > 0 || holder2.ap > 0.5
     // update flipping
     if (isFlipping) {
-      holder1.ap -= holder1.flips * 0.015 + 0.04
+      holder1.ap -= holder1.flips * 0.02 + 0.04
       if (holder1.flips > 0) {
         if (holder1.ap <= 0) {
           holder1.flips--
@@ -222,7 +257,7 @@ export default class Render {
         holder1.ap = Math.max(holder1.ap, 0.5)
       }
 
-      holder2.ap -= holder2.flips * 0.015 + 0.04
+      holder2.ap -= holder2.flips * 0.02 + 0.04
       if (holder2.flips > 0) {
         if (holder2.ap <= 0) {
           holder2.flips--
@@ -344,6 +379,7 @@ export default class Render {
     }
   }
 
+  // card: 105 x 140
   renderTransformCard(
     card: Card,
     x: number,

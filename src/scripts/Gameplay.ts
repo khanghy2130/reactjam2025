@@ -1,7 +1,7 @@
 import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
 import type { PlayerId } from "rune-sdk"
 import GameClient from "./GameClient"
-import { GameState } from "../logic"
+import { Collection, GameState } from "../logic"
 import Render from "./Render"
 import { Card, CARDS_TABLE } from "./cards"
 
@@ -50,7 +50,8 @@ interface Shop {
 
 interface LocalCard {
   card: Card
-  placedPos: null | [number, number]
+  // [(x,y) of this card after placement, wasPlayedFirst, shift-direction: none-u-r-d-l]
+  placedPos: null | [number, number, boolean, number]
   x: number
   y: number
   s: number
@@ -69,6 +70,8 @@ export default class Gameplay {
   shop: Shop
   inspect: Inspect
   localCards: null | [LocalCard, LocalCard]
+  // update directly collection, x & y
+  localDisplay: { collection: Collection; x: number; y: number }
 
   /// ready phase: no render local card if already there
 
@@ -110,6 +113,16 @@ export default class Gameplay {
       oy: 0,
       os: 0,
       ap: 0,
+    }
+    this.localDisplay = {
+      collection: [
+        [null, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+      ],
+      x: 0,
+      y: 0,
     }
   }
 

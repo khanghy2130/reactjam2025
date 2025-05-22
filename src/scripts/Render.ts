@@ -66,7 +66,82 @@ export default class Render {
         } else shop.openBtnHintCountdown--
       }
     } else if (gp.phase === "PLAY") {
-      ///
+      const { mx, my, isPressing } = this.gc
+      const lc1 = gp.localCards![0]
+      const lc2 = gp.localCards![1]
+
+      // not placed?
+      if (lc1.placedPos === null) {
+        this.renderTransformCard(lc1.card, lc1.x, lc1.y, lc1.s, lc1.s)
+        // check drag
+        if (isPressing && !lc2.isDragging) {
+          if (
+            mx > lc1.x - 78 &&
+            mx < lc1.x + 78 &&
+            my > lc1.y - 105 &&
+            my < lc1.y + 105
+          ) {
+            lc1.isDragging = true
+          }
+        }
+        if (lc1.isDragging) {
+          // follow cursor
+          lc1.s = Math.max(1, lc1.s - 0.1)
+          lc1.x += (mx - lc1.x) * 0.4
+          lc1.y += (my - lc1.y) * 0.4
+        } else {
+          // return to hand
+          lc1.s = Math.min(1.5, lc1.s + 0.1)
+          lc1.x += (140 - lc1.x) * 0.4
+          lc1.y += (800 - lc1.y) * 0.4
+        }
+      }
+
+      // not placed?
+      if (lc2.placedPos === null) {
+        this.renderTransformCard(lc2.card, lc2.x, lc2.y, lc2.s, lc2.s)
+        // check drag
+        if (isPressing && !lc1.isDragging) {
+          if (
+            mx > lc2.x - 78 &&
+            mx < lc2.x + 78 &&
+            my > lc2.y - 105 &&
+            my < lc2.y + 105
+          ) {
+            lc2.isDragging = true
+          }
+        }
+        if (lc2.isDragging) {
+          // follow cursor
+          lc2.s = Math.max(1, lc2.s - 0.1)
+          lc2.x += (mx - lc2.x) * 0.4
+          lc2.y += (my - lc2.y) * 0.4
+        } else {
+          // return to hand
+          lc2.s = Math.min(1.5, lc2.s + 0.1)
+          lc2.x += (360 - lc2.x) * 0.4
+          lc2.y += (800 - lc2.y) * 0.4
+        }
+      }
+
+      // render hint drag arrow
+      if (gp.gs.round === 1 && !lc1.isDragging && !lc2.isDragging) {
+        p5.push()
+        const ap = p5.cos(p5.frameCount * 4)
+        p5.translate(320 + 30 * ap, 660 + 80 * ap)
+        p5.rotate(-25)
+        p5.stroke(0)
+        p5.strokeWeight(18)
+        p5.line(0, 0, 0, -80)
+        p5.line(15, -60, 0, -80)
+        p5.line(-15, -60, 0, -80)
+        p5.stroke(255)
+        p5.strokeWeight(8)
+        p5.line(0, 0, 0, -80)
+        p5.line(15, -60, 0, -80)
+        p5.line(-15, -60, 0, -80)
+        p5.pop()
+      }
     }
 
     // card inspection
@@ -296,7 +371,7 @@ export default class Render {
     p5.stroke(0)
     p5.strokeWeight(3)
     p5.textSize(16)
-    p5.text("2 / Chicken\nDragon", 0, 40)
+    p5.text("ability\nhere", 0, 40)
     p5.pop()
   }
 
@@ -404,8 +479,21 @@ export default class Render {
           return buttons.openShop.clicked()
         }
       }
+    } else if (gp.phase === "PLAY") {
+      // release dragged card
+      //// place card if possible
+      if (gp.localCards![0].isDragging) {
+        gp.localCards![0].isDragging = false
+        return
+      }
+      if (gp.localCards![1].isDragging) {
+        gp.localCards![1].isDragging = false
+        return
+      }
     }
 
-    //// SPECTATE phase can switch between views, similar to READY?
+    ///// any phase: inspect collection
+
+    //// SPECTATE phase can switch between views, similar to READY (use READY instead?)
   }
 }

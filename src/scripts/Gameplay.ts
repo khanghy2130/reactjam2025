@@ -50,7 +50,11 @@ interface Shop {
 
 interface LocalCard {
   card: Card
-  position: null | [number, number]
+  placedPos: null | [number, number]
+  x: number
+  y: number
+  s: number
+  isDragging: boolean
 }
 
 export default class Gameplay {

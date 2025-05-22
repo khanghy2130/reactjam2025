@@ -43,7 +43,26 @@ const createButtons = (
         p5.text(gc.translatedTexts.short.acceeptcards, 0, -5)
       },
       function () {
-        ///
+        shop.isOpened = false
+        gameplay.phase = "PLAY"
+        gameplay.localCards = [
+          {
+            card: shop.availableCards![0],
+            placedPos: null,
+            x: 140,
+            y: shop.holdersY.DEFAULT,
+            s: 1.5,
+            isDragging: false,
+          },
+          {
+            card: shop.availableCards![1],
+            placedPos: null,
+            x: 360,
+            y: shop.holdersY.DEFAULT,
+            s: 1.5,
+            isDragging: false,
+          },
+        ]
       }
     ),
     closeShop: new Button(

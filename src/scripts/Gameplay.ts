@@ -12,7 +12,7 @@ interface Inspect {
   ox: number
   oy: number
   os: number
-  ap: number
+  ap: number // 0 to 1 (opening), 1 to 0 (closing)
 }
 
 interface CardHolder {
@@ -46,8 +46,6 @@ interface Shop {
   }
   hasRerolled: boolean
   menuType: "DEFAULT" | "CHANGE_ELEMENT" | "CHANGE_TYPE"
-
-  inspect: Inspect
 }
 
 interface LocalCard {
@@ -65,6 +63,7 @@ export default class Gameplay {
   phase: "SCORING" | "GET" | "PLAY" | "READY" | "SPECTATE"
 
   shop: Shop
+  inspect: Inspect
   localCards: null | [LocalCard, LocalCard]
 
   /// ready phase: no render local card if already there
@@ -98,21 +97,31 @@ export default class Gameplay {
       },
       hasRerolled: false,
       menuType: "DEFAULT",
-
-      inspect: {
-        isOpened: false,
-        isOpening: false,
-        card: CARDS_TABLE[0],
-        ox: 0,
-        oy: 0,
-        os: 0,
-        ap: 0,
-      },
+    }
+    this.inspect = {
+      isOpened: false,
+      isOpening: false,
+      card: CARDS_TABLE[0],
+      ox: 0,
+      oy: 0,
+      os: 0,
+      ap: 0,
     }
   }
 
   inspectCard(card: Card, ox: number, oy: number, os: number) {
-    //// exit conditions here
+    const ip = this.inspect
+
+    //// more exit conditions here
+    if (ip.isOpened) return
+
+    ip.card = card
+    ip.ox = ox
+    ip.oy = oy
+    ip.os = os
+    ip.ap = 0
+    ip.isOpening = true
+    ip.isOpened = true
   }
 
   startScoringPhase() {

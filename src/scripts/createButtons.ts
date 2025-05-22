@@ -144,6 +144,7 @@ const createButtons = (
         if (!thisPlayer) throw "Can't find this player data"
 
         render.buttons.rerollYes.ap = 1
+        render.buttons.acceptCards.ap = 0
         shop.menuType = "DEFAULT"
         shop.holdersY.start = shop.holdersY.end
         shop.holdersY.end = shop.holdersY.DEFAULT

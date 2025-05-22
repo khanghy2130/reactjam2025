@@ -3,6 +3,7 @@ import GameClient from "./GameClient"
 import Gameplay from "./Gameplay"
 import Button from "./Button"
 import { Card } from "./cards"
+import { Translation } from "./locales"
 
 interface Buttons {
   openShop: Button
@@ -31,6 +32,7 @@ export default class Render {
     const p5 = this.p5
     const gp = this.gameplay
     const buttons = this.buttons
+    const tt = this.gc.translatedTexts
 
     // card: 105 x 140
     //// test layout
@@ -47,11 +49,13 @@ export default class Render {
       }
     }
 
+    //// any phase: collection, players, lang menu
+
     // GET phase
     if (gp.phase === "GET") {
       const shop = gp.shop
 
-      if (shop.isOpened) this.renderShop(p5, gp)
+      if (shop.isOpened) this.renderShop(p5, gp, tt)
       // shop closed? update hint countdown
       else {
         // render open shop button
@@ -61,10 +65,48 @@ export default class Render {
           shop.openBtnHintCountdown = 120
         } else shop.openBtnHintCountdown--
       }
+    } else if (gp.phase === "PLAY") {
+      ///
+    }
+
+    // card inspection
+    if (gp.inspect.isOpened) {
+      const ip = gp.inspect
+      const { card, ap, ox, oy, os } = ip
+
+      // update opening and closing animation
+      if (ip.isOpening) ip.ap = Math.min(1, ip.ap + 0.15)
+      else {
+        ip.ap = Math.max(0, ip.ap - 0.15)
+        if (ip.ap === 0) {
+          ip.isOpened = false // done closing
+        }
+      }
+
+      // render bg
+      p5.noStroke()
+      const h = (p5.height / p5.width) * 500
+      p5.fill(0, 220 * ap)
+      p5.rect(250, h / 2, 500, h)
+
+      // render card
+      this.renderTransformCard(
+        card,
+        ox + (250 - ox) * ap,
+        oy + (470 - oy) * ap,
+        os + (4 - os) * ap,
+        os + (4 - os) * ap
+      )
+
+      // render full desc
+      p5.noStroke()
+      p5.fill(255)
+      p5.textSize(30)
+      p5.text(tt.carddesc[card.id], 250, -100 + 210 * ap)
     }
   }
 
-  renderShop(p5: P5, gp: Gameplay) {
+  renderShop(p5: P5, gp: Gameplay, tt: Translation) {
     const shop = gp.shop
     const buttons = this.buttons
 
@@ -166,7 +208,7 @@ export default class Render {
         p5.noStroke()
         p5.fill(255)
         p5.textSize(26)
-        p5.text(this.gc.translatedTexts.short.clicktoinspect, 140, 80)
+        p5.text(tt.short.clicktoinspect, 140, 80)
         p5.stroke(255)
         p5.strokeWeight(5)
         p5.line(140, 120, 140, 170)
@@ -214,8 +256,8 @@ export default class Render {
         p5.fill(255)
         p5.text(
           shop.menuType === "CHANGE_ELEMENT"
-            ? this.gc.translatedTexts.short.changeeleques
-            : this.gc.translatedTexts.short.changetypeques,
+            ? tt.short.changeeleques
+            : tt.short.changetypeques,
           250,
           660
         )
@@ -252,7 +294,7 @@ export default class Render {
     )
     p5.fill(255)
     p5.stroke(0)
-    p5.strokeWeight(5)
+    p5.strokeWeight(3)
     p5.textSize(16)
     p5.text("2 / Chicken\nDragon", 0, 40)
     p5.pop()
@@ -262,7 +304,8 @@ export default class Render {
     const gp = this.gameplay
     const buttons = this.buttons
 
-    /// if is inspecting card then exit
+    // if is inspecting card then exit
+    if (gp.inspect.isOpening) return (gp.inspect.isOpening = false)
 
     const mx = this.gc.mx
     const my = this.gc.my
@@ -278,21 +321,22 @@ export default class Render {
         if (isFlipping) return
 
         // check click to inspect holders
+        const holdersYEnd = shop.holdersY.end
         if (
           mx > 140 - 75 &&
           mx < 140 + 75 &&
-          my > shop.holdersY.end - 100 &&
-          my < shop.holdersY.end + 100
+          my > holdersYEnd - 100 &&
+          my < holdersYEnd + 100
         ) {
-          console.log("click card 1")
+          gp.inspectCard(holder1.card, 140, holdersYEnd, 1.5)
           return
         } else if (
           mx > 360 - 75 &&
           mx < 360 + 75 &&
-          my > shop.holdersY.end - 100 &&
-          my < shop.holdersY.end + 100
+          my > holdersYEnd - 100 &&
+          my < holdersYEnd + 100
         ) {
-          console.log("click card 2")
+          gp.inspectCard(holder2.card, 360, holdersYEnd, 1.5)
           return
         }
 
@@ -323,21 +367,32 @@ export default class Render {
           }
 
           // check click to inspect reroll previews
+          const holdersYAR = shop.holdersY.AFTER_REROLL
           if (
             mx > 140 - 75 &&
             mx < 140 + 75 &&
-            my > shop.holdersY.AFTER_REROLL - 100 &&
-            my < shop.holdersY.AFTER_REROLL + 100
+            my > holdersYAR - 100 &&
+            my < holdersYAR + 100
           ) {
-            console.log("click preview card 1")
+            gp.inspectCard(
+              shop.rerollPreviews.yangPool[shop.rerollPreviews.showingIndex],
+              140,
+              holdersYAR,
+              1.5
+            )
             return
           } else if (
             mx > 360 - 75 &&
             mx < 360 + 75 &&
-            my > shop.holdersY.AFTER_REROLL - 100 &&
-            my < shop.holdersY.AFTER_REROLL + 100
+            my > holdersYAR - 100 &&
+            my < holdersYAR + 100
           ) {
-            console.log("click preview card 2")
+            gp.inspectCard(
+              shop.rerollPreviews.yinPool[shop.rerollPreviews.showingIndex],
+              360,
+              holdersYAR,
+              1.5
+            )
             return
           }
         }

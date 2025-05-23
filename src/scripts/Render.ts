@@ -2,7 +2,7 @@ import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
 import GameClient from "./GameClient"
 import Gameplay from "./Gameplay"
 import Button from "./Button"
-import { Card } from "./cards"
+import { Card, CARDS_TABLE } from "./cards"
 import { Translation } from "./locales"
 import { Collection } from "../logic"
 
@@ -17,6 +17,12 @@ interface Buttons {
   rerollNo: Button
 }
 
+interface Flasher {
+  x: number
+  y: number
+  ap: 0
+}
+
 export default class Render {
   gc: GameClient
   sheet!: P5.Image
@@ -25,8 +31,14 @@ export default class Render {
 
   buttons!: Buttons
 
+  flashers: Flasher[]
+
+  dragHoveredPos: null | [number, number]
+
   constructor(gameClient: GameClient) {
     this.gc = gameClient
+    this.flashers = []
+    this.dragHoveredPos = null
   }
 
   getGridCenter(collection: Collection): [number, number] {
@@ -42,8 +54,52 @@ export default class Render {
         }
       }
     }
+    return [rows, cols]
+  }
 
-    return [92.5 + (3 - rows) * 52.5, 250 + (3 - cols) * 75]
+  getPossiblePlacements(rows: number, cols: number): [number, number][] {
+    const collection = this.gameplay.localDisplay.collection
+    // check if no card placed then return only first slot
+    if (rows === 0 && collection[0][0] === null) return [[0, 0]]
+    const obj: { [key: string]: true } = {}
+    const dirs = [
+      [0, 1],
+      [1, 0],
+      [0, -1],
+      [-1, 0],
+    ]
+
+    // loop through all cards to get pps
+    for (let y = 0; y < cols + 1; y++) {
+      for (let x = 0; x < rows + 1; x++) {
+        if (collection[y][x] === null) continue // no card here
+        // add all empty adjs to obj
+        for (let i = 0; i < dirs.length; i++) {
+          const newX = x + dirs[i][0]
+          const newY = y + dirs[i][1]
+          // out of bound right-bottom? skip
+          if (newX > 3 || newY > 3) continue
+
+          // accepted conditions
+          if (
+            (newX === -1 && rows < 3) ||
+            (newY === -1 && cols < 3) ||
+            collection[newY][newX] === null
+          ) {
+            obj[`${newX},${newY}`] = true
+          }
+        }
+      }
+    }
+
+    return Object.keys(obj).map((key) => {
+      const arr = key.split(",")
+      return [Number(arr[0]), Number(arr[1])]
+    })
+  }
+
+  addFlasher(x: number, y: number) {
+    this.flashers.push({ x, y, ap: 0 })
   }
 
   draw() {
@@ -62,19 +118,22 @@ export default class Render {
 
     // render collection
     const ld = gp.localDisplay
-    const [targetGridX, targetGridY] = this.getGridCenter(ld.collection)
+    const [rows, cols] = this.getGridCenter(ld.collection)
     // update grid position
-    ld.x += (targetGridX - ld.x) * 0.2
-    ld.y += (targetGridY - ld.y) * 0.2
+    ld.x += (92.5 + (3 - rows) * 52.5 - ld.x) * 0.2
+    ld.y += (250 + (3 - cols) * 75 - ld.y) * 0.2
+    const ldx = ld.x
+    const ldy = ld.y
 
-    //// test render grid layout
-    p5.strokeWeight(1)
-    p5.stroke(255)
-    p5.noFill()
+    //// guest collection?
+    const renderingCollection = ld.collection
     for (let y = 0; y < 4; y++) {
       for (let x = 0; x < 4; x++) {
-        p5.rect(ld.x + 105 * x, ld.y + 140 * y, 105, 140)
-        /////// render card here
+        const cardId = renderingCollection[y][x]
+        if (cardId !== null) {
+          const card = CARDS_TABLE[cardId]
+          this.renderTransformCard(card, ldx + 105 * x, ldy + 140 * y, 1, 1)
+        }
       }
     }
 
@@ -93,11 +152,37 @@ export default class Render {
         } else shop.openBtnHintCountdown--
       }
     } else if (gp.phase === "PLAY") {
+      this.dragHoveredPos = null
       const { mx, my, isPressing } = this.gc
       const lc1 = gp.localCards![0]
       const lc2 = gp.localCards![1]
 
-      // not placed?
+      // is dragging? render pps
+      if (lc1.isDragging || lc2.isDragging) {
+        // make a list of possible placements
+        const pps = this.getPossiblePlacements(rows, cols)
+        p5.noFill()
+        p5.stroke(220, 220, 0)
+        p5.strokeWeight(3)
+        for (let i = 0; i < pps.length; i++) {
+          const [x, y] = pps[i]
+          const centerX = ldx + 105 * x
+          const centerY = ldy + 140 * y
+
+          // check hover
+          if (
+            mx > centerX - 52.5 &&
+            mx < centerX + 52.5 &&
+            my > centerY - 70 &&
+            my < centerY + 70
+          ) {
+            p5.rect(centerX, centerY, 105, 140, 10)
+            this.dragHoveredPos = [x, y]
+          } else p5.circle(centerX, centerY, 30)
+        }
+      }
+
+      // not placed? render local card 1
       if (lc1.placedPos === null) {
         this.renderTransformCard(lc1.card, lc1.x, lc1.y, lc1.s, lc1.s)
         // check drag
@@ -124,7 +209,7 @@ export default class Render {
         }
       }
 
-      // not placed?
+      // not placed? render local card 2
       if (lc2.placedPos === null) {
         this.renderTransformCard(lc2.card, lc2.x, lc2.y, lc2.s, lc2.s)
         // check drag
@@ -151,16 +236,15 @@ export default class Render {
         }
       }
 
-      // is dragging?
-      if (lc1.isDragging || lc2.isDragging) {
-        //// make a list of possible placement
-      }
-      // render hint drag arrow
-      else if (
+      // not dragging & is round 1?
+      if (
+        !lc1.isDragging &&
+        !lc2.isDragging &&
         gp.gs.round === 1 &&
         gp.localCards![0].placedPos === null &&
         gp.localCards![1].placedPos === null
       ) {
+        // render hint drag arrow
         p5.push()
         const ap = p5.cos(p5.frameCount * 4)
         p5.translate(320 + 30 * ap, 660 + 80 * ap)
@@ -177,6 +261,16 @@ export default class Render {
         p5.line(-15, -60, 0, -80)
         p5.pop()
       }
+    }
+
+    // render flashers
+    p5.noStroke()
+    for (let i = this.flashers.length - 1; i >= 0; i--) {
+      const f = this.flashers[i]
+      p5.fill(255, 255, 0, (1 - f.ap) * 220)
+      p5.rect(ldx + 105 * f.x, ldy + 140 * f.y, 105, 140, 10)
+      f.ap += 0.15
+      if (f.ap >= 1) this.flashers.splice(i, 1) // remove flasher
     }
 
     // card inspection
@@ -516,14 +610,17 @@ export default class Render {
         }
       }
     } else if (gp.phase === "PLAY") {
+      const [lc1, lc2] = gp.localCards!
+
       // release dragged card
-      //// place card if possible
-      if (gp.localCards![0].isDragging) {
-        gp.localCards![0].isDragging = false
+      if (lc1.isDragging) {
+        lc1.isDragging = false
+        if (this.dragHoveredPos) gp.playCard(lc1, this.dragHoveredPos)
         return
       }
-      if (gp.localCards![1].isDragging) {
-        gp.localCards![1].isDragging = false
+      if (lc2.isDragging) {
+        lc2.isDragging = false
+        if (this.dragHoveredPos) gp.playCard(lc2, this.dragHoveredPos)
         return
       }
     }

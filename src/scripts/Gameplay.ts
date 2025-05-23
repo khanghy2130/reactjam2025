@@ -1,4 +1,3 @@
-import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
 import type { PlayerId } from "rune-sdk"
 import GameClient from "./GameClient"
 import { Collection, GameState } from "../logic"
@@ -50,8 +49,8 @@ interface Shop {
 
 interface LocalCard {
   card: Card
-  // [(x,y) of this card after placement, wasPlayedFirst, shift-direction: none-u-r-d-l]
-  placedPos: null | [number, number, boolean, number]
+  // placedPos for spawning unplayed cards on undo
+  placedPos: null | [number, number]
   x: number
   y: number
   s: number
@@ -71,9 +70,12 @@ export default class Gameplay {
   inspect: Inspect
   localCards: null | [LocalCard, LocalCard]
   // update directly collection, x & y
-  localDisplay: { collection: Collection; x: number; y: number }
-
-  /// ready phase: no render local card if already there
+  localDisplay: {
+    collection: Collection
+    guestCollection: Collection
+    x: number
+    y: number
+  }
 
   constructor(gameClient: GameClient) {
     this.gc = gameClient
@@ -121,9 +123,46 @@ export default class Gameplay {
         [null, null, null, null],
         [null, null, null, null],
       ],
+      guestCollection: [
+        [null, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+        [null, null, null, null],
+      ],
       x: 0,
       y: 0,
     }
+  }
+
+  playCard(lc: LocalCard, [x, y]: [number, number]) {
+    const collection = this.localDisplay.collection
+    lc.placedPos = [x, y] // set to local card
+    // make change to collection
+    // shift cols
+    if (x === -1) {
+      for (let col = 0; col < 4; col++) {
+        for (let row = 3; row > 0; row--) {
+          collection[col][row] = collection[col][row - 1]
+          collection[col][row - 1] = null
+        }
+      }
+      this.localDisplay.x -= 105
+      x = 0
+    }
+    // shift rows
+    if (y === -1) {
+      for (let col = 3; col > 0; col--) {
+        for (let row = 0; row < 4; row++) {
+          collection[col][row] = collection[col - 1][row]
+          collection[col - 1][row] = null
+        }
+      }
+      this.localDisplay.y -= 140
+      y = 0
+    }
+    // add card to collection
+    collection[y][x] = lc.card.id
+    this.render.addFlasher(x, y)
   }
 
   inspectCard(card: Card, ox: number, oy: number, os: number) {

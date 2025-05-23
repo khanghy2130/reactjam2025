@@ -12,6 +12,8 @@ export type Translation = {
     changetypeques: string
     yes: string
     no: string
+    undo: string
+    ready: string
   }
   carddesc: string[]
 }
@@ -28,6 +30,8 @@ export const translations: Record<Language, Translation> = {
       changetypeques: "Keep element and\nchange type?",
       yes: "Yes",
       no: "No",
+      undo: "Undo",
+      ready: "Ready",
     },
     carddesc: [
       "0: dummy desc\ntext long text an text long\n line 3",

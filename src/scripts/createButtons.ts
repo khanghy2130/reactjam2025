@@ -211,6 +211,35 @@ const createButtons = (
         shop.holdersY.ap = 0
       }
     ),
+
+    undo: new Button(
+      [120, 805, 140, 60],
+      p5.color(240, 70, 50),
+      function () {
+        p5.fill(255, 255, 255)
+        p5.stroke(0)
+        p5.strokeWeight(6)
+        p5.textSize(24)
+        p5.text(gc.translatedTexts.short.undo, 0, -4)
+      },
+      function () {
+        gameplay.undo()
+      }
+    ),
+    ready: new Button(
+      [350, 805, 200, 60],
+      p5.color(65, 150, 60),
+      function () {
+        p5.fill(255, 255, 255)
+        p5.stroke(0)
+        p5.strokeWeight(6)
+        p5.textSize(32)
+        p5.text(gc.translatedTexts.short.ready, 0, -5)
+      },
+      function () {
+        console.log("ready")
+      }
+    ),
   }
 }
 

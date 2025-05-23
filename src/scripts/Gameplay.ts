@@ -134,6 +134,34 @@ export default class Gameplay {
     }
   }
 
+  undo() {
+    if (
+      !this.localCards ||
+      this.localCards[0].placedPos === null ||
+      this.localCards[1].placedPos === null
+    )
+      return
+    const stateCollection = this.gs.players.find(
+      (player) => player.id === this.myPlayerId!
+    )?.collection
+    if (stateCollection === undefined) return
+    const ld = this.localDisplay
+    // reset collection
+    ld.collection = stateCollection.map((row) => row.slice())
+
+    for (let i = 0; i < this.localCards.length; i++) {
+      const lc = this.localCards[i]
+      const [px, py] = lc.placedPos!
+      // was shifted by x?
+      if (px === -1) this.localDisplay.x += 105
+      // was shifted by y?
+      if (py === -1) this.localDisplay.y += 140
+      lc.x = 250
+      lc.y = 1000
+      lc.placedPos = null
+    }
+  }
+
   playCard(lc: LocalCard, [x, y]: [number, number]) {
     const collection = this.localDisplay.collection
     lc.placedPos = [x, y] // set to local card
@@ -160,9 +188,12 @@ export default class Gameplay {
       this.localDisplay.y -= 140
       y = 0
     }
+
     // add card to collection
     collection[y][x] = lc.card.id
     this.render.addFlasher(x, y)
+    this.render.buttons.undo.ap = 0
+    this.render.buttons.ready.ap = 0
   }
 
   inspectCard(card: Card, ox: number, oy: number, os: number) {

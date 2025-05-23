@@ -12,9 +12,11 @@ interface Buttons {
   closeShop: Button
   rerollEle: Button
   rerollType: Button
-
   rerollYes: Button
   rerollNo: Button
+
+  undo: Button
+  ready: Button
 }
 
 interface Flasher {
@@ -236,17 +238,16 @@ export default class Render {
         }
       }
 
+      // both cards are placed?
+      if (lc1.placedPos !== null && lc2.placedPos !== null) {
+        this.buttons.undo.render(p5)
+        this.buttons.ready.render(p5)
+      }
       // not dragging & is round 1?
-      if (
-        !lc1.isDragging &&
-        !lc2.isDragging &&
-        gp.gs.round === 1 &&
-        gp.localCards![0].placedPos === null &&
-        gp.localCards![1].placedPos === null
-      ) {
+      else if (gp.gs.round === 1 && !lc1.isDragging && !lc2.isDragging) {
         // render hint drag arrow
         p5.push()
-        const ap = p5.cos(p5.frameCount * 4)
+        const ap = p5.cos(p5.frameCount * 5)
         p5.translate(320 + 30 * ap, 660 + 80 * ap)
         p5.rotate(-22)
         p5.stroke(0)
@@ -515,7 +516,7 @@ export default class Render {
     const mx = this.gc.mx
     const my = this.gc.my
 
-    // get cards phase
+    // phases
     if (gp.phase === "GET") {
       const shop = gp.shop
       // shop is opened?
@@ -547,9 +548,8 @@ export default class Render {
 
         if (shop.menuType == "DEFAULT") {
           // default menu buttons
-          if (buttons.acceptCards.checkHover(mx, my)) {
+          if (buttons.acceptCards.checkHover(mx, my))
             return buttons.acceptCards.clicked()
-          }
 
           if (!shop.hasRerolled) {
             if (buttons.rerollEle.checkHover(mx, my)) {
@@ -564,12 +564,11 @@ export default class Render {
           }
         } else {
           // reroll menu buttons
-          if (buttons.rerollYes.checkHover(mx, my)) {
+          if (buttons.rerollYes.checkHover(mx, my))
             return buttons.rerollYes.clicked()
-          }
-          if (buttons.rerollNo.checkHover(mx, my)) {
+
+          if (buttons.rerollNo.checkHover(mx, my))
             return buttons.rerollNo.clicked()
-          }
 
           // check click to inspect reroll previews
           const holdersYAR = shop.holdersY.AFTER_REROLL
@@ -615,13 +614,17 @@ export default class Render {
       // release dragged card
       if (lc1.isDragging) {
         lc1.isDragging = false
-        if (this.dragHoveredPos) gp.playCard(lc1, this.dragHoveredPos)
-        return
+        if (this.dragHoveredPos) return gp.playCard(lc1, this.dragHoveredPos)
       }
       if (lc2.isDragging) {
         lc2.isDragging = false
-        if (this.dragHoveredPos) gp.playCard(lc2, this.dragHoveredPos)
-        return
+        if (this.dragHoveredPos) return gp.playCard(lc2, this.dragHoveredPos)
+      }
+
+      // both cards are placed?
+      if (lc1.placedPos !== null && lc2.placedPos !== null) {
+        if (buttons.undo.checkHover(mx, my)) return buttons.undo.clicked()
+        if (buttons.ready.checkHover(mx, my)) return buttons.ready.clicked()
       }
     }
 

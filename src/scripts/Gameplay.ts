@@ -231,6 +231,11 @@ export default class Gameplay {
     const thisPlayer = this.gs.players.find((p) => p.id === this.myPlayerId)
     if (!thisPlayer) throw "Can't find this player data"
 
+    // update self collection
+    this.localDisplay.collection = thisPlayer.collection.map((row) =>
+      row.slice()
+    )
+
     this.localCards = null
     const shop = this.shop
 

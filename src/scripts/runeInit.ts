@@ -28,6 +28,8 @@ export default function runeInit(gameplay: Gameplay) {
       if (prevGS === undefined || prevGS.round !== game.round) {
         gameplay.startScoringPhase()
       }
+
+      /// else: handle other onchange actions? update guestCollection if viewing it? update self collection if self got ready?
     },
   })
 }

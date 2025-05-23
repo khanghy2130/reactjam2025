@@ -57,7 +57,12 @@ Rune.initLogic({
         yangPts: 0,
         isReady: false,
         rng: generateRNG(),
-        collection: Array.from({ length: 4 }, () => Array(4).fill(null)),
+        collection: [
+          [null, null, null, null],
+          [null, null, null, null],
+          [null, null, null, null],
+          [null, null, null, null],
+        ],
         playedPositions: null,
       })
     ),

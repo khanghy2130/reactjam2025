@@ -50,7 +50,7 @@ export default class Render {
     for (let y = 3; y >= 0; y--) {
       for (let x = 3; x >= 0; x--) {
         // not empty?
-        if (collection[y][x]) {
+        if (collection[y][x] !== null) {
           cols = Math.max(cols, y)
           rows = Math.max(rows, x)
         }
@@ -86,7 +86,7 @@ export default class Render {
           if (
             (newX === -1 && rows < 3) ||
             (newY === -1 && cols < 3) ||
-            collection[newY][newX] === null
+            (newX > -1 && newY > -1 && collection[newY][newX] === null)
           ) {
             obj[`${newX},${newY}`] = true
           }
@@ -165,7 +165,7 @@ export default class Render {
         const pps = this.getPossiblePlacements(rows, cols)
         p5.noFill()
         p5.stroke(220, 220, 0)
-        p5.strokeWeight(3)
+        p5.strokeWeight(5)
         for (let i = 0; i < pps.length; i++) {
           const [x, y] = pps[i]
           const centerX = ldx + 105 * x
@@ -180,7 +180,7 @@ export default class Render {
           ) {
             p5.rect(centerX, centerY, 105, 140, 10)
             this.dragHoveredPos = [x, y]
-          } else p5.circle(centerX, centerY, 30)
+          } else p5.circle(centerX, centerY, 15)
         }
       }
 
@@ -243,8 +243,14 @@ export default class Render {
         this.buttons.undo.render(p5)
         this.buttons.ready.render(p5)
       }
-      // not dragging & is round 1?
-      else if (gp.gs.round === 1 && !lc1.isDragging && !lc2.isDragging) {
+      // not dragging & none placed yet & is round 1?
+      else if (
+        gp.gs.round === 1 &&
+        !lc1.isDragging &&
+        !lc2.isDragging &&
+        lc1.placedPos === null &&
+        lc2.placedPos === null
+      ) {
         // render hint drag arrow
         p5.push()
         const ap = p5.cos(p5.frameCount * 5)
@@ -270,7 +276,7 @@ export default class Render {
       const f = this.flashers[i]
       p5.fill(255, 255, 0, (1 - f.ap) * 220)
       p5.rect(ldx + 105 * f.x, ldy + 140 * f.y, 105, 140, 10)
-      f.ap += 0.15
+      f.ap += 0.1
       if (f.ap >= 1) this.flashers.splice(i, 1) // remove flasher
     }
 

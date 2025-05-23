@@ -220,7 +220,7 @@ const createButtons = (
         p5.stroke(0)
         p5.strokeWeight(6)
         p5.textSize(24)
-        p5.text(gc.translatedTexts.short.undo, 0, -4)
+        p5.text(gc.translatedTexts.short.undo, 0, -2)
       },
       function () {
         gameplay.undo()

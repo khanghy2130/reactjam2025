@@ -14,6 +14,7 @@ export type Translation = {
     no: string
     undo: string
     ready: string
+    goback: string
   }
   carddesc: string[]
 }
@@ -32,6 +33,7 @@ export const translations: Record<Language, Translation> = {
       no: "No",
       undo: "Undo",
       ready: "Ready",
+      goback: "Go back",
     },
     carddesc: [
       "0: dummy desc\ntext long text an text long\n line 3",

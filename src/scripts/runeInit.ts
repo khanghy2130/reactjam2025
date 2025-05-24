@@ -5,12 +5,17 @@ export default function runeInit(gameplay: Gameplay) {
   Rune.initClient({
     //// would restart work automatically at any round?
     onChange: ({ game, yourPlayerId, event }) => {
+      let prevGS: GameState | undefined = gameplay.gs
+      gameplay.gs = game // sync game state
+
       // new game? reset all
       if (event?.name === "stateSync" && event.isNewGame) {
+        prevGS = undefined // force reset
         gameplay.myPlayerId = yourPlayerId // sync playerId
         // inital viewingPlayer (self, or first player if is spectator)
-        if (yourPlayerId) gameplay.viewingPlayer = yourPlayerId
-        else gameplay.viewingPlayer = game.players[0].id
+        if (yourPlayerId) {
+          gameplay.setViewingPlayer(yourPlayerId)
+        } else gameplay.setViewingPlayer(game.players[0].id)
 
         // load player images
         const render = gameplay.render
@@ -24,12 +29,15 @@ export default function runeInit(gameplay: Gameplay) {
         })
       }
 
-      const prevGS: GameState | undefined = gameplay.gs
-      gameplay.gs = game // sync game state
-
-      // update viewingPlayer if out of players array (due to someone leaving)
-      // if doing the scoring process then skip to next if watching this leaving player
-      /// set to self if not spectator
+      // if viewingPlayer no longer exists
+      if (
+        game.players.find((p) => p.id === gameplay.viewingPlayer) === undefined
+      ) {
+        if (yourPlayerId) {
+          gameplay.setViewingPlayer(yourPlayerId)
+        } else gameplay.setViewingPlayer(game.players[0].id)
+        // if doing the scoring process then skip to next ///////
+      }
 
       // round changed? start scoring phase
       if (prevGS === undefined || prevGS.round !== game.round) {

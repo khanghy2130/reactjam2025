@@ -64,7 +64,7 @@ export default class Gameplay {
 
   myPlayerId?: PlayerId
   viewingPlayer!: PlayerId
-  phase: "SCORING" | "GET" | "PLAY" | "READY" | "SPECTATE"
+  phase: "SCORING" | "GET" | "PLAY" | "READY"
 
   shop: Shop
   inspect: Inspect
@@ -157,7 +157,7 @@ export default class Gameplay {
       // was shifted by y?
       if (py === -1) this.localDisplay.y += 140
       lc.x = 250
-      lc.y = 1000
+      lc.y = 1200
       lc.placedPos = null
     }
   }
@@ -196,6 +196,24 @@ export default class Gameplay {
     this.render.buttons.ready.ap = 0
   }
 
+  setViewingPlayer(playerId: PlayerId) {
+    // already viewing this player?
+    if (this.viewingPlayer === playerId) return
+
+    // clicked a guest?
+    if (this.myPlayerId !== playerId) {
+      // set guest collection
+      const thisPlayerState = this.gs!.players.find((p) => p.id === playerId)
+      if (thisPlayerState)
+        this.localDisplay.guestCollection = thisPlayerState.collection
+      else throw "This player state doesn't exist"
+    }
+    this.viewingPlayer = playerId
+    this.localDisplay.x = 1000
+    this.render.buttons.goBack.ap = 0
+    this.render.buttons.ready.ap = 0
+  }
+
   inspectCard(card: Card, ox: number, oy: number, os: number) {
     const ip = this.inspect
 
@@ -223,7 +241,7 @@ export default class Gameplay {
   startGetPhase() {
     // spectator skips this and PLAY phases
     if (this.myPlayerId === undefined) {
-      this.phase = "SPECTATE"
+      this.phase = "READY"
       if (this.gs!.round > 5) Rune.showGameOverPopUp()
       return
     }
@@ -232,6 +250,7 @@ export default class Gameplay {
     if (!thisPlayer) throw "Can't find this player data"
 
     // update self collection
+    console.log(thisPlayer.id)
     this.localDisplay.collection = thisPlayer.collection.map((row) =>
       row.slice()
     )

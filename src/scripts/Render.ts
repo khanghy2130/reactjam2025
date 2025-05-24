@@ -17,6 +17,7 @@ interface Buttons {
 
   undo: Button
   ready: Button
+  goBack: Button
 }
 
 interface Flasher {
@@ -113,17 +114,6 @@ export default class Render {
     const infos = statePlayers.map((p) => this.playersInfo[p.id])
     p5.textSize(32)
 
-    //// test player outlines
-    /*
-    p5.stroke(200)
-    p5.strokeWeight(4)
-    p5.noFill()
-    p5.rect(170, 50, 200, 60, 50)
-    p5.rect(380, 50, 200, 60, 50)
-    p5.rect(170, 120, 200, 60, 50)
-    p5.rect(380, 120, 200, 60, 50)
-    */
-
     // render viewing player outline
     const vp = this.gameplay.viewingPlayer
     p5.fill(240, 70, 60)
@@ -211,13 +201,13 @@ export default class Render {
     // p5.strokeWeight(3)
     // this.renderYin(300, 500, 20)
 
-    this.renderPlayers(p5)
-
     // render collection border
-    p5.strokeWeight(5)
-    p5.stroke(150)
-    p5.noFill()
-    p5.rect(250, 460, 440, 580, 15)
+    // p5.strokeWeight(5)
+    // p5.stroke(150)
+    // p5.noFill()
+    // p5.rect(250, 460, 440, 580, 15)
+
+    this.renderPlayers(p5)
 
     // render collection
     const ld = gp.localDisplay
@@ -228,8 +218,8 @@ export default class Render {
     const ldx = ld.x
     const ldy = ld.y
 
-    //// guest collection?
-    const renderingCollection = ld.collection
+    const renderingCollection =
+      gp.viewingPlayer === gp.myPlayerId ? ld.collection : ld.guestCollection
     for (let y = 0; y < 4; y++) {
       for (let x = 0; x < 4; x++) {
         const cardId = renderingCollection[y][x]
@@ -240,134 +230,146 @@ export default class Render {
       }
     }
 
-    // GET phase
-    if (gp.phase === "GET") {
-      const shop = gp.shop
+    // viewing a guest?
+    if (gp.viewingPlayer !== gp.myPlayerId) {
+      // not spectator?
+      if (gp.myPlayerId) buttons.goBack.render(p5)
+    } else {
+      // GET phase
+      if (gp.phase === "GET") {
+        const shop = gp.shop
 
-      if (shop.isOpened) this.renderShop(p5, gp, tt)
-      // shop closed? update hint countdown
-      else {
-        // render open shop button
-        buttons.openShop.render(p5)
-        if (shop.openBtnHintCountdown <= 0) {
-          buttons.openShop.ap = 0
-          shop.openBtnHintCountdown = 120
-        } else shop.openBtnHintCountdown--
-      }
-    } else if (gp.phase === "PLAY") {
-      this.dragHoveredPos = null
-      const { mx, my, isPressing } = this.gc
-      const lc1 = gp.localCards![0]
-      const lc2 = gp.localCards![1]
-
-      // is dragging? render pps
-      if (lc1.isDragging || lc2.isDragging) {
-        // make a list of possible placements
-        const pps = this.getPossiblePlacements(rows, cols)
-        p5.noFill()
-        p5.stroke(220, 220, 0)
-        p5.strokeWeight(5)
-        for (let i = 0; i < pps.length; i++) {
-          const [x, y] = pps[i]
-          const centerX = ldx + 105 * x
-          const centerY = ldy + 140 * y
-
-          // check hover
-          if (
-            mx > centerX - 52.5 &&
-            mx < centerX + 52.5 &&
-            my > centerY - 70 &&
-            my < centerY + 70
-          ) {
-            p5.rect(centerX, centerY, 105, 140, 10)
-            this.dragHoveredPos = [x, y]
-          } else p5.circle(centerX, centerY, 15)
+        if (shop.isOpened) this.renderShop(p5, gp, tt)
+        // shop closed?
+        else {
+          // render open shop button
+          buttons.openShop.render(p5)
+          if (shop.openBtnHintCountdown <= 0) {
+            buttons.openShop.ap = 0
+            shop.openBtnHintCountdown = 120
+          } else shop.openBtnHintCountdown--
+          p5.stroke(255)
+          p5.strokeWeight(10)
+          const arrowY = p5.cos(p5.frameCount * 8) * 20
+          p5.line(250, 600 + arrowY, 250, 700 + arrowY)
+          p5.line(270, 670 + arrowY, 250, 700 + arrowY)
+          p5.line(230, 670 + arrowY, 250, 700 + arrowY)
         }
-      }
+      } else if (gp.phase === "PLAY") {
+        this.dragHoveredPos = null
+        const { mx, my, isPressing } = this.gc
+        const lc1 = gp.localCards![0]
+        const lc2 = gp.localCards![1]
 
-      // not placed? render local card 1
-      if (lc1.placedPos === null) {
-        this.renderTransformCard(lc1.card, lc1.x, lc1.y, lc1.s, lc1.s)
-        // check drag
-        if (isPressing && !lc2.isDragging) {
-          if (
-            mx > lc1.x - 78 &&
-            mx < lc1.x + 78 &&
-            my > lc1.y - 105 &&
-            my < lc1.y + 105
-          ) {
-            lc1.isDragging = true
+        // is dragging? render pps
+        if (lc1.isDragging || lc2.isDragging) {
+          // make a list of possible placements
+          const pps = this.getPossiblePlacements(rows, cols)
+          p5.noFill()
+          p5.stroke(220, 220, 0)
+          p5.strokeWeight(5)
+          for (let i = 0; i < pps.length; i++) {
+            const [x, y] = pps[i]
+            const centerX = ldx + 105 * x
+            const centerY = ldy + 140 * y
+
+            // check hover
+            if (
+              mx > centerX - 52.5 &&
+              mx < centerX + 52.5 &&
+              my > centerY - 70 &&
+              my < centerY + 70
+            ) {
+              p5.rect(centerX, centerY, 105, 140, 10)
+              this.dragHoveredPos = [x, y]
+            } else p5.circle(centerX, centerY, 15)
           }
         }
-        if (lc1.isDragging) {
-          // follow cursor
-          lc1.s = Math.max(1, lc1.s - 0.1)
-          lc1.x += (mx - lc1.x) * 0.4
-          lc1.y += (my - lc1.y) * 0.4
-        } else {
-          // return to hand
-          lc1.s = Math.min(1.5, lc1.s + 0.1)
-          lc1.x += (140 - lc1.x) * 0.4
-          lc1.y += (800 - lc1.y) * 0.4
-        }
-      }
 
-      // not placed? render local card 2
-      if (lc2.placedPos === null) {
-        this.renderTransformCard(lc2.card, lc2.x, lc2.y, lc2.s, lc2.s)
-        // check drag
-        if (isPressing && !lc1.isDragging) {
-          if (
-            mx > lc2.x - 78 &&
-            mx < lc2.x + 78 &&
-            my > lc2.y - 105 &&
-            my < lc2.y + 105
-          ) {
-            lc2.isDragging = true
+        // not placed? render local card 1
+        if (lc1.placedPos === null) {
+          this.renderTransformCard(lc1.card, lc1.x, lc1.y, lc1.s, lc1.s)
+          // check drag
+          if (isPressing && !lc2.isDragging) {
+            if (
+              mx > lc1.x - 78 &&
+              mx < lc1.x + 78 &&
+              my > lc1.y - 105 &&
+              my < lc1.y + 105
+            ) {
+              lc1.isDragging = true
+            }
+          }
+          if (lc1.isDragging) {
+            // follow cursor
+            lc1.s = Math.max(1, lc1.s - 0.1)
+            lc1.x += (mx - lc1.x) * 0.4
+            lc1.y += (my - lc1.y) * 0.4
+          } else {
+            // return to hand
+            lc1.s = Math.min(1.5, lc1.s + 0.1)
+            lc1.x += (140 - lc1.x) * 0.4
+            lc1.y += (800 - lc1.y) * 0.4
           }
         }
-        if (lc2.isDragging) {
-          // follow cursor
-          lc2.s = Math.max(1, lc2.s - 0.1)
-          lc2.x += (mx - lc2.x) * 0.4
-          lc2.y += (my - lc2.y) * 0.4
-        } else {
-          // return to hand
-          lc2.s = Math.min(1.5, lc2.s + 0.1)
-          lc2.x += (360 - lc2.x) * 0.4
-          lc2.y += (800 - lc2.y) * 0.4
-        }
-      }
 
-      // both cards are placed?
-      if (lc1.placedPos !== null && lc2.placedPos !== null) {
-        this.buttons.undo.render(p5)
-        this.buttons.ready.render(p5)
-      }
-      // not dragging & none placed yet & is round 1?
-      else if (
-        gp.gs.round === 1 &&
-        !lc1.isDragging &&
-        !lc2.isDragging &&
-        lc1.placedPos === null &&
-        lc2.placedPos === null
-      ) {
-        // render hint drag arrow
-        p5.push()
-        const ap = p5.cos(p5.frameCount * 5)
-        p5.translate(320 + 30 * ap, 660 + 80 * ap)
-        p5.rotate(-22)
-        p5.stroke(0)
-        p5.strokeWeight(18)
-        p5.line(0, 0, 0, -80)
-        p5.line(15, -60, 0, -80)
-        p5.line(-15, -60, 0, -80)
-        p5.stroke(255)
-        p5.strokeWeight(8)
-        p5.line(0, 0, 0, -80)
-        p5.line(15, -60, 0, -80)
-        p5.line(-15, -60, 0, -80)
-        p5.pop()
+        // not placed? render local card 2
+        if (lc2.placedPos === null) {
+          this.renderTransformCard(lc2.card, lc2.x, lc2.y, lc2.s, lc2.s)
+          // check drag
+          if (isPressing && !lc1.isDragging) {
+            if (
+              mx > lc2.x - 78 &&
+              mx < lc2.x + 78 &&
+              my > lc2.y - 105 &&
+              my < lc2.y + 105
+            ) {
+              lc2.isDragging = true
+            }
+          }
+          if (lc2.isDragging) {
+            // follow cursor
+            lc2.s = Math.max(1, lc2.s - 0.1)
+            lc2.x += (mx - lc2.x) * 0.4
+            lc2.y += (my - lc2.y) * 0.4
+          } else {
+            // return to hand
+            lc2.s = Math.min(1.5, lc2.s + 0.1)
+            lc2.x += (360 - lc2.x) * 0.4
+            lc2.y += (800 - lc2.y) * 0.4
+          }
+        }
+
+        // both cards are placed?
+        if (lc1.placedPos !== null && lc2.placedPos !== null) {
+          this.buttons.undo.render(p5)
+          this.buttons.ready.render(p5)
+        }
+        // not dragging & none placed yet & is round 1?
+        else if (
+          gp.gs.round === 1 &&
+          !lc1.isDragging &&
+          !lc2.isDragging &&
+          lc1.placedPos === null &&
+          lc2.placedPos === null
+        ) {
+          // render hint drag arrow
+          p5.push()
+          const ap = p5.cos(p5.frameCount * 5)
+          p5.translate(320 + 30 * ap, 660 + 80 * ap)
+          p5.rotate(-22)
+          p5.stroke(0)
+          p5.strokeWeight(18)
+          p5.line(0, 0, 0, -80)
+          p5.line(15, -60, 0, -80)
+          p5.line(-15, -60, 0, -80)
+          p5.stroke(255)
+          p5.strokeWeight(8)
+          p5.line(0, 0, 0, -80)
+          p5.line(15, -60, 0, -80)
+          p5.line(-15, -60, 0, -80)
+          p5.pop()
+        }
       }
     }
 
@@ -647,128 +649,175 @@ export default class Render {
 
   click() {
     const gp = this.gameplay
-    const buttons = this.buttons
-
+    if (!gp.gs) return
     // if is inspecting card then exit
     if (gp.inspect.isOpening) return (gp.inspect.isOpening = false)
 
+    const buttons = this.buttons
     const mx = this.gc.mx
     const my = this.gc.my
 
-    // phases
-    if (gp.phase === "GET") {
-      const shop = gp.shop
-      // shop is opened?
-      if (gp.shop.isOpened) {
-        const holder1 = shop.cardHolders![0]
-        const holder2 = shop.cardHolders![1]
-        const isFlipping = holder2.flips > 0 || holder2.ap > 0.5
-        if (isFlipping) return
+    // viewing a guest?
+    if (gp.viewingPlayer !== gp.myPlayerId) {
+      if (gp.myPlayerId) {
+        if (buttons.goBack.checkHover(mx, my)) return buttons.goBack.clicked()
+      }
+    } else {
+      // phases
+      if (gp.phase === "GET") {
+        const shop = gp.shop
+        // shop is opened?
+        if (gp.shop.isOpened) {
+          const holder1 = shop.cardHolders![0]
+          const holder2 = shop.cardHolders![1]
+          const isFlipping = holder2.flips > 0 || holder2.ap > 0.5
+          if (isFlipping) return
 
-        // check click to inspect holders
-        const holdersYEnd = shop.holdersY.end
-        if (
-          mx > 140 - 75 &&
-          mx < 140 + 75 &&
-          my > holdersYEnd - 100 &&
-          my < holdersYEnd + 100
-        ) {
-          gp.inspectCard(holder1.card, 140, holdersYEnd, 1.5)
-          return
-        } else if (
-          mx > 360 - 75 &&
-          mx < 360 + 75 &&
-          my > holdersYEnd - 100 &&
-          my < holdersYEnd + 100
-        ) {
-          gp.inspectCard(holder2.card, 360, holdersYEnd, 1.5)
-          return
-        }
-
-        if (shop.menuType == "DEFAULT") {
-          // default menu buttons
-          if (buttons.acceptCards.checkHover(mx, my))
-            return buttons.acceptCards.clicked()
-
-          if (!shop.hasRerolled) {
-            if (buttons.rerollEle.checkHover(mx, my)) {
-              return buttons.rerollEle.clicked()
-            }
-            if (buttons.rerollType.checkHover(mx, my)) {
-              return buttons.rerollType.clicked()
-            }
-            if (buttons.closeShop.checkHover(mx, my)) {
-              return buttons.closeShop.clicked()
-            }
-          }
-        } else {
-          // reroll menu buttons
-          if (buttons.rerollYes.checkHover(mx, my))
-            return buttons.rerollYes.clicked()
-
-          if (buttons.rerollNo.checkHover(mx, my))
-            return buttons.rerollNo.clicked()
-
-          // check click to inspect reroll previews
-          const holdersYAR = shop.holdersY.AFTER_REROLL
+          // check click to inspect holders
+          const holdersYEnd = shop.holdersY.end
           if (
             mx > 140 - 75 &&
             mx < 140 + 75 &&
-            my > holdersYAR - 100 &&
-            my < holdersYAR + 100
+            my > holdersYEnd - 100 &&
+            my < holdersYEnd + 100
           ) {
-            gp.inspectCard(
-              shop.rerollPreviews.yangPool[shop.rerollPreviews.showingIndex],
-              140,
-              holdersYAR,
-              1.5
-            )
+            gp.inspectCard(holder1.card, 140, holdersYEnd, 1.5)
             return
           } else if (
             mx > 360 - 75 &&
             mx < 360 + 75 &&
-            my > holdersYAR - 100 &&
-            my < holdersYAR + 100
+            my > holdersYEnd - 100 &&
+            my < holdersYEnd + 100
           ) {
-            gp.inspectCard(
-              shop.rerollPreviews.yinPool[shop.rerollPreviews.showingIndex],
-              360,
-              holdersYAR,
-              1.5
-            )
+            gp.inspectCard(holder2.card, 360, holdersYEnd, 1.5)
             return
           }
-        }
-      }
-      // shop is closed?
-      else {
-        // check click open shop button
-        if (buttons.openShop.checkHover(mx, my)) {
-          return buttons.openShop.clicked()
-        }
-      }
-    } else if (gp.phase === "PLAY") {
-      const [lc1, lc2] = gp.localCards!
 
-      // release dragged card
-      if (lc1.isDragging) {
-        lc1.isDragging = false
-        if (this.dragHoveredPos) return gp.playCard(lc1, this.dragHoveredPos)
-      }
-      if (lc2.isDragging) {
-        lc2.isDragging = false
-        if (this.dragHoveredPos) return gp.playCard(lc2, this.dragHoveredPos)
-      }
+          if (shop.menuType == "DEFAULT") {
+            // default menu buttons
+            if (buttons.acceptCards.checkHover(mx, my))
+              return buttons.acceptCards.clicked()
 
-      // both cards are placed?
-      if (lc1.placedPos !== null && lc2.placedPos !== null) {
-        if (buttons.undo.checkHover(mx, my)) return buttons.undo.clicked()
-        if (buttons.ready.checkHover(mx, my)) return buttons.ready.clicked()
+            if (!shop.hasRerolled) {
+              if (buttons.rerollEle.checkHover(mx, my)) {
+                return buttons.rerollEle.clicked()
+              }
+              if (buttons.rerollType.checkHover(mx, my)) {
+                return buttons.rerollType.clicked()
+              }
+              if (buttons.closeShop.checkHover(mx, my)) {
+                return buttons.closeShop.clicked()
+              }
+            }
+          } else {
+            // reroll menu buttons
+            if (buttons.rerollYes.checkHover(mx, my))
+              return buttons.rerollYes.clicked()
+
+            if (buttons.rerollNo.checkHover(mx, my))
+              return buttons.rerollNo.clicked()
+
+            // check click to inspect reroll previews
+            const holdersYAR = shop.holdersY.AFTER_REROLL
+            if (
+              mx > 140 - 75 &&
+              mx < 140 + 75 &&
+              my > holdersYAR - 100 &&
+              my < holdersYAR + 100
+            ) {
+              gp.inspectCard(
+                shop.rerollPreviews.yangPool[shop.rerollPreviews.showingIndex],
+                140,
+                holdersYAR,
+                1.5
+              )
+              return
+            } else if (
+              mx > 360 - 75 &&
+              mx < 360 + 75 &&
+              my > holdersYAR - 100 &&
+              my < holdersYAR + 100
+            ) {
+              gp.inspectCard(
+                shop.rerollPreviews.yinPool[shop.rerollPreviews.showingIndex],
+                360,
+                holdersYAR,
+                1.5
+              )
+              return
+            }
+          }
+          return
+        }
+        // shop is closed?
+        else {
+          // check click open shop button
+          if (buttons.openShop.checkHover(mx, my)) {
+            return buttons.openShop.clicked()
+          }
+        }
+      } else if (gp.phase === "PLAY") {
+        const [lc1, lc2] = gp.localCards!
+
+        // release dragged card
+        if (lc1.isDragging) {
+          lc1.isDragging = false
+          if (this.dragHoveredPos) return gp.playCard(lc1, this.dragHoveredPos)
+        }
+        if (lc2.isDragging) {
+          lc2.isDragging = false
+          if (this.dragHoveredPos) return gp.playCard(lc2, this.dragHoveredPos)
+        }
+
+        // both cards are placed?
+        if (lc1.placedPos !== null && lc2.placedPos !== null) {
+          if (buttons.undo.checkHover(mx, my)) return buttons.undo.clicked()
+          if (buttons.ready.checkHover(mx, my)) return buttons.ready.clicked()
+        }
       }
     }
 
-    ///// any phase: inspect collection
+    // inspect card in collection
+    const clickedCardX = Math.floor((mx - (gp.localDisplay.x - 52.5)) / 105)
+    const clickedCardY = Math.floor((my - (gp.localDisplay.y - 70)) / 140)
+    if (
+      clickedCardX > -1 &&
+      clickedCardX < 4 &&
+      clickedCardY > -1 &&
+      clickedCardY < 4
+    ) {
+      const collection =
+        gp.viewingPlayer === gp.myPlayerId
+          ? gp.localDisplay.collection
+          : gp.localDisplay.guestCollection
+      const cardId = collection[clickedCardY][clickedCardX]
+      if (cardId !== null) {
+        return gp.inspectCard(
+          CARDS_TABLE[cardId],
+          gp.localDisplay.x + 105 * clickedCardX,
+          gp.localDisplay.y + 140 * clickedCardY,
+          1
+        )
+      }
+    }
 
-    //// SPECTATE phase can switch between views, similar to READY (use READY instead?)
+    // clicked a player?
+    const statePlayers = gp.gs.players
+    if (mx > 70 && mx < 270) {
+      if (my > 20 && my < 80) {
+        return gp.setViewingPlayer(statePlayers[0].id)
+      }
+      if (statePlayers.length > 2 && my > 90 && my < 150) {
+        return gp.setViewingPlayer(statePlayers[2].id)
+      }
+    }
+    if (statePlayers.length > 1 && mx > 280 && mx < 480) {
+      if (my > 20 && my < 80) {
+        return gp.setViewingPlayer(statePlayers[1].id)
+      }
+      if (statePlayers.length > 3 && my > 90 && my < 150) {
+        return gp.setViewingPlayer(statePlayers[3].id)
+      }
+    }
   }
 }

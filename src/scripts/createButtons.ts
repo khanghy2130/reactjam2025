@@ -36,7 +36,6 @@ const createButtons = (
     acceptCards: new Button(
       [250, 760, 400, 70],
       p5.color(65, 150, 60),
-
       p5,
       function () {
         p5.fill(255, 255, 255)
@@ -71,7 +70,6 @@ const createButtons = (
     closeShop: new Button(
       [430, 70, 70, 50],
       p5.color(240, 70, 60),
-
       p5,
       function () {
         p5.fill(255)
@@ -87,7 +85,6 @@ const createButtons = (
     rerollEle: new Button(
       [250, 500, 300, 50],
       p5.color(65, 150, 60),
-
       p5,
       function () {
         p5.fill(255)
@@ -122,7 +119,6 @@ const createButtons = (
     rerollType: new Button(
       [250, 580, 300, 50],
       p5.color(65, 150, 60),
-
       p5,
       function () {
         p5.fill(255)
@@ -158,7 +154,6 @@ const createButtons = (
     rerollYes: new Button(
       [140, 760, 140, 60],
       p5.color(65, 150, 60),
-
       p5,
       function () {
         p5.fill(255, 255, 255)
@@ -204,7 +199,6 @@ const createButtons = (
     rerollNo: new Button(
       [360, 760, 140, 60],
       p5.color(240, 70, 60),
-
       p5,
       function () {
         p5.fill(255, 255, 255)
@@ -228,7 +222,6 @@ const createButtons = (
     undo: new Button(
       [120, 805, 140, 60],
       p5.color(240, 70, 50),
-
       p5,
       function () {
         p5.fill(255, 255, 255)
@@ -244,7 +237,6 @@ const createButtons = (
     ready: new Button(
       [350, 805, 200, 60],
       p5.color(65, 150, 60),
-
       p5,
       function () {
         p5.fill(255, 255, 255)
@@ -255,6 +247,22 @@ const createButtons = (
       },
       function () {
         console.log("ready")
+      }
+    ),
+
+    goBack: new Button(
+      [150, 805, 180, 60],
+      p5.color(65, 150, 60),
+      p5,
+      function () {
+        p5.fill(255, 255, 255)
+        p5.stroke(0)
+        p5.strokeWeight(6)
+        p5.textSize(26)
+        p5.text(gc.translatedTexts.short.goback, 0, -5)
+      },
+      function () {
+        if (gameplay.myPlayerId) gameplay.setViewingPlayer(gameplay.myPlayerId)
       }
     ),
   }

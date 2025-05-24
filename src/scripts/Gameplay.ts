@@ -59,7 +59,7 @@ interface LocalCard {
 
 export default class Gameplay {
   gc: GameClient
-  gs!: GameState // synchronized game state across server and all players
+  gs?: GameState // synchronized game state across server and all players
   render!: Render
 
   myPlayerId?: PlayerId
@@ -141,7 +141,7 @@ export default class Gameplay {
       this.localCards[1].placedPos === null
     )
       return
-    const stateCollection = this.gs.players.find(
+    const stateCollection = this.gs!.players.find(
       (player) => player.id === this.myPlayerId!
     )?.collection
     if (stateCollection === undefined) return
@@ -213,7 +213,7 @@ export default class Gameplay {
 
   startScoringPhase() {
     // skip scoring phase on 1st round
-    if (this.gs.round === 1) {
+    if (this.gs!.round === 1) {
       this.startGetPhase()
       return
     }
@@ -224,11 +224,11 @@ export default class Gameplay {
     // spectator skips this and PLAY phases
     if (this.myPlayerId === undefined) {
       this.phase = "SPECTATE"
-      if (this.gs.round > 5) Rune.showGameOverPopUp()
+      if (this.gs!.round > 5) Rune.showGameOverPopUp()
       return
     }
 
-    const thisPlayer = this.gs.players.find((p) => p.id === this.myPlayerId)
+    const thisPlayer = this.gs!.players.find((p) => p.id === this.myPlayerId)
     if (!thisPlayer) throw "Can't find this player data"
 
     // update self collection
@@ -260,7 +260,7 @@ export default class Gameplay {
     shop.flipYangPool = shop.yangPool
 
     // last round? show result popup
-    if (this.gs.round > 5) {
+    if (this.gs!.round > 5) {
       this.phase = "READY"
       Rune.showGameOverPopUp()
     } else this.phase = "GET"

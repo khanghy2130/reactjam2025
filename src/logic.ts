@@ -3,7 +3,7 @@ import type { PlayerId, RuneClient } from "rune-sdk"
 type CardItem = number | null
 export type Collection = CardItem[][]
 
-interface Player {
+export interface LogicPlayer {
   id: PlayerId
   prevYinPts: number
   prevYangPts: number
@@ -17,7 +17,7 @@ interface Player {
 
 export interface GameState {
   round: number
-  players: Player[]
+  players: LogicPlayer[]
 }
 
 type GameActions = {
@@ -49,7 +49,7 @@ Rune.initLogic({
   setup: (allPlayerIds) => ({
     round: 1,
     players: allPlayerIds.map(
-      (playerId): Player => ({
+      (playerId): LogicPlayer => ({
         id: playerId,
         prevYinPts: 0,
         prevYangPts: 0,
@@ -76,6 +76,7 @@ Rune.initLogic({
   events: {
     playerLeft: (playerId, { game }) => {
       // clean up this player data in game state
+      game.players = game.players.filter((p) => p.id !== playerId)
       //// checkToEndRound() again
     },
   },

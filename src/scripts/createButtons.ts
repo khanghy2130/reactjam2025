@@ -168,7 +168,7 @@ const createButtons = (
         p5.text(gc.translatedTexts.short.yes, 0, -8)
       },
       function () {
-        const thisPlayer = gameplay.gs.players.find(
+        const thisPlayer = gameplay.gs!.players.find(
           (p) => p.id === gameplay.myPlayerId
         )
         if (!thisPlayer) throw "Can't find this player data"

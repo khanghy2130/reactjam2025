@@ -4,7 +4,7 @@ import Gameplay from "./Gameplay"
 import Button from "./Button"
 import { Card, CARDS_TABLE } from "./cards"
 import { Translation } from "./locales"
-import { Collection } from "../logic"
+import { Collection, LogicPlayer } from "../logic"
 
 interface Buttons {
   openShop: Button
@@ -31,6 +31,8 @@ export default class Render {
   p5!: P5
   gameplay!: Gameplay
 
+  playersInfo: { [key: string]: { name: string; avatar: P5.Image } }
+
   buttons!: Buttons
 
   flashers: Flasher[]
@@ -41,6 +43,7 @@ export default class Render {
     this.gc = gameClient
     this.flashers = []
     this.dragHoveredPos = null
+    this.playersInfo = {}
   }
 
   getGridCenter(collection: Collection): [number, number] {
@@ -104,13 +107,111 @@ export default class Render {
     this.flashers.push({ x, y, ap: 0 })
   }
 
+  renderPlayers(p5: P5) {
+    // render players
+    const statePlayers = this.gameplay.gs!.players
+    const infos = statePlayers.map((p) => this.playersInfo[p.id])
+    p5.textSize(32)
+
+    //// test player outlines
+    /*
+    p5.stroke(200)
+    p5.strokeWeight(4)
+    p5.noFill()
+    p5.rect(170, 50, 200, 60, 50)
+    p5.rect(380, 50, 200, 60, 50)
+    p5.rect(170, 120, 200, 60, 50)
+    p5.rect(380, 120, 200, 60, 50)
+    */
+
+    // render viewing player outline
+    const vp = this.gameplay.viewingPlayer
+    p5.fill(240, 70, 60)
+    p5.noStroke()
+    if (vp === statePlayers[0]?.id) {
+      p5.rect(185, 50, 180, 60, 20)
+    } else if (vp === statePlayers[1]?.id) {
+      p5.rect(395, 50, 180, 60, 20)
+    } else if (vp === statePlayers[2]?.id) {
+      p5.rect(185, 120, 180, 60, 20)
+    } else if (vp === statePlayers[3]?.id) {
+      p5.rect(395, 120, 180, 60, 20)
+    }
+
+    // player 1
+    p5.noStroke()
+    p5.fill(255)
+    p5.rect(150, 50, 100, 40)
+    p5.fill(0)
+    p5.rect(230, 50, 70, 40, 0, 10, 10, 0)
+    p5.text(888, 160, 46)
+    p5.fill(255)
+    p5.text(888, 230, 46)
+    if (infos[0].avatar) {
+      p5.image(infos[0].avatar, 100, 50, 60, 60)
+    }
+    if (statePlayers.length === 1) return
+
+    // player 2
+    p5.noStroke()
+    p5.fill(255)
+    p5.rect(360, 50, 100, 40)
+    p5.fill(0)
+    p5.rect(440, 50, 70, 40, 0, 10, 10, 0)
+    p5.text(888, 370, 46)
+    p5.fill(255)
+    p5.text(888, 440, 46)
+    if (infos[1].avatar) {
+      p5.image(infos[1].avatar, 310, 50, 60, 60)
+    }
+    if (statePlayers.length === 2) return
+
+    // player 3
+    p5.noStroke()
+    p5.fill(255)
+    p5.rect(150, 120, 100, 40)
+    p5.fill(0)
+    p5.rect(230, 120, 70, 40, 0, 10, 10, 0)
+    p5.text(888, 160, 116)
+    p5.fill(255)
+    p5.text(888, 230, 116)
+    if (infos[2].avatar) {
+      p5.image(infos[2].avatar, 100, 120, 60, 60)
+    }
+    if (statePlayers.length === 3) return
+
+    // player 4
+    p5.noStroke()
+    p5.fill(255)
+    p5.rect(360, 120, 100, 40)
+    p5.fill(0)
+    p5.rect(440, 120, 70, 40, 0, 10, 10, 0)
+    p5.text(888, 370, 116)
+    p5.fill(255)
+    p5.text(888, 440, 116)
+    if (infos[3].avatar) {
+      p5.image(infos[3].avatar, 310, 120, 60, 60)
+    }
+  }
+
   draw() {
-    const p5 = this.p5
     const gp = this.gameplay
+    if (!gp.gs) return
+    const p5 = this.p5
     const buttons = this.buttons
     const tt = this.gc.translatedTexts
 
     //// any phase rendering: collection, players, lang menu
+
+    // p5.stroke(0)
+    // p5.strokeWeight(3)
+    // this.renderYang(250, 500, 20)
+
+    // p5.stroke(255)
+    // p5.strokeWeight(3)
+    // this.renderYin(300, 500, 20)
+
+    this.renderPlayers(p5)
 
     // render collection border
     p5.strokeWeight(5)
@@ -510,6 +611,38 @@ export default class Render {
     p5.textSize(16)
     p5.text("ability\nhere", 0, 40)
     p5.pop()
+  }
+
+  renderYang(x: number, y: number, r: number) {
+    const p5 = this.p5
+    const rg = r * 1.33
+    const hrg = (r / 2) * 1.33
+    p5.fill(255)
+    p5.beginShape()
+    p5.vertex(x, y - r)
+    p5.bezierVertex(x - rg, y - r, x - rg, y + r, x, y + r)
+    p5.bezierVertex(x - hrg, y + r, x - hrg, y, x, y)
+    p5.bezierVertex(x + hrg, y, x + hrg, y - r, x, y - r)
+    p5.endShape()
+    p5.noStroke()
+    p5.fill(0)
+    p5.circle(x, y - r / 2, r * 0.4)
+  }
+
+  renderYin(x: number, y: number, r: number) {
+    const p5 = this.p5
+    const rg = r * 1.33
+    const hrg = (r / 2) * 1.33
+    p5.fill(0)
+    p5.beginShape()
+    p5.vertex(x + 0, y + r)
+    p5.bezierVertex(x + rg, y + r, x + rg, y - r, x, y - r)
+    p5.bezierVertex(x + hrg, y - r, x + hrg, y, x, y)
+    p5.bezierVertex(x - hrg, y, x - hrg, y + r, x, y + r)
+    p5.endShape()
+    p5.noStroke()
+    p5.fill(255)
+    p5.circle(x, y + r / 2, r * 0.4)
   }
 
   click() {

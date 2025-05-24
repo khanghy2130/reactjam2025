@@ -7,14 +7,21 @@ export default function runeInit(gameplay: Gameplay) {
     onChange: ({ game, yourPlayerId, event }) => {
       // new game? reset all
       if (event?.name === "stateSync" && event.isNewGame) {
-        ///// reset for a new game here if needed
-      }
-
-      gameplay.myPlayerId = yourPlayerId // sync playerId
-      // inital viewingPlayer (self, or first player if is spectator)
-      if (gameplay.viewingPlayer === undefined) {
+        gameplay.myPlayerId = yourPlayerId // sync playerId
+        // inital viewingPlayer (self, or first player if is spectator)
         if (yourPlayerId) gameplay.viewingPlayer = yourPlayerId
         else gameplay.viewingPlayer = game.players[0].id
+
+        // load player images
+        const render = gameplay.render
+        render.playersInfo = {}
+        game.players.forEach((p) => {
+          const info = Rune.getPlayerInfo(p.id)
+          render.playersInfo[p.id] = {
+            name: info.displayName,
+            avatar: render.p5.loadImage(info.avatarUrl),
+          }
+        })
       }
 
       const prevGS: GameState | undefined = gameplay.gs

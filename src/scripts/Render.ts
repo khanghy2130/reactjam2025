@@ -108,7 +108,7 @@ export default class Render {
     this.flashers.push({ x, y, ap: 0 })
   }
 
-  renderPlayers(p5: P5) {
+  renderPlayers(p5: P5, playersState: LogicPlayer[]) {
     // render players
     const statePlayers = this.gameplay.gs!.players
     const infos = statePlayers.map((p) => this.playersInfo[p.id])
@@ -190,6 +190,7 @@ export default class Render {
     const p5 = this.p5
     const buttons = this.buttons
     const tt = this.gc.translatedTexts
+    const playersState = gp.gs.players
 
     //// any phase rendering: collection, players, lang menu
 
@@ -207,25 +208,72 @@ export default class Render {
     // p5.noFill()
     // p5.rect(250, 460, 440, 580, 15)
 
-    this.renderPlayers(p5)
+    const viewingPlayerState = playersState.find(
+      (p) => p.id === gp.viewingPlayer
+    )!
+
+    this.renderPlayers(p5, playersState)
 
     // render collection
     const ld = gp.localDisplay
-    const [rows, cols] = this.getGridCenter(ld.collection)
+    const [rows, cols] = this.getGridCenter(
+      gp.viewingPlayer === gp.myPlayerId
+        ? ld.collection
+        : viewingPlayerState.collection
+    )
     // update grid position
     ld.x += (92.5 + (3 - rows) * 52.5 - ld.x) * 0.2
     ld.y += (250 + (3 - cols) * 75 - ld.y) * 0.2
     const ldx = ld.x
     const ldy = ld.y
 
-    const renderingCollection =
-      gp.viewingPlayer === gp.myPlayerId ? ld.collection : ld.guestCollection
-    for (let y = 0; y < 4; y++) {
-      for (let x = 0; x < 4; x++) {
-        const cardId = renderingCollection[y][x]
-        if (cardId !== null) {
-          const card = CARDS_TABLE[cardId]
-          this.renderTransformCard(card, ldx + 105 * x, ldy + 140 * y, 1, 1)
+    if (gp.viewingPlayer === gp.myPlayerId) {
+      // render self collection
+      for (let y = 0; y < 4; y++) {
+        for (let x = 0; x < 4; x++) {
+          const cardId = ld.collection[y][x]
+          if (cardId !== null) {
+            const card = CARDS_TABLE[cardId]
+            this.renderTransformCard(card, ldx + 105 * x, ldy + 140 * y, 1, 1)
+          }
+        }
+      }
+    } else {
+      // guest collection
+      for (let y = 0; y < 4; y++) {
+        for (let x = 0; x < 4; x++) {
+          const cardId = viewingPlayerState.collection[y][x]
+          if (cardId !== null) {
+            // render question mark if this player is ready and this is the newly played card
+            if (
+              viewingPlayerState.playedPositions &&
+              viewingPlayerState.isReady
+            ) {
+              const [pos1, pos2] = viewingPlayerState.playedPositions
+              if (
+                (pos1[0] === x && pos1[1] === y) ||
+                (pos2[0] === x && pos2[1] === y)
+              ) {
+                p5.strokeWeight(4)
+                p5.stroke(255)
+                p5.noFill()
+                p5.rect(ldx + 105 * x, ldy + 140 * y, 90, 125, 10)
+                p5.fill(255)
+                p5.noStroke()
+                p5.textSize(50)
+                p5.text("?", ldx + 105 * x, ldy + 140 * y)
+
+                continue
+              }
+            }
+            this.renderTransformCard(
+              CARDS_TABLE[cardId],
+              ldx + 105 * x,
+              ldy + 140 * y,
+              1,
+              1
+            )
+          }
         }
       }
     }
@@ -234,6 +282,17 @@ export default class Render {
     if (gp.viewingPlayer !== gp.myPlayerId) {
       // not spectator?
       if (gp.myPlayerId) buttons.goBack.render(p5)
+      // watching guest-name text
+      if (p5.frameCount % 60 > 10) {
+        p5.textSize(24)
+        p5.noStroke()
+        p5.fill(255)
+        p5.text(
+          tt.short.watching + "\n" + this.playersInfo[gp.viewingPlayer].name,
+          360,
+          805
+        )
+      }
     } else {
       // GET phase
       if (gp.phase === "GET") {
@@ -762,11 +821,13 @@ export default class Render {
         // release dragged card
         if (lc1.isDragging) {
           lc1.isDragging = false
-          if (this.dragHoveredPos) return gp.playCard(lc1, this.dragHoveredPos)
+          if (this.dragHoveredPos) gp.playCard(0, this.dragHoveredPos)
+          return
         }
         if (lc2.isDragging) {
           lc2.isDragging = false
-          if (this.dragHoveredPos) return gp.playCard(lc2, this.dragHoveredPos)
+          if (this.dragHoveredPos) gp.playCard(1, this.dragHoveredPos)
+          return
         }
 
         // both cards are placed?
@@ -786,12 +847,27 @@ export default class Render {
       clickedCardY > -1 &&
       clickedCardY < 4
     ) {
+      const viewingPlayerState = gp.gs.players.find(
+        (p) => p.id === gp.viewingPlayer
+      )!
       const collection =
         gp.viewingPlayer === gp.myPlayerId
           ? gp.localDisplay.collection
-          : gp.localDisplay.guestCollection
+          : viewingPlayerState.collection
       const cardId = collection[clickedCardY][clickedCardX]
       if (cardId !== null) {
+        if (
+          gp.viewingPlayer !== gp.myPlayerId &&
+          viewingPlayerState.isReady &&
+          viewingPlayerState.playedPositions
+        ) {
+          const [pos1, pos2] = viewingPlayerState.playedPositions
+          if (
+            (pos1[0] === clickedCardX && pos1[1] === clickedCardY) ||
+            (pos2[0] === clickedCardX && pos2[1] === clickedCardY)
+          )
+            return // cancel if this card is hidden for this guest
+        }
         return gp.inspectCard(
           CARDS_TABLE[cardId],
           gp.localDisplay.x + 105 * clickedCardX,

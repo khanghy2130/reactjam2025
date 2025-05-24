@@ -72,15 +72,19 @@ export default class Gameplay {
   // update directly collection, x & y
   localDisplay: {
     collection: Collection
-    guestCollection: Collection
     x: number
     y: number
   }
+  playedPositions: [number[], number[]]
 
   constructor(gameClient: GameClient) {
     this.gc = gameClient
     this.phase = "READY"
     this.localCards = null
+    this.playedPositions = [
+      [0, 0],
+      [0, 0],
+    ]
     this.shop = {
       yinPool: CARDS_TABLE.filter((c) => c.isYin),
       yangPool: CARDS_TABLE.filter((c) => !c.isYin),
@@ -123,12 +127,6 @@ export default class Gameplay {
         [null, null, null, null],
         [null, null, null, null],
       ],
-      guestCollection: [
-        [null, null, null, null],
-        [null, null, null, null],
-        [null, null, null, null],
-        [null, null, null, null],
-      ],
       x: 0,
       y: 0,
     }
@@ -162,9 +160,11 @@ export default class Gameplay {
     }
   }
 
-  playCard(lc: LocalCard, [x, y]: [number, number]) {
+  playCard(lcIndex: number, [x, y]: [number, number]) {
+    const lc = this.localCards![lcIndex]
     const collection = this.localDisplay.collection
     lc.placedPos = [x, y] // set to local card
+
     // make change to collection
     // shift cols
     if (x === -1) {
@@ -189,6 +189,23 @@ export default class Gameplay {
       y = 0
     }
 
+    const otherLc = this.localCards![lcIndex === 0 ? 1 : 0]
+    // set playedPositions if this is the 2nd card played
+    if (otherLc.placedPos !== null) {
+      const firstPos = otherLc.placedPos.slice()
+      firstPos[0] = Math.max(firstPos[0], 0)
+      firstPos[1] = Math.max(firstPos[1], 0)
+
+      const secondPos = lc.placedPos.slice()
+      // apply shifting to firstPos
+      if (secondPos[0] === -1) firstPos[0]++
+      if (secondPos[1] === -1) firstPos[1]++
+      secondPos[0] = Math.max(secondPos[0], 0)
+      secondPos[1] = Math.max(secondPos[1], 0)
+
+      this.playedPositions = [firstPos, secondPos]
+    }
+
     // add card to collection
     collection[y][x] = lc.card.id
     this.render.addFlasher(x, y)
@@ -200,14 +217,6 @@ export default class Gameplay {
     // already viewing this player?
     if (this.viewingPlayer === playerId) return
 
-    // clicked a guest?
-    if (this.myPlayerId !== playerId) {
-      // set guest collection
-      const thisPlayerState = this.gs!.players.find((p) => p.id === playerId)
-      if (thisPlayerState)
-        this.localDisplay.guestCollection = thisPlayerState.collection
-      else throw "This player state doesn't exist"
-    }
     this.viewingPlayer = playerId
     this.localDisplay.x = 1000
     this.render.buttons.goBack.ap = 0
@@ -230,6 +239,8 @@ export default class Gameplay {
   }
 
   startScoringPhase() {
+    //// sync self collection
+
     // skip scoring phase on 1st round
     if (this.gs!.round === 1) {
       this.startGetPhase()
@@ -250,7 +261,6 @@ export default class Gameplay {
     if (!thisPlayer) throw "Can't find this player data"
 
     // update self collection
-    console.log(thisPlayer.id)
     this.localDisplay.collection = thisPlayer.collection.map((row) =>
       row.slice()
     )

@@ -3,7 +3,6 @@ import Gameplay from "./Gameplay"
 
 export default function runeInit(gameplay: Gameplay) {
   Rune.initClient({
-    //// would restart work automatically at any round?
     onChange: ({ game, yourPlayerId, event }) => {
       let prevGS: GameState | undefined = gameplay.gs
       gameplay.gs = game // sync game state
@@ -29,10 +28,11 @@ export default function runeInit(gameplay: Gameplay) {
         })
       }
 
-      // if viewingPlayer no longer exists
-      if (
-        game.players.find((p) => p.id === gameplay.viewingPlayer) === undefined
-      ) {
+      const viewingPlayerState = game.players.find(
+        (p) => p.id === gameplay.viewingPlayer
+      )
+      // if viewingPlayer no longer exists (left)
+      if (viewingPlayerState === undefined) {
         if (yourPlayerId) {
           gameplay.setViewingPlayer(yourPlayerId)
         } else gameplay.setViewingPlayer(game.players[0].id)
@@ -43,8 +43,6 @@ export default function runeInit(gameplay: Gameplay) {
       if (prevGS === undefined || prevGS.round !== game.round) {
         gameplay.startScoringPhase()
       }
-
-      /// else: handle other onchange actions? update guestCollection if viewing it? update self collection if self got ready?
     },
   })
 }

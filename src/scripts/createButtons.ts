@@ -18,7 +18,7 @@ const createButtons = (
       p5.color(65, 150, 60),
       p5,
       function () {
-        p5.fill(255, 255, 255)
+        p5.fill(255)
         p5.stroke(0)
         p5.strokeWeight(8)
         p5.textSize(36)
@@ -38,7 +38,7 @@ const createButtons = (
       p5.color(65, 150, 60),
       p5,
       function () {
-        p5.fill(255, 255, 255)
+        p5.fill(255)
         p5.stroke(0)
         p5.strokeWeight(8)
         p5.textSize(36)
@@ -156,7 +156,7 @@ const createButtons = (
       p5.color(65, 150, 60),
       p5,
       function () {
-        p5.fill(255, 255, 255)
+        p5.fill(255)
         p5.stroke(0)
         p5.strokeWeight(8)
         p5.textSize(28)
@@ -201,7 +201,7 @@ const createButtons = (
       p5.color(240, 70, 60),
       p5,
       function () {
-        p5.fill(255, 255, 255)
+        p5.fill(255)
         p5.stroke(0)
         p5.strokeWeight(8)
         p5.textSize(28)
@@ -224,7 +224,7 @@ const createButtons = (
       p5.color(240, 70, 50),
       p5,
       function () {
-        p5.fill(255, 255, 255)
+        p5.fill(255)
         p5.stroke(0)
         p5.strokeWeight(6)
         p5.textSize(24)
@@ -239,23 +239,27 @@ const createButtons = (
       p5.color(65, 150, 60),
       p5,
       function () {
-        p5.fill(255, 255, 255)
+        p5.fill(255)
         p5.stroke(0)
         p5.strokeWeight(6)
         p5.textSize(32)
         p5.text(gc.translatedTexts.short.ready, 0, -8)
       },
       function () {
-        console.log("ready")
+        gameplay.phase = "READY"
+        Rune.actions.becomeReady({
+          collection: gameplay.localDisplay.collection,
+          playedPositions: gameplay.playedPositions,
+        })
       }
     ),
 
     goBack: new Button(
-      [150, 805, 180, 60],
+      [130, 805, 170, 60],
       p5.color(65, 150, 60),
       p5,
       function () {
-        p5.fill(255, 255, 255)
+        p5.fill(255)
         p5.stroke(0)
         p5.strokeWeight(6)
         p5.textSize(26)

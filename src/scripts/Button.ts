@@ -16,12 +16,14 @@ export default class Button {
   w: number
   h: number
   bc: P5.Color
+  bc2: P5.Color
   renderContent: () => void
   clicked: () => void
 
   constructor(
     [x, y, w, h]: [number, number, number, number],
     bc: P5.Color,
+    p5: P5,
     renderContent: () => void,
     clicked: () => void
   ) {
@@ -31,6 +33,7 @@ export default class Button {
     this.w = w
     this.h = h
     this.bc = bc
+    this.bc2 = p5.lerpColor(bc, p5.color(0), 0.25)
     this.renderContent = renderContent
     this.clicked = () => {
       this.ap = 0 // start animation
@@ -65,7 +68,9 @@ export default class Button {
 
     p5.noStroke()
     p5.fill(p5.lerpColor(p5.color(200), this.bc, this.ap * 2))
-    p5.rect(0, 0, this.w, this.h, 8)
+    p5.rect(0, 0, this.w, this.h, 10)
+    p5.fill(p5.lerpColor(p5.color(200), this.bc2, this.ap * 2))
+    p5.rect(0, this.h * 0.5, this.w, this.h / 4, 0, 0, 10, 10)
     this.renderContent()
     p5.pop()
   }

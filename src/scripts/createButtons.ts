@@ -16,12 +16,13 @@ const createButtons = (
     openShop: new Button(
       [250, 805, 400, 70],
       p5.color(65, 150, 60),
+      p5,
       function () {
         p5.fill(255, 255, 255)
         p5.stroke(0)
         p5.strokeWeight(8)
         p5.textSize(36)
-        p5.text(gc.translatedTexts.short.getanimals, 0, -5)
+        p5.text(gc.translatedTexts.short.getanimals, 0, -8)
       },
       function () {
         shop.openBtnHintCountdown = 150
@@ -35,12 +36,14 @@ const createButtons = (
     acceptCards: new Button(
       [250, 760, 400, 70],
       p5.color(65, 150, 60),
+
+      p5,
       function () {
         p5.fill(255, 255, 255)
         p5.stroke(0)
         p5.strokeWeight(8)
         p5.textSize(36)
-        p5.text(gc.translatedTexts.short.acceeptcards, 0, -5)
+        p5.text(gc.translatedTexts.short.acceeptcards, 0, -8)
       },
       function () {
         shop.isOpened = false
@@ -68,11 +71,13 @@ const createButtons = (
     closeShop: new Button(
       [430, 70, 70, 50],
       p5.color(240, 70, 60),
+
+      p5,
       function () {
         p5.fill(255)
         p5.noStroke()
         p5.textSize(30)
-        p5.text("X", 0, -4)
+        p5.text("X", 0, -6)
       },
       function () {
         shop.isOpened = false
@@ -82,12 +87,14 @@ const createButtons = (
     rerollEle: new Button(
       [250, 500, 300, 50],
       p5.color(65, 150, 60),
+
+      p5,
       function () {
         p5.fill(255)
         p5.stroke(0)
         p5.strokeWeight(6)
         p5.textSize(24)
-        p5.text(gc.translatedTexts.short.changeelement, 0, -4)
+        p5.text(gc.translatedTexts.short.changeelement, 0, -6)
       },
       function () {
         render.buttons.rerollYes.ap = 0
@@ -115,12 +122,14 @@ const createButtons = (
     rerollType: new Button(
       [250, 580, 300, 50],
       p5.color(65, 150, 60),
+
+      p5,
       function () {
         p5.fill(255)
         p5.stroke(0)
         p5.strokeWeight(6)
         p5.textSize(24)
-        p5.text(gc.translatedTexts.short.changetype, 0, -4)
+        p5.text(gc.translatedTexts.short.changetype, 0, -6)
       },
       function () {
         render.buttons.rerollYes.ap = 0
@@ -149,12 +158,14 @@ const createButtons = (
     rerollYes: new Button(
       [140, 760, 140, 60],
       p5.color(65, 150, 60),
+
+      p5,
       function () {
         p5.fill(255, 255, 255)
         p5.stroke(0)
         p5.strokeWeight(8)
         p5.textSize(28)
-        p5.text(gc.translatedTexts.short.yes, 0, -5)
+        p5.text(gc.translatedTexts.short.yes, 0, -8)
       },
       function () {
         const thisPlayer = gameplay.gs.players.find(
@@ -193,12 +204,14 @@ const createButtons = (
     rerollNo: new Button(
       [360, 760, 140, 60],
       p5.color(240, 70, 60),
+
+      p5,
       function () {
         p5.fill(255, 255, 255)
         p5.stroke(0)
         p5.strokeWeight(8)
         p5.textSize(28)
-        p5.text(gc.translatedTexts.short.no, 0, -5)
+        p5.text(gc.translatedTexts.short.no, 0, -8)
       },
       function () {
         render.buttons.rerollNo.ap = 1
@@ -215,12 +228,14 @@ const createButtons = (
     undo: new Button(
       [120, 805, 140, 60],
       p5.color(240, 70, 50),
+
+      p5,
       function () {
         p5.fill(255, 255, 255)
         p5.stroke(0)
         p5.strokeWeight(6)
         p5.textSize(24)
-        p5.text(gc.translatedTexts.short.undo, 0, -2)
+        p5.text(gc.translatedTexts.short.undo, 0, -3)
       },
       function () {
         gameplay.undo()
@@ -229,12 +244,14 @@ const createButtons = (
     ready: new Button(
       [350, 805, 200, 60],
       p5.color(65, 150, 60),
+
+      p5,
       function () {
         p5.fill(255, 255, 255)
         p5.stroke(0)
         p5.strokeWeight(6)
         p5.textSize(32)
-        p5.text(gc.translatedTexts.short.ready, 0, -5)
+        p5.text(gc.translatedTexts.short.ready, 0, -8)
       },
       function () {
         console.log("ready")

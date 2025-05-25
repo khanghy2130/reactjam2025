@@ -508,13 +508,6 @@ export const CARDS_TABLE: Card[] = [
   },
 ]
 
-// match indices with card ids
-export const renderMiniAbilityFunctions = [
-  (p5: P5) => {
-    ///
-  },
-]
-
 // returns triggering positions
 export const getTriggerPositions: (
   collection: Collection,

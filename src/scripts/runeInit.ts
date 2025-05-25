@@ -35,8 +35,15 @@ export default function runeInit(gameplay: Gameplay) {
       if (viewingPlayerState === undefined) {
         if (yourPlayerId) {
           gameplay.setViewingPlayer(yourPlayerId)
-        } else gameplay.setViewingPlayer(game.players[0].id)
-        // if doing the scoring process then skip to next ///////
+        } else {
+          if (game.players.length === 0) throw "No active player"
+          gameplay.setViewingPlayer(game.players[0].id)
+        }
+        // scoring this player? skip to next
+        if (gameplay.phase === "SCORING") {
+          gameplay.scoringControl.playerIndex-- // reverse due to array size change
+          gameplay.nextPlayerToScore()
+        }
       }
 
       // round changed? start scoring phase

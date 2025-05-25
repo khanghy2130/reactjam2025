@@ -111,7 +111,6 @@ export default class Render {
   renderPlayers(p5: P5, playersState: LogicPlayer[]) {
     // render players
     const statePlayers = this.gameplay.gs!.players
-    const isScoringPhase = this.gameplay.phase === "SCORING"
     const infos = statePlayers.map((p) => this.playersInfo[p.id])
     p5.textSize(32)
 
@@ -139,7 +138,7 @@ export default class Render {
     p5.fill(255)
     p5.text(888, 230, 46)
     if (infos[0].avatar) p5.image(infos[0].avatar, 100, 50, 60, 60)
-    if (statePlayers[0].isReady || isScoringPhase) {
+    if (statePlayers[0].isReady) {
       p5.fill(65, 230, 60)
       p5.circle(78, 28, 20)
     }
@@ -154,7 +153,7 @@ export default class Render {
       p5.fill(255)
       p5.text(888, 440, 46)
       if (infos[1].avatar) p5.image(infos[1].avatar, 310, 50, 60, 60)
-      if (statePlayers[1].isReady || isScoringPhase) {
+      if (statePlayers[1].isReady) {
         p5.fill(65, 230, 60)
         p5.circle(288, 28, 20)
       }
@@ -170,7 +169,7 @@ export default class Render {
       p5.fill(255)
       p5.text(888, 230, 116)
       if (infos[2].avatar) p5.image(infos[2].avatar, 100, 120, 60, 60)
-      if (statePlayers[2].isReady || isScoringPhase) {
+      if (statePlayers[2].isReady) {
         p5.fill(65, 230, 60)
         p5.circle(78, 98, 20)
       }
@@ -186,7 +185,7 @@ export default class Render {
       p5.fill(255)
       p5.text(888, 440, 116)
       if (infos[3].avatar) p5.image(infos[3].avatar, 310, 120, 60, 60)
-      if (statePlayers[3].isReady || isScoringPhase) {
+      if (statePlayers[3].isReady) {
         p5.fill(65, 230, 60)
         p5.circle(288, 98, 20)
       }
@@ -292,8 +291,8 @@ export default class Render {
 
     // viewing a guest?
     if (gp.viewingPlayer !== gp.myPlayerId) {
-      // not spectator?
-      if (gp.myPlayerId) buttons.goBack.render(p5)
+      // not spectator && not scoring phase? show go back button
+      if (gp.myPlayerId && gp.phase !== "SCORING") buttons.goBack.render(p5)
       // watching guest-name text
       p5.textSize(24)
       p5.noStroke()
@@ -718,7 +717,8 @@ export default class Render {
 
   click() {
     const gp = this.gameplay
-    if (!gp.gs) return
+    // no input during scoring phase
+    if (!gp.gs || gp.phase === "SCORING") return
     // if is inspecting card then exit
     if (gp.inspect.isOpening) return (gp.inspect.isOpening = false)
 

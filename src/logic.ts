@@ -1,4 +1,5 @@
-import type { PlayerId, RuneClient } from "rune-sdk"
+import type { GameOverResult, PlayerId, RuneClient } from "rune-sdk"
+import { CARDS_TABLE, getTriggerPositions } from "./scripts/cards"
 
 type CardItem = number | null
 export type Collection = CardItem[][]
@@ -39,11 +40,38 @@ const generateRNG = () => {
 
 function checkToEndRound(game: GameState) {
   // exit if someone is not ready
-  game.players.some((p) => !p.isReady)
+  if (game.players.some((p) => !p.isReady)) return
 
-  /// calculate gained score for each player
-  /// each player: isReady => false, renew rng, update score & prevScore
-  // unready all players
+  // update all players
+  game.players.forEach((p) => {
+    p.isReady = false
+    p.rng = generateRNG()
+    p.prevYangPts = p.yangPts
+    p.prevYinPts = p.yinPts
+
+    // go through collection to calculate points gained
+    const c = p.collection
+    for (let y = 0; y < 4; y++) {
+      for (let x = 0; x < 4; x++) {
+        const cardId = c[y][x]
+        if (cardId !== null) {
+          const triggers = getTriggerPositions(c, [x, y])
+          const card = CARDS_TABLE[cardId]
+          const pointsGained = triggers.length * card.ability.num
+          if (card.isYin) p.yinPts += pointsGained
+          else p.yangPts += pointsGained
+        }
+      }
+    }
+  })
+
+  game.round++ // update round
+  if (game.round === 6) {
+    // game over
+    const scores: { [playerId: string]: GameOverResult } = {}
+    game.players.forEach((p) => (scores[p.id] = Math.min(p.yinPts, p.yangPts)))
+    Rune.gameOver({ players: scores, delayPopUp: true })
+  }
 }
 
 Rune.initLogic({

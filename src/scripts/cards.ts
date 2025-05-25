@@ -515,9 +515,157 @@ export const renderMiniAbilityFunctions = [
   },
 ]
 
-type EA = (collection: Collection, targetPosition: [number, number]) => number
-export const evaluateAbility: EA = (collection, targetPosition) => {
-  //// handle each ability type
-  //// pay attention for edge type
-  return 123
+// returns triggering positions
+export const getTriggerPositions: (
+  collection: Collection,
+  targetPosition: [number, number]
+) => [number, number][] = (collection, [tx, ty]) => {
+  const targetCardId = collection[ty][tx]
+  if (targetCardId === null) return [] // no card here
+
+  const targetCard = CARDS_TABLE[targetCardId]
+  const con = targetCard.ability.con
+
+  // early exit special case SELF FLUX
+  if (con.special === "FLUX") return [[tx, ty]]
+
+  let possibleTPs: [number, number][] = []
+  switch (targetCard.ability.where) {
+    case "ALL":
+      for (let y = 0; y < 4; y++) {
+        for (let x = 0; x < 4; x++) {
+          if (collection[y][x] !== null) possibleTPs.push([x, y])
+        }
+      }
+      break
+    case "ADJ":
+      possibleTPs.push([tx, ty - 1])
+      possibleTPs.push([tx - 1, ty])
+      possibleTPs.push([tx + 1, ty])
+      possibleTPs.push([tx, ty + 1])
+      // if checking for empties then don't filter out empties
+      possibleTPs = possibleTPs.filter(
+        ([x, y]) =>
+          x > -1 &&
+          x < 4 &&
+          y > -1 &&
+          y < 4 &&
+          (collection[y][x] !== null || con.special === "EMPTY")
+      )
+      break
+    case "DIA":
+      possibleTPs.push([tx - 1, ty - 1])
+      possibleTPs.push([tx + 1, ty - 1])
+      possibleTPs.push([tx - 1, ty + 1])
+      possibleTPs.push([tx + 1, ty + 1])
+      possibleTPs = possibleTPs.filter(
+        ([x, y]) =>
+          x > -1 && x < 4 && y > -1 && y < 4 && collection[y][x] !== null
+      )
+      break
+    case "COL":
+      for (let y = 0; y < 4; y++) {
+        if (collection[y][tx] !== null) possibleTPs.push([tx, y])
+      }
+      break
+    case "ROW":
+      for (let x = 0; x < 4; x++) {
+        if (collection[ty][x] !== null) possibleTPs.push([x, ty])
+      }
+      break
+  }
+
+  // check condition
+  if (con.force) {
+    const targetIsYin = con.force === "YIN"
+    return possibleTPs.filter(
+      ([x, y]) => CARDS_TABLE[collection[y][x]!].isYin === targetIsYin
+    )
+  }
+  // already handled FLUX case earlier, therefore no FLUX here
+  if (con.ele) {
+    return possibleTPs.filter(
+      ([x, y]) => CARDS_TABLE[collection[y][x]!].ele === con.ele
+    )
+  }
+  if (con.animals) {
+    return possibleTPs.filter(([x, y]) => {
+      const thisCardAnimal = CARDS_TABLE[collection[y][x]!].animal
+      return con.animals!.includes(thisCardAnimal)
+    })
+  }
+  if (con.special) {
+    const uniqueElementObj: { [key: string]: true } = {} // key is ele
+    let is4x4 = false
+    switch (con.special) {
+      case "EMPTY":
+        return possibleTPs.filter(([x, y]) => collection[y][x] === null)
+      case "UNIQUEELE":
+        return possibleTPs.filter(([x, y]) => {
+          const ele = CARDS_TABLE[collection[y][x]!].ele
+          // skip flux
+          if (ele === "FLUX") return false
+          if (!uniqueElementObj[ele]) {
+            uniqueElementObj[ele] = true
+            return true
+          }
+          return false
+        })
+      case "DOUBLEADJ":
+        return possibleTPs.filter(([x, y]) => {
+          const adjs = [
+            [x, y - 1],
+            [x - 1, y],
+            [x + 1, y],
+            [x, y + 1],
+          ]
+          let counter = 0
+          for (let i = 0; i < adjs.length; i++) {
+            const [ax, ay] = adjs[i]
+            if (
+              ax > -1 &&
+              ax < 4 &&
+              ay > -1 &&
+              ay < 4 &&
+              collection[ay][ax] !== null
+            )
+              counter++
+          }
+          return counter === 2
+        })
+      case "EDGE":
+        for (let y = 0; y < 4; y++) {
+          if (collection[y][3] !== null) {
+            is4x4 = true
+            break
+          }
+        }
+        for (let x = 0; x < 4; x++) {
+          if (collection[3][x] !== null) {
+            is4x4 = true
+            break
+          }
+        }
+        // no card on 4th row and 4th col?
+        if (!is4x4) return []
+        return possibleTPs.filter(
+          ([x, y]) => x === 0 || x === 3 || y === 0 || y === 3
+        )
+    }
+  }
+
+  return []
 }
+
+// test
+// console.log(
+//   getTriggerPositions(
+//     [
+//       [6, 12, null, 2],
+//       [null, 12, null, 1],
+//       [null, null, 2, 7],
+//       [null, 2, 4, null],
+//     ],
+//     [1, 1]
+//   )
+// )

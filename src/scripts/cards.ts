@@ -584,9 +584,10 @@ export const getTriggerPositions: (
   }
   // already handled FLUX case earlier, therefore no FLUX here
   if (con.ele) {
-    return possibleTPs.filter(
-      ([x, y]) => CARDS_TABLE[collection[y][x]!].ele === con.ele
-    )
+    return possibleTPs.filter(([x, y]) => {
+      const ele = CARDS_TABLE[collection[y][x]!].ele
+      return ele === con.ele || ele === "FLUX"
+    })
   }
   if (con.animals) {
     return possibleTPs.filter(([x, y]) => {
@@ -662,8 +663,8 @@ export const getTriggerPositions: (
 //   getTriggerPositions(
 //     [
 //       [6, 12, null, 2],
-//       [null, 12, null, 1],
-//       [null, null, 2, 7],
+//       [null, 24, null, 11],
+//       [null, null, 2, 17],
 //       [null, 2, 4, null],
 //     ],
 //     [1, 1]

@@ -111,10 +111,11 @@ export default class Render {
   renderPlayers(p5: P5, playersState: LogicPlayer[]) {
     // render players
     const statePlayers = this.gameplay.gs!.players
+    const isScoringPhase = this.gameplay.phase === "SCORING"
     const infos = statePlayers.map((p) => this.playersInfo[p.id])
     p5.textSize(32)
 
-    // render viewing player outline
+    // render selected viewingPlayer outline
     const vp = this.gameplay.viewingPlayer
     p5.fill(240, 70, 60)
     p5.noStroke()
@@ -137,51 +138,62 @@ export default class Render {
     p5.text(888, 160, 46)
     p5.fill(255)
     p5.text(888, 230, 46)
-    if (infos[0].avatar) {
-      p5.image(infos[0].avatar, 100, 50, 60, 60)
+    if (infos[0].avatar) p5.image(infos[0].avatar, 100, 50, 60, 60)
+    if (statePlayers[0].isReady || isScoringPhase) {
+      p5.fill(65, 230, 60)
+      p5.circle(78, 28, 20)
     }
-    if (statePlayers.length === 1) return
 
-    // player 2
-    p5.noStroke()
-    p5.fill(255)
-    p5.rect(360, 50, 100, 40)
-    p5.fill(0)
-    p5.rect(440, 50, 70, 40, 0, 10, 10, 0)
-    p5.text(888, 370, 46)
-    p5.fill(255)
-    p5.text(888, 440, 46)
-    if (infos[1].avatar) {
-      p5.image(infos[1].avatar, 310, 50, 60, 60)
+    if (statePlayers.length > 1) {
+      // player 2
+      p5.fill(255)
+      p5.rect(360, 50, 100, 40)
+      p5.fill(0)
+      p5.rect(440, 50, 70, 40, 0, 10, 10, 0)
+      p5.text(888, 370, 46)
+      p5.fill(255)
+      p5.text(888, 440, 46)
+      if (infos[1].avatar) p5.image(infos[1].avatar, 310, 50, 60, 60)
+      if (statePlayers[1].isReady || isScoringPhase) {
+        p5.fill(65, 230, 60)
+        p5.circle(288, 28, 20)
+      }
     }
-    if (statePlayers.length === 2) return
 
-    // player 3
-    p5.noStroke()
-    p5.fill(255)
-    p5.rect(150, 120, 100, 40)
-    p5.fill(0)
-    p5.rect(230, 120, 70, 40, 0, 10, 10, 0)
-    p5.text(888, 160, 116)
-    p5.fill(255)
-    p5.text(888, 230, 116)
-    if (infos[2].avatar) {
-      p5.image(infos[2].avatar, 100, 120, 60, 60)
+    if (statePlayers.length > 2) {
+      // player 3
+      p5.fill(255)
+      p5.rect(150, 120, 100, 40)
+      p5.fill(0)
+      p5.rect(230, 120, 70, 40, 0, 10, 10, 0)
+      p5.text(888, 160, 116)
+      p5.fill(255)
+      p5.text(888, 230, 116)
+      if (infos[2].avatar) p5.image(infos[2].avatar, 100, 120, 60, 60)
+      if (statePlayers[2].isReady || isScoringPhase) {
+        p5.fill(65, 230, 60)
+        p5.circle(78, 98, 20)
+      }
     }
-    if (statePlayers.length === 3) return
 
-    // player 4
-    p5.noStroke()
-    p5.fill(255)
-    p5.rect(360, 120, 100, 40)
-    p5.fill(0)
-    p5.rect(440, 120, 70, 40, 0, 10, 10, 0)
-    p5.text(888, 370, 116)
-    p5.fill(255)
-    p5.text(888, 440, 116)
-    if (infos[3].avatar) {
-      p5.image(infos[3].avatar, 310, 120, 60, 60)
+    if (statePlayers.length > 3) {
+      // player 4
+      p5.fill(255)
+      p5.rect(360, 120, 100, 40)
+      p5.fill(0)
+      p5.rect(440, 120, 70, 40, 0, 10, 10, 0)
+      p5.text(888, 370, 116)
+      p5.fill(255)
+      p5.text(888, 440, 116)
+      if (infos[3].avatar) p5.image(infos[3].avatar, 310, 120, 60, 60)
+      if (statePlayers[3].isReady || isScoringPhase) {
+        p5.fill(65, 230, 60)
+        p5.circle(288, 98, 20)
+      }
     }
+
+    // render added totals during scoring phase
+    ////
   }
 
   draw() {
@@ -283,16 +295,14 @@ export default class Render {
       // not spectator?
       if (gp.myPlayerId) buttons.goBack.render(p5)
       // watching guest-name text
-      if (p5.frameCount % 60 > 10) {
-        p5.textSize(24)
-        p5.noStroke()
-        p5.fill(255)
-        p5.text(
-          tt.short.watching + "\n" + this.playersInfo[gp.viewingPlayer].name,
-          360,
-          805
-        )
-      }
+      p5.textSize(24)
+      p5.noStroke()
+      p5.fill(255)
+      p5.text(
+        tt.short.watching + "\n" + this.playersInfo[gp.viewingPlayer].name,
+        360,
+        805
+      )
     } else {
       // GET phase
       if (gp.phase === "GET") {

@@ -2,7 +2,7 @@ import type { PlayerId } from "rune-sdk"
 import GameClient from "./GameClient"
 import { Collection, GameState } from "../logic"
 import Render from "./Render"
-import { Card, CARDS_TABLE } from "./cards"
+import { Card, CARDS_TABLE, getTriggerPositions } from "./cards"
 
 interface Inspect {
   isOpened: boolean
@@ -57,6 +57,22 @@ interface LocalCard {
   isDragging: boolean
 }
 
+interface ScoringControl {
+  playerIndex: number
+  cardIndex: number
+  triggerIndex: number
+  yinSum: number
+  yangSum: number
+  scoresList: {
+    pos: [number, number]
+    triggers: ReturnType<typeof getTriggerPositions>
+    isYin: boolean
+    adder: number
+    sum: number
+  }[]
+  countdown: number
+  ap: number
+}
 export default class Gameplay {
   gc: GameClient
   gs?: GameState // synchronized game state across server and all players
@@ -76,6 +92,7 @@ export default class Gameplay {
     y: number
   }
   playedPositions: [number[], number[]]
+  scoringControl: ScoringControl
 
   constructor(gameClient: GameClient) {
     this.gc = gameClient
@@ -130,6 +147,31 @@ export default class Gameplay {
       x: 0,
       y: 0,
     }
+    this.scoringControl = {
+      playerIndex: 0,
+      cardIndex: 0,
+      triggerIndex: 0,
+      yinSum: 0,
+      yangSum: 0,
+      scoresList: [],
+      countdown: 0,
+      ap: 0,
+    }
+  }
+
+  nextPlayerToScore(isAtBeginning?: boolean) {
+    const sc = this.scoringControl
+    const playersState = this.gs!.players
+    if (isAtBeginning) sc.playerIndex = 0
+    else sc.playerIndex++
+
+    // done scoring?
+    if (sc.playerIndex >= playersState.length) {
+      ///// end scoring phase
+      return
+    }
+
+    ///// set viewingPlayer, starting countdown, new scoresList
   }
 
   undo() {
@@ -239,14 +281,25 @@ export default class Gameplay {
   }
 
   startScoringPhase() {
-    //// sync self collection
+    // sync self collection
+    if (this.myPlayerId) {
+      this.localDisplay.collection = this.gs!.players.find(
+        (p) => p.id === this.myPlayerId
+      )!.collection.map((row) => row.slice())
+    }
 
     // skip scoring phase on 1st round
     if (this.gs!.round === 1) {
       this.startGetPhase()
       return
     }
+
     this.phase = "SCORING"
+    this.shop.isOpened = false
+    this.inspect.isOpened = false
+    //// close other modals here
+
+    this.nextPlayerToScore(true)
   }
 
   startGetPhase() {

@@ -80,7 +80,7 @@ export default class Gameplay {
 
   myPlayerId?: PlayerId
   viewingPlayer!: PlayerId
-  phase: "SCORING" | "GET" | "PLAY" | "READY"
+  phase: "SCORING" | "GET" | "PLAY" | "READY" | "ENDING"
 
   shop: Shop
   inspect: Inspect
@@ -94,10 +94,17 @@ export default class Gameplay {
   playedPositions: [number[], number[]]
   scoringControl: ScoringControl
 
+  endingControl: {
+    yyAP: number
+    increaseAP: number
+    isOpened: boolean
+  }
+
   constructor(gameClient: GameClient) {
     this.gc = gameClient
     this.phase = "READY"
     this.localCards = null
+    this.endingControl = { yyAP: 0, increaseAP: 0, isOpened: false }
     this.playedPositions = [
       [0, 0],
       [0, 0],
@@ -339,7 +346,12 @@ export default class Gameplay {
     // last round? show result popup
     if (this.gs!.round > 5) {
       this.phase = "READY"
-      Rune.actions.readyToEndGame()
+      // start ending phase
+      this.phase = "ENDING"
+      this.endingControl.isOpened = true
+      this.endingControl.yyAP = 0
+      this.endingControl.increaseAP = 0
+      this.render.buttons.closeShop.ap = 0
       return
     } else this.phase = "GET" // continue below
 

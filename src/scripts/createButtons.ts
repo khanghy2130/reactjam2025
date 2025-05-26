@@ -25,6 +25,16 @@ const createButtons = (
         p5.text(gc.translatedTexts.short.getanimals, 0, -8)
       },
       function () {
+        ////
+        // if (true) {
+        //   // start ending phase
+        //   gameplay.phase = "ENDING"
+        //   gameplay.endingControl.isOpened = true
+        //   gameplay.endingControl.yyAP = 0
+        //   gameplay.endingControl.increaseAP = 0
+        //   gameplay.render.buttons.closeShop.ap = 0
+        // }
+
         shop.openBtnHintCountdown = 150
         shop.isOpened = true
         render.buttons.acceptCards.ap = 0
@@ -78,6 +88,11 @@ const createButtons = (
         p5.text("X", 0, -6)
       },
       function () {
+        // closing ending?
+        if (gameplay.endingControl.isOpened) {
+          gameplay.endingControl.isOpened = false
+          Rune.showGameOverPopUp()
+        }
         shop.isOpened = false
         render.buttons.closeShop.ap = 1
       }

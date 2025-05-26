@@ -144,7 +144,7 @@ export default class Render {
     p5.noStroke()
     p5.fill(255)
     p5.rect(150, 50, 100, 40)
-    p5.fill(0)
+    p5.fill(30)
     p5.rect(230, 50, 70, 40, 0, 10, 10, 0)
     p5.text(displayPoints[0][0], 160, 46)
     p5.fill(255)
@@ -159,7 +159,7 @@ export default class Render {
       // player 2
       p5.fill(255)
       p5.rect(360, 50, 100, 40)
-      p5.fill(0)
+      p5.fill(30)
       p5.rect(440, 50, 70, 40, 0, 10, 10, 0)
       p5.text(displayPoints[1][0], 370, 46)
       p5.fill(255)
@@ -175,7 +175,7 @@ export default class Render {
       // player 3
       p5.fill(255)
       p5.rect(150, 120, 100, 40)
-      p5.fill(0)
+      p5.fill(30)
       p5.rect(230, 120, 70, 40, 0, 10, 10, 0)
       p5.text(displayPoints[2][0], 160, 116)
       p5.fill(255)
@@ -191,7 +191,7 @@ export default class Render {
       // player 4
       p5.fill(255)
       p5.rect(360, 120, 100, 40)
-      p5.fill(0)
+      p5.fill(30)
       p5.rect(440, 120, 70, 40, 0, 10, 10, 0)
       p5.text(displayPoints[3][0], 370, 116)
       p5.fill(255)
@@ -569,12 +569,113 @@ export default class Render {
         )
         p5.scale(sc.ap < 0.3 ? this.easeOutElastic(scaleFactor) : scaleFactor)
         if (i === sc.cardIndex) p5.stroke(240, 70, 60)
-        p5.fill(scoringCard.isYin ? 0 : 255)
+        p5.fill(scoringCard.isYin ? 30 : 255)
         p5.rect(0, 0, 60, 35, 5)
         p5.noStroke()
-        p5.fill(scoringCard.isYin ? 255 : 0)
+        p5.fill(scoringCard.isYin ? 255 : 30)
         p5.text("+" + scoringCard.sum, 0, -5)
         p5.pop()
+      }
+    }
+    // ending phase
+    else if (gp.phase === "ENDING") {
+      const ec = gp.endingControl
+      if (ec.isOpened) {
+        // render bg
+        p5.noStroke()
+        const h = (p5.height / p5.width) * 500
+        p5.fill(0, 220)
+        p5.rect(250, h / 2, 500, h)
+
+        if (ec.increaseAP === 1) this.buttons.closeShop.render(p5)
+
+        // render players
+        const xChange = (1 - Math.pow(1 - ec.yyAP, 5)) * 100
+        for (let i = 0; i < playersState.length; i++) {
+          const p = playersState[i]
+          const info = this.playersInfo[p.id]
+          const y = 190 + i * 180
+          p5.image(info.avatar, 80, y, 100, 100)
+          p5.noStroke()
+          p5.textSize(18)
+          p5.fill(255)
+          p5.text(info.name, 80, y + 60)
+
+          // yy
+          const yangX = 170 + xChange
+          const yinX = 370 - xChange
+          this.renderYang(yangX, y, 40)
+          this.renderYin(yinX, y, 40)
+
+          const actualPoints = Math.min(p.yangPts, p.yinPts) // points here
+          const increaseFactor = Math.floor(
+            Math.sqrt(1 - Math.pow(ec.increaseAP - 1, 2)) * actualPoints
+          )
+          p5.textSize(26)
+          p5.fill(255)
+          p5.rect(yangX - 30, y + 70, 60, 30)
+          p5.fill(30)
+          // yang points
+          p5.text(p.yangPts - increaseFactor, yangX - 30, y + 67)
+
+          p5.fill(30)
+          p5.rect(yinX + 30, y + 70, 60, 30)
+          p5.fill(255)
+          // yin points
+          p5.text(p.yinPts - increaseFactor, yinX + 30, y + 67)
+
+          if (increaseFactor > 0) {
+            // actual points
+            p5.textSize(32)
+            p5.stroke(0)
+            p5.strokeWeight(6)
+            p5.fill(65, 200, 60)
+            p5.text(increaseFactor, 270, y - 4)
+
+            // letter rating
+            p5.textSize(50)
+            p5.fill(0)
+            p5.strokeWeight(15)
+            let letter = "F"
+            let percentage = 0
+            if (increaseFactor < 60) {
+              percentage = increaseFactor / 60
+              letter = "F"
+              p5.stroke(150)
+            } else if (increaseFactor < 70) {
+              percentage = (increaseFactor - 60) / 10
+              letter = "D"
+              p5.stroke(65, 200, 60)
+            } else if (increaseFactor < 80) {
+              percentage = (increaseFactor - 70) / 10
+              letter = "C"
+              p5.stroke(23, 160, 227)
+            } else if (increaseFactor < 90) {
+              percentage = (increaseFactor - 80) / 10
+              letter = "B"
+              p5.stroke(237, 190, 17)
+            } else if (increaseFactor < 100) {
+              percentage = (increaseFactor - 90) / 10
+              letter = "A"
+              p5.stroke(240, 70, 60)
+            } else {
+              percentage = 1
+              letter = "S"
+              p5.stroke(255)
+            }
+            p5.text(letter, 420, y)
+            p5.strokeWeight(4)
+            p5.noFill()
+            p5.arc(420, y + 6, 100, 100, 0, percentage * 360)
+          }
+        }
+        // update ap
+        if (ec.yyAP < 1) ec.yyAP = Math.min(1, ec.yyAP + 0.02)
+        else if (ec.increaseAP < 1) {
+          ec.increaseAP = Math.min(1, ec.increaseAP + 0.007)
+          // trigger game over
+          if (ec.increaseAP === 1) Rune.actions.readyToEndGame()
+        }
       }
     }
   }
@@ -795,7 +896,7 @@ export default class Render {
     p5.bezierVertex(x + hrg, y, x + hrg, y - r, x, y - r)
     p5.endShape()
     p5.noStroke()
-    p5.fill(0)
+    p5.fill(30)
     p5.circle(x, y - r / 2, r * 0.4)
   }
 
@@ -803,7 +904,7 @@ export default class Render {
     const p5 = this.p5
     const rg = r * 1.33
     const hrg = (r / 2) * 1.33
-    p5.fill(0)
+    p5.fill(30)
     p5.beginShape()
     p5.vertex(x + 0, y + r)
     p5.bezierVertex(x + rg, y + r, x + rg, y - r, x, y - r)
@@ -825,6 +926,17 @@ export default class Render {
     const buttons = this.buttons
     const mx = this.gc.mx
     const my = this.gc.my
+
+    // blocked by ending modal?
+    if (gp.endingControl.isOpened) {
+      if (
+        gp.endingControl.increaseAP === 1 &&
+        buttons.closeShop.checkHover(mx, my)
+      ) {
+        buttons.closeShop.clicked()
+      }
+      return
+    }
 
     // viewing a guest?
     if (gp.viewingPlayer !== gp.myPlayerId) {

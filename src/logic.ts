@@ -130,8 +130,7 @@ Rune.initLogic({
         )
         Rune.gameOver({
           players: scores,
-          delayPopUp: false,
-          minimizePopUp: true,
+          delayPopUp: true,
         })
       }
     },

@@ -1,5 +1,6 @@
 import { GameState } from "../logic"
 import Gameplay from "./Gameplay"
+import { translations } from "./locales"
 
 export default function runeInit(gameplay: Gameplay) {
   Rune.initClient({
@@ -26,6 +27,20 @@ export default function runeInit(gameplay: Gameplay) {
             avatar: render.p5.loadImage(info.avatarUrl),
           }
         })
+
+        // close all modals
+        gameplay.shop.isOpened = false
+        gameplay.inspect.isOpened = false
+        gameplay.langModal.isOpened = false
+        gameplay.wheelModalIsOpened = false
+
+        if (yourPlayerId !== undefined) {
+          const savedLang = game.persisted[yourPlayerId].lang
+          console.log(savedLang)
+          if (savedLang) gameplay.gc.translatedTexts = translations[savedLang]
+          // open language modal if haven't set before
+          else gameplay.openLangModal()
+        }
       }
 
       const viewingPlayerState = game.players.find(

@@ -33,6 +33,7 @@ const createButtons = (
         function () {
           gc.translatedTexts = langObj
           gameplay.langModal.isOpened = false
+          Rune.actions.setLang(langCode as Language)
         }
       )
     )

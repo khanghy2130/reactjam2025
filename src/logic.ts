@@ -1,5 +1,6 @@
 import type { GameOverResult, PlayerId, RuneClient } from "rune-sdk"
 import { CARDS_TABLE, getTriggerPositions } from "./scripts/cards"
+import { Language } from "./scripts/locales"
 
 type CardItem = number | null
 export type Collection = CardItem[][]
@@ -21,16 +22,21 @@ export interface GameState {
   players: LogicPlayer[]
 }
 
+type Persisted = {
+  lang: Language
+}
+
 type GameActions = {
   becomeReady: (payload: {
     collection: Collection
     playedPositions: [number[], number[]]
   }) => void
   readyToEndGame: () => void
+  setLang: (payload: Language) => void
 }
 
 declare global {
-  const Rune: RuneClient<GameState, GameActions>
+  const Rune: RuneClient<GameState, GameActions, Persisted>
 }
 
 // randomness for each player per round
@@ -72,6 +78,7 @@ function checkToEndRound(game: GameState) {
 }
 
 Rune.initLogic({
+  persistPlayerData: true,
   minPlayers: 1,
   maxPlayers: 4,
   setup: (allPlayerIds) => ({
@@ -133,6 +140,9 @@ Rune.initLogic({
           delayPopUp: true,
         })
       }
+    },
+    setLang: (payload, { game, playerId }) => {
+      game.persisted[playerId].lang = payload
     },
   },
   events: {

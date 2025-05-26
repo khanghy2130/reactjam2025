@@ -109,22 +109,34 @@ export default class Render {
   }
 
   renderPlayers(p5: P5, playersState: LogicPlayer[]) {
+    const gp = this.gameplay
     // render players
-    const statePlayers = this.gameplay.gs!.players
-    const infos = statePlayers.map((p) => this.playersInfo[p.id])
+    const avatars = playersState.map((p) => this.playersInfo[p.id].avatar)
+    const displayPoints: [number, number][] = playersState.map((p, index) => {
+      // not scoring phase? show current
+      if (gp.phase !== "SCORING") return [p.yangPts, p.yinPts]
+
+      const sc = gp.scoringControl
+      // if already past this player? show current
+      if (sc.playerIndex > index) return [p.yangPts, p.yinPts]
+      // if is not at this player yet? show past
+      if (sc.playerIndex < index) return [p.prevYangPts, p.prevYinPts]
+      // is at this player? show past + sc total
+      return [p.prevYangPts + sc.yangSum, p.prevYinPts + sc.yinSum]
+    })
     p5.textSize(32)
 
     // render selected viewingPlayer outline
-    const vp = this.gameplay.viewingPlayer
+    const vp = gp.viewingPlayer
     p5.fill(240, 70, 60)
     p5.noStroke()
-    if (vp === statePlayers[0]?.id) {
+    if (vp === playersState[0]?.id) {
       p5.rect(185, 50, 180, 60, 20)
-    } else if (vp === statePlayers[1]?.id) {
+    } else if (vp === playersState[1]?.id) {
       p5.rect(395, 50, 180, 60, 20)
-    } else if (vp === statePlayers[2]?.id) {
+    } else if (vp === playersState[2]?.id) {
       p5.rect(185, 120, 180, 60, 20)
-    } else if (vp === statePlayers[3]?.id) {
+    } else if (vp === playersState[3]?.id) {
       p5.rect(395, 120, 180, 60, 20)
     }
 
@@ -134,65 +146,62 @@ export default class Render {
     p5.rect(150, 50, 100, 40)
     p5.fill(0)
     p5.rect(230, 50, 70, 40, 0, 10, 10, 0)
-    p5.text(888, 160, 46)
+    p5.text(displayPoints[0][0], 160, 46)
     p5.fill(255)
-    p5.text(888, 230, 46)
-    if (infos[0].avatar) p5.image(infos[0].avatar, 100, 50, 60, 60)
-    if (statePlayers[0].isReady) {
+    p5.text(displayPoints[0][1], 230, 46)
+    if (avatars[0]) p5.image(avatars[0], 100, 50, 60, 60)
+    if (playersState[0].isReady) {
       p5.fill(65, 230, 60)
       p5.circle(78, 28, 20)
     }
 
-    if (statePlayers.length > 1) {
+    if (playersState.length > 1) {
       // player 2
       p5.fill(255)
       p5.rect(360, 50, 100, 40)
       p5.fill(0)
       p5.rect(440, 50, 70, 40, 0, 10, 10, 0)
-      p5.text(888, 370, 46)
+      p5.text(displayPoints[1][0], 370, 46)
       p5.fill(255)
-      p5.text(888, 440, 46)
-      if (infos[1].avatar) p5.image(infos[1].avatar, 310, 50, 60, 60)
-      if (statePlayers[1].isReady) {
+      p5.text(displayPoints[1][1], 440, 46)
+      if (avatars[1]) p5.image(avatars[1], 310, 50, 60, 60)
+      if (playersState[1].isReady) {
         p5.fill(65, 230, 60)
         p5.circle(288, 28, 20)
       }
     }
 
-    if (statePlayers.length > 2) {
+    if (playersState.length > 2) {
       // player 3
       p5.fill(255)
       p5.rect(150, 120, 100, 40)
       p5.fill(0)
       p5.rect(230, 120, 70, 40, 0, 10, 10, 0)
-      p5.text(888, 160, 116)
+      p5.text(displayPoints[2][0], 160, 116)
       p5.fill(255)
-      p5.text(888, 230, 116)
-      if (infos[2].avatar) p5.image(infos[2].avatar, 100, 120, 60, 60)
-      if (statePlayers[2].isReady) {
+      p5.text(displayPoints[1][1], 230, 116)
+      if (avatars[2]) p5.image(avatars[2], 100, 120, 60, 60)
+      if (playersState[2].isReady) {
         p5.fill(65, 230, 60)
         p5.circle(78, 98, 20)
       }
     }
 
-    if (statePlayers.length > 3) {
+    if (playersState.length > 3) {
       // player 4
       p5.fill(255)
       p5.rect(360, 120, 100, 40)
       p5.fill(0)
       p5.rect(440, 120, 70, 40, 0, 10, 10, 0)
-      p5.text(888, 370, 116)
+      p5.text(displayPoints[3][0], 370, 116)
       p5.fill(255)
-      p5.text(888, 440, 116)
-      if (infos[3].avatar) p5.image(infos[3].avatar, 310, 120, 60, 60)
-      if (statePlayers[3].isReady) {
+      p5.text(displayPoints[3][1], 440, 116)
+      if (avatars[3]) p5.image(avatars[3], 310, 120, 60, 60)
+      if (playersState[3].isReady) {
         p5.fill(65, 230, 60)
         p5.circle(288, 98, 20)
       }
     }
-
-    // render added totals during scoring phase
-    ////
   }
 
   draw() {
@@ -316,6 +325,8 @@ export default class Render {
             buttons.openShop.ap = 0
             shop.openBtnHintCountdown = 120
           } else shop.openBtnHintCountdown--
+
+          // render hint arrow
           p5.stroke(255)
           p5.strokeWeight(10)
           const arrowY = p5.cos(p5.frameCount * 8) * 20
@@ -486,6 +497,95 @@ export default class Render {
       p5.textSize(30)
       p5.text(tt.carddesc[card.id], 250, -100 + 210 * ap)
     }
+
+    // scoring phase: update & render card sums
+    if (gp.phase === "SCORING") {
+      const sc = gp.scoringControl
+      if (sc.countdown-- < 0) {
+        // go to next player?
+        if (sc.cardIndex === 999) gp.nextPlayerToScore()
+        // still at a card?
+        else if (sc.cardIndex < sc.scoresList.length) {
+          const scoringCard = sc.scoresList[sc.cardIndex]
+          // still at a trigger?
+          if (sc.triggerIndex < scoringCard.triggers.length) {
+            const triggerPos = scoringCard.triggers[sc.triggerIndex]
+            this.addFlasher(triggerPos[0], triggerPos[1])
+            scoringCard.sum += scoringCard.adder
+            if (scoringCard.isYin) sc.yinSum += scoringCard.adder
+            else sc.yangSum += scoringCard.adder
+
+            sc.ap = 0
+            sc.countdown = 7 // delay before next trigger
+            sc.triggerIndex++
+          } else {
+            sc.triggerIndex = 0 // reset trigger index
+            sc.cardIndex++
+            // add delay if next card exists and has any trigger
+            if (
+              sc.cardIndex < sc.scoresList.length &&
+              sc.scoresList[sc.cardIndex].triggers.length > 0
+            ) {
+              sc.countdown = 10 // delay before next card
+            }
+          }
+        }
+        // done with all card? set up delay before next player
+        else {
+          sc.countdown = 35 // delay before next player
+          sc.cardIndex = 999
+        }
+      }
+
+      // render nums
+      sc.ap = Math.min(1, sc.ap + 0.02)
+      p5.noStroke()
+      p5.strokeWeight(4)
+      p5.textSize(30)
+      for (let i = 0; i < sc.scoresList.length; i++) {
+        const scoringCard = sc.scoresList[i]
+
+        // break if haven't gotten to this card yet
+        if (sc.cardIndex < i) break
+
+        // skip if sum is 0
+        if (scoringCard.sum === 0) continue
+
+        let scaleFactor = 1
+        // this card is currently being scored? apply ap to scaleFactor
+        if (i === sc.cardIndex) {
+          if (sc.ap < 0.3) {
+            scaleFactor = (1 / 0.3) * sc.ap
+          } else if (sc.ap < 0.9) {
+            // nothing here
+          } else {
+            scaleFactor = (1 / 0.1) * (0.1 - (sc.ap - 0.9))
+          }
+        }
+        p5.push()
+        p5.translate(
+          ldx + 105 * scoringCard.pos[0],
+          ldy + 140 * scoringCard.pos[1]
+        )
+        p5.scale(sc.ap < 0.3 ? this.easeOutElastic(scaleFactor) : scaleFactor)
+        if (i === sc.cardIndex) p5.stroke(240, 70, 60)
+        p5.fill(scoringCard.isYin ? 0 : 255)
+        p5.rect(0, 0, 60, 35, 5)
+        p5.noStroke()
+        p5.fill(scoringCard.isYin ? 255 : 0)
+        p5.text("+" + scoringCard.sum, 0, -5)
+        p5.pop()
+      }
+    }
+  }
+
+  easeOutElastic(x: number) {
+    const c4 = (2 * Math.PI) / 3
+    return x === 0
+      ? 0
+      : x === 1
+        ? 1
+        : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1
   }
 
   renderShop(p5: P5, gp: Gameplay, tt: Translation) {

@@ -26,6 +26,7 @@ type GameActions = {
     collection: Collection
     playedPositions: [number[], number[]]
   }) => void
+  readyToEndGame: () => void
 }
 
 declare global {
@@ -41,6 +42,8 @@ const generateRNG = () => {
 function checkToEndRound(game: GameState) {
   // exit if someone is not ready
   if (game.players.some((p) => !p.isReady)) return
+
+  if (game.round >= 6) return // game is already over
 
   // update all players
   game.players.forEach((p) => {
@@ -66,12 +69,6 @@ function checkToEndRound(game: GameState) {
   })
 
   game.round++ // update round
-  if (game.round === 6) {
-    // game over
-    const scores: { [playerId: string]: GameOverResult } = {}
-    game.players.forEach((p) => (scores[p.id] = Math.min(p.yinPts, p.yangPts)))
-    Rune.gameOver({ players: scores, delayPopUp: true })
-  }
 }
 
 Rune.initLogic({
@@ -100,6 +97,8 @@ Rune.initLogic({
   }),
   actions: {
     becomeReady: (payload, { game, playerId }) => {
+      if (game.round >= 6) throw Rune.invalidAction() // game is already over
+
       const thisPlayer = game.players.find((p) => p.id === playerId)
       // validate
       if (thisPlayer === undefined || thisPlayer.isReady)
@@ -118,6 +117,23 @@ Rune.initLogic({
       thisPlayer.isReady = true
 
       checkToEndRound(game)
+    },
+    readyToEndGame: (payload, { game, playerId }) => {
+      if (game.round !== 6) throw Rune.invalidAction()
+
+      const playerState = game.players.find((p) => p.id === playerId)
+      if (playerState) playerState.isReady = true
+      if (game.players.every((p) => p.isReady)) {
+        const scores: { [playerId: string]: GameOverResult } = {}
+        game.players.forEach(
+          (p) => (scores[p.id] = Math.min(p.yinPts, p.yangPts))
+        )
+        Rune.gameOver({
+          players: scores,
+          delayPopUp: false,
+          minimizePopUp: true,
+        })
+      }
     },
   },
   events: {

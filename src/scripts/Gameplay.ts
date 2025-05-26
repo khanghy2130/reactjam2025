@@ -149,7 +149,7 @@ export default class Gameplay {
     }
     this.scoringControl = {
       playerIndex: 0,
-      cardIndex: 0,
+      cardIndex: 0, // can be 999 to indicate go to next player
       triggerIndex: 0,
       yinSum: 0,
       yangSum: 0,
@@ -167,11 +167,38 @@ export default class Gameplay {
 
     // done scoring?
     if (sc.playerIndex >= playersState.length) {
-      ///// end scoring phase
+      this.startGetPhase()
+      if (this.myPlayerId) this.setViewingPlayer(this.myPlayerId)
       return
     }
 
-    ///// set viewingPlayer, starting countdown, new scoresList
+    // change viewingPlayer if different
+    if (playersState[sc.playerIndex].id !== this.viewingPlayer) {
+      this.viewingPlayer = playersState[sc.playerIndex].id
+      this.localDisplay.x = 1000
+    }
+    sc.countdown = 20 // initial wait before starting to score first card
+    sc.cardIndex = 0
+    sc.triggerIndex = 0
+    sc.yinSum = 0
+    sc.yangSum = 0
+
+    sc.scoresList = [] // new scoresList
+    const c = playersState[sc.playerIndex].collection
+    for (let y = 0; y < 4; y++) {
+      for (let x = 0; x < 4; x++) {
+        const cardId = c[y][x]
+        if (cardId === null) continue
+        const card = CARDS_TABLE[cardId]
+        sc.scoresList.push({
+          pos: [x, y],
+          adder: card.ability.num,
+          isYin: card.isYin,
+          sum: 0,
+          triggers: getTriggerPositions(c, [x, y]),
+        })
+      }
+    }
   }
 
   undo() {
@@ -306,9 +333,15 @@ export default class Gameplay {
     // spectator skips this and PLAY phases
     if (this.myPlayerId === undefined) {
       this.phase = "READY"
-      if (this.gs!.round > 5) Rune.showGameOverPopUp()
       return
     }
+
+    // last round? show result popup
+    if (this.gs!.round > 5) {
+      this.phase = "READY"
+      Rune.actions.readyToEndGame()
+      return
+    } else this.phase = "GET" // continue below
 
     const thisPlayer = this.gs!.players.find((p) => p.id === this.myPlayerId)
     if (!thisPlayer) throw "Can't find this player data"
@@ -340,11 +373,5 @@ export default class Gameplay {
     shop.holdersY.ap = 0
     shop.flipYinPool = shop.yinPool
     shop.flipYangPool = shop.yangPool
-
-    // last round? show result popup
-    if (this.gs!.round > 5) {
-      this.phase = "READY"
-      Rune.showGameOverPopUp()
-    } else this.phase = "GET"
   }
 }

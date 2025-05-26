@@ -1,4 +1,3 @@
-import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
 import { Collection } from "../logic"
 
 export type Animal =
@@ -522,6 +521,39 @@ export const getTriggerPositions: (
   // early exit special case SELF FLUX
   if (con.special === "FLUX") return [[tx, ty]]
 
+  // early exit special case ADJ EMPTY
+  if (con.special === "EMPTY") {
+    let rowIsFull = false
+    let colIsFull = false
+    for (let y = 0; y < 4; y++) {
+      if (collection[y][3] !== null) {
+        rowIsFull = true
+        break
+      }
+    }
+    for (let x = 0; x < 4; x++) {
+      if (collection[3][x] !== null) {
+        colIsFull = true
+        break
+      }
+    }
+    const result: [number, number][] = []
+    result.push([tx, ty - 1])
+    result.push([tx - 1, ty])
+    result.push([tx + 1, ty])
+    result.push([tx, ty + 1])
+
+    return result.filter(([x, y]) => {
+      // if col is not full and y is -1, still add
+      if (y === -1 && !colIsFull) return true
+      // if row is not full and x is -1, still add
+      if (x === -1 && !rowIsFull) return true
+      return x > -1 && x < 4 && y > -1 && y < 4 && collection[y][x] === null
+    })
+  }
+
+  //// return possibleTPs.filter(([x, y]) => collection[y][x] === null)
+
   let possibleTPs: [number, number][] = []
   switch (targetCard.ability.where) {
     case "ALL":
@@ -539,11 +571,7 @@ export const getTriggerPositions: (
       // if checking for empties then don't filter out empties
       possibleTPs = possibleTPs.filter(
         ([x, y]) =>
-          x > -1 &&
-          x < 4 &&
-          y > -1 &&
-          y < 4 &&
-          (collection[y][x] !== null || con.special === "EMPTY")
+          x > -1 && x < 4 && y > -1 && y < 4 && collection[y][x] !== null
       )
       break
     case "DIA":
@@ -590,10 +618,9 @@ export const getTriggerPositions: (
   }
   if (con.special) {
     const uniqueElementObj: { [key: string]: true } = {} // key is ele
-    let is4x4 = false
+    let rowIsFull = false
+    let colIsFull = false
     switch (con.special) {
-      case "EMPTY":
-        return possibleTPs.filter(([x, y]) => collection[y][x] === null)
       case "UNIQUEELE":
         return possibleTPs.filter(([x, y]) => {
           const ele = CARDS_TABLE[collection[y][x]!].ele
@@ -630,20 +657,21 @@ export const getTriggerPositions: (
       case "EDGE":
         for (let y = 0; y < 4; y++) {
           if (collection[y][3] !== null) {
-            is4x4 = true
+            rowIsFull = true
             break
           }
         }
         for (let x = 0; x < 4; x++) {
           if (collection[3][x] !== null) {
-            is4x4 = true
+            colIsFull = true
             break
           }
         }
-        // no card on 4th row and 4th col?
-        if (!is4x4) return []
+        // if row is full, count any x = 0 and x = 3. same to y
         return possibleTPs.filter(
-          ([x, y]) => x === 0 || x === 3 || y === 0 || y === 3
+          ([x, y]) =>
+            ((x === 0 || x === 3) && rowIsFull) ||
+            ((y === 0 || y === 3) && colIsFull)
         )
     }
   }
@@ -655,11 +683,11 @@ export const getTriggerPositions: (
 // console.log(
 //   getTriggerPositions(
 //     [
-//       [6, 12, null, 2],
-//       [null, 24, null, 11],
-//       [null, null, 2, 17],
-//       [null, 2, 4, null],
+//       [12, 12, 2, 6],
+//       [null, 24, null, null],
+//       [null, 2, 1, null],
+//       [null, null, 1, null],
 //     ],
-//     [1, 1]
+//     [3, 0]
 //   )
 // )

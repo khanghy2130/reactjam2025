@@ -179,7 +179,7 @@ export default class Render {
       p5.rect(230, 120, 70, 40, 0, 10, 10, 0)
       p5.text(displayPoints[2][0], 160, 116)
       p5.fill(255)
-      p5.text(displayPoints[1][1], 230, 116)
+      p5.text(displayPoints[2][1], 230, 116)
       if (avatars[2]) p5.image(avatars[2], 100, 120, 60, 60)
       if (playersState[2].isReady) {
         p5.fill(65, 230, 60)
@@ -233,6 +233,14 @@ export default class Render {
     )!
 
     this.renderPlayers(p5, playersState)
+
+    // render language menu button
+    p5.noFill()
+    p5.stroke(52, 183, 235)
+    p5.strokeWeight(3)
+    p5.circle(35, 50, 35)
+    p5.ellipse(35, 50, 15, 35)
+    p5.ellipse(35, 50, 35, 15)
 
     // render collection
     const ld = gp.localDisplay
@@ -327,12 +335,14 @@ export default class Render {
           } else shop.openBtnHintCountdown--
 
           // render hint arrow
-          p5.stroke(255)
-          p5.strokeWeight(10)
-          const arrowY = p5.cos(p5.frameCount * 8) * 20
-          p5.line(250, 600 + arrowY, 250, 700 + arrowY)
-          p5.line(270, 670 + arrowY, 250, 700 + arrowY)
-          p5.line(230, 670 + arrowY, 250, 700 + arrowY)
+          if (gp.gs!.round < 2) {
+            p5.stroke(255)
+            p5.strokeWeight(10)
+            const arrowY = p5.cos(p5.frameCount * 8) * 20
+            p5.line(250, 600 + arrowY, 250, 700 + arrowY)
+            p5.line(270, 670 + arrowY, 250, 700 + arrowY)
+            p5.line(230, 670 + arrowY, 250, 700 + arrowY)
+          }
         }
       } else if (gp.phase === "PLAY") {
         this.dragHoveredPos = null
@@ -460,6 +470,16 @@ export default class Render {
       p5.rect(ldx + 105 * f.x, ldy + 140 * f.y, 105, 140, 10)
       f.ap += 0.1
       if (f.ap >= 1) this.flashers.splice(i, 1) // remove flasher
+    }
+
+    // render langModal
+    if (gp.langModal.isOpened) {
+      // modal bg
+      p5.noStroke()
+      p5.fill(0, 200)
+      const h = (p5.height / p5.width) * 500
+      p5.rect(250, h / 2, 500, h)
+      gp.langModal.optionButtons.forEach((b) => b.render(p5))
     }
 
     // card inspection
@@ -916,7 +936,7 @@ export default class Render {
     p5.circle(x, y + r / 2, r * 0.4)
   }
 
-  click() {
+  click(p5: P5) {
     const gp = this.gameplay
     // no input during scoring phase
     if (!gp.gs || gp.phase === "SCORING") return
@@ -938,7 +958,20 @@ export default class Render {
       return
     }
 
-    // viewing a guest?
+    // blocked by lang modal?
+    if (gp.langModal.isOpened) {
+      // check options
+      const ops = gp.langModal.optionButtons
+      for (let i = 0; i < ops.length; i++) {
+        if (ops[i].checkHover(mx, my)) return ops[i].clicked()
+      }
+      return
+    }
+
+    // clicked language menu?
+    if (p5.dist(mx, my, 35, 50) < 18) return gp.openLangModal()
+
+    // viewing a guest? go back button
     if (gp.viewingPlayer !== gp.myPlayerId) {
       if (gp.myPlayerId) {
         if (buttons.goBack.checkHover(mx, my)) return buttons.goBack.clicked()

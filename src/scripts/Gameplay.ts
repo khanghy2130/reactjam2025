@@ -3,6 +3,7 @@ import GameClient from "./GameClient"
 import { Collection, GameState } from "../logic"
 import Render from "./Render"
 import { Card, CARDS_TABLE, getTriggerPositions } from "./cards"
+import Button from "./Button"
 
 interface Inspect {
   isOpened: boolean
@@ -100,11 +101,20 @@ export default class Gameplay {
     isOpened: boolean
   }
 
+  langModal: { isOpened: boolean; optionButtons: Button[] }
+
+  wheelModalIsOpened: boolean
+
   constructor(gameClient: GameClient) {
     this.gc = gameClient
     this.phase = "READY"
     this.localCards = null
     this.endingControl = { yyAP: 0, increaseAP: 0, isOpened: false }
+    this.wheelModalIsOpened = false
+    this.langModal = {
+      isOpened: false,
+      optionButtons: [],
+    }
     this.playedPositions = [
       [0, 0],
       [0, 0],
@@ -164,6 +174,11 @@ export default class Gameplay {
       countdown: 0,
       ap: 0,
     }
+  }
+
+  openLangModal() {
+    this.langModal.isOpened = true
+    this.langModal.optionButtons.forEach((b) => (b.ap = 0))
   }
 
   nextPlayerToScore(isAtBeginning?: boolean) {
@@ -302,7 +317,6 @@ export default class Gameplay {
   inspectCard(card: Card, ox: number, oy: number, os: number) {
     const ip = this.inspect
 
-    //// more exit conditions here
     if (ip.isOpened) return
 
     ip.card = card
@@ -329,9 +343,11 @@ export default class Gameplay {
     }
 
     this.phase = "SCORING"
+    // close all modals
     this.shop.isOpened = false
     this.inspect.isOpened = false
-    //// close other modals here
+    this.langModal.isOpened = false
+    this.wheelModalIsOpened = false
 
     this.nextPlayerToScore(true)
   }

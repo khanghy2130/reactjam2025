@@ -3,6 +3,7 @@ import Gameplay from "./Gameplay"
 import Render from "./Render"
 import Button from "./Button"
 import GameClient from "./GameClient"
+import { Language, translations } from "./locales"
 
 const createButtons = (
   gc: GameClient,
@@ -11,6 +12,36 @@ const createButtons = (
   render: Render
 ) => {
   const shop = gameplay.shop
+
+  // add lang option buttons
+  let langOpX = 0
+  let langOpY = 0
+  for (const langCode in translations) {
+    const langObj = translations[langCode as Language]
+    gameplay.langModal.optionButtons.push(
+      new Button(
+        [langOpX === 0 ? 140 : 360, 250 + 105 * langOpY, 180, 60],
+        p5.color(180),
+        p5,
+        function () {
+          p5.fill(255)
+          p5.stroke(0)
+          p5.strokeWeight(8)
+          p5.textSize(28)
+          p5.text(langObj.langname, 0, -5)
+        },
+        function () {
+          gc.translatedTexts = langObj
+          gameplay.langModal.isOpened = false
+        }
+      )
+    )
+    langOpX++
+    if (langOpX > 1) {
+      langOpX = 0
+      langOpY++
+    }
+  }
 
   render.buttons = {
     openShop: new Button(
@@ -25,16 +56,6 @@ const createButtons = (
         p5.text(gc.translatedTexts.short.getanimals, 0, -8)
       },
       function () {
-        ////
-        // if (true) {
-        //   // start ending phase
-        //   gameplay.phase = "ENDING"
-        //   gameplay.endingControl.isOpened = true
-        //   gameplay.endingControl.yyAP = 0
-        //   gameplay.endingControl.increaseAP = 0
-        //   gameplay.render.buttons.closeShop.ap = 0
-        // }
-
         shop.openBtnHintCountdown = 150
         shop.isOpened = true
         render.buttons.acceptCards.ap = 0
@@ -92,7 +113,13 @@ const createButtons = (
         if (gameplay.endingControl.isOpened) {
           gameplay.endingControl.isOpened = false
           Rune.showGameOverPopUp()
+          return
         }
+
+        if (gameplay.wheelModalIsOpened) {
+          return (gameplay.wheelModalIsOpened = false)
+        }
+
         shop.isOpened = false
         render.buttons.closeShop.ap = 1
       }

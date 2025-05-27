@@ -6,6 +6,9 @@ import Gameplay from "./Gameplay.ts"
 import runeInit from "./runeInit.ts"
 
 import sheetPath from "../assets/sheet.webp"
+import sheetElesPath from "../assets/elementsSheet.webp"
+import sheetAnimalsPath from "../assets/animalsSheet.webp"
+import sheetAbilitiesPath from "../assets/abilitySheet.webp"
 import fontPath from "../assets/font.ttf"
 import createButtons from "./createButtons.ts"
 import { Translation, translations } from "./locales.ts"
@@ -38,6 +41,9 @@ export default class GameClient {
     let globalFont: P5.Font | undefined
     this.preload = (p5) => {
       render.sheet = p5.loadImage(sheetPath)
+      render.sheetEles = p5.loadImage(sheetElesPath)
+      render.sheetAnimals = p5.loadImage(sheetAnimalsPath)
+      render.sheetAbilities = p5.loadImage(sheetAbilitiesPath)
       globalFont = p5.loadFont(fontPath)
     }
 

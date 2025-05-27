@@ -17,6 +17,7 @@ export type Translation = {
     ready: string
     goback: string
     watching: string
+    waiting: string
   }
   carddesc: string[]
 }
@@ -38,6 +39,7 @@ export const translations: Record<Language, Translation> = {
       ready: "Ready",
       goback: "Go back",
       watching: "Watching",
+      waiting: "Waiting...",
     },
     carddesc: [
       "0: dummy desc\ntext long text an text long\n line 3",
@@ -79,9 +81,9 @@ export const translations: Record<Language, Translation> = {
     ],
   },
   es: {
-    langname: "Español",
+    langname: "English",
     short: {
-      getanimals: "adafaef animals",
+      getanimals: "Get animals",
       acceeptcards: "Accept",
       changeelement: "Change element?",
       changetype: "Change type?",
@@ -94,6 +96,7 @@ export const translations: Record<Language, Translation> = {
       ready: "Ready",
       goback: "Go back",
       watching: "Watching",
+      waiting: "Waiting...",
     },
     carddesc: [
       "0: dummy desc\ntext long text an text long\n line 3",
@@ -135,9 +138,9 @@ export const translations: Record<Language, Translation> = {
     ],
   },
   pt: {
-    langname: "Português",
+    langname: "English",
     short: {
-      getanimals: "adafaef animals",
+      getanimals: "Get animals",
       acceeptcards: "Accept",
       changeelement: "Change element?",
       changetype: "Change type?",
@@ -150,6 +153,7 @@ export const translations: Record<Language, Translation> = {
       ready: "Ready",
       goback: "Go back",
       watching: "Watching",
+      waiting: "Waiting...",
     },
     carddesc: [
       "0: dummy desc\ntext long text an text long\n line 3",
@@ -191,9 +195,9 @@ export const translations: Record<Language, Translation> = {
     ],
   },
   ru: {
-    langname: "Русский",
+    langname: "English",
     short: {
-      getanimals: "adafaef animals",
+      getanimals: "Get animals",
       acceeptcards: "Accept",
       changeelement: "Change element?",
       changetype: "Change type?",
@@ -206,6 +210,7 @@ export const translations: Record<Language, Translation> = {
       ready: "Ready",
       goback: "Go back",
       watching: "Watching",
+      waiting: "Waiting...",
     },
     carddesc: [
       "0: dummy desc\ntext long text an text long\n line 3",

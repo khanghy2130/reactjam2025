@@ -36,7 +36,6 @@ export default function runeInit(gameplay: Gameplay) {
 
         if (yourPlayerId !== undefined) {
           const savedLang = game.persisted[yourPlayerId].lang
-          console.log(savedLang)
           if (savedLang) gameplay.gc.translatedTexts = translations[savedLang]
           // open language modal if haven't set before
           else gameplay.openLangModal()

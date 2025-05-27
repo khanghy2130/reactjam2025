@@ -552,8 +552,6 @@ export const getTriggerPositions: (
     })
   }
 
-  //// return possibleTPs.filter(([x, y]) => collection[y][x] === null)
-
   let possibleTPs: [number, number][] = []
   switch (targetCard.ability.where) {
     case "ALL":

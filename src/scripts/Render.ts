@@ -2,7 +2,7 @@ import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
 import GameClient from "./GameClient"
 import Gameplay from "./Gameplay"
 import Button from "./Button"
-import { Card, CARDS_TABLE } from "./cards"
+import { Animal, Card, CARDS_TABLE, Ele } from "./cards"
 import { Translation } from "./locales"
 import { Collection, LogicPlayer } from "../logic"
 
@@ -29,6 +29,9 @@ interface Flasher {
 export default class Render {
   gc: GameClient
   sheet!: P5.Image
+  sheetEles!: P5.Image
+  sheetAnimals!: P5.Image
+  sheetAbilities!: P5.Image
   p5!: P5
   gameplay!: Gameplay
 
@@ -40,11 +43,29 @@ export default class Render {
 
   dragHoveredPos: null | [number, number]
 
+  animalsOrder: Animal[]
+  elesOrder: Ele[]
+
   constructor(gameClient: GameClient) {
     this.gc = gameClient
     this.flashers = []
     this.dragHoveredPos = null
     this.playersInfo = {}
+    this.animalsOrder = [
+      "RAT",
+      "OX",
+      "TIGER",
+      "RABBIT",
+      "DRAGON",
+      "SNAKE",
+      "HORSE",
+      "GOAT",
+      "MONKEY",
+      "CHICKEN",
+      "DOG",
+      "PIG",
+    ]
+    this.elesOrder = ["WOOD", "FIRE", "EARTH", "METAL", "WATER", "FLUX"]
   }
 
   getGridCenter(collection: Collection): [number, number] {
@@ -211,22 +232,6 @@ export default class Render {
     const buttons = this.buttons
     const tt = this.gc.translatedTexts
     const playersState = gp.gs.players
-
-    //// any phase rendering: collection, players, lang menu
-
-    // p5.stroke(0)
-    // p5.strokeWeight(3)
-    // this.renderYang(250, 500, 20)
-
-    // p5.stroke(255)
-    // p5.strokeWeight(3)
-    // this.renderYin(300, 500, 20)
-
-    // render collection border
-    // p5.strokeWeight(5)
-    // p5.stroke(150)
-    // p5.noFill()
-    // p5.rect(250, 460, 440, 580, 15)
 
     const viewingPlayerState = playersState.find(
       (p) => p.id === gp.viewingPlayer
@@ -458,6 +463,13 @@ export default class Render {
           p5.line(15, -60, 0, -80)
           p5.line(-15, -60, 0, -80)
           p5.pop()
+        }
+      } else if (gp.phase === "READY") {
+        if (gp.viewingPlayer === gp.myPlayerId) {
+          p5.fill(255)
+          p5.noStroke()
+          p5.textSize(30)
+          p5.text(tt.short.waiting, 250, 800)
         }
       }
     }
@@ -698,6 +710,15 @@ export default class Render {
         }
       }
     }
+
+    /////
+    // this.renderTransformCard(
+    //   CARDS_TABLE[Math.floor((p5.frameCount * 0.05) % 36)],
+    //   250,
+    //   400,
+    //   4,
+    //   4
+    // )
   }
 
   easeOutElastic(x: number) {
@@ -872,6 +893,144 @@ export default class Render {
     }
   }
 
+  renderMiniAbility(p5: P5, card: Card) {
+    const ability = card.ability
+    p5.noStroke()
+    p5.textSize(16)
+    const numY = 48
+    if (card.isYin) {
+      p5.fill(30)
+      p5.rect(0, numY, 25, 15)
+      p5.fill(255)
+      p5.text("+" + ability.num, 0, numY - 2)
+    } else {
+      p5.fill(255)
+      p5.rect(0, numY, 25, 15)
+      p5.fill(30)
+      p5.text("+" + ability.num, 0, numY - 2)
+    }
+
+    // flux
+    if (ability.con.special === "FLUX") return
+
+    if (ability.where === "ALL") {
+      if (ability.con.animals) {
+        this.renderAnimalIcon(p5, ability.con.animals[0], -15, 27, 35)
+        this.renderAnimalIcon(p5, ability.con.animals[1], 15, 27, 35)
+        return
+      }
+      if (ability.con.ele) {
+        this.renderEleIcon(p5, ability.con.ele, 0, 28, 30)
+        return
+      }
+      // edge
+      if (ability.con.special === "EDGE") {
+        p5.image(this.sheetAbilities, 0, 28, 20, 20, 300, 0, 150, 150)
+        return
+      }
+      // double adj
+      if (ability.con.special === "DOUBLEADJ") {
+        p5.image(this.sheetAbilities, -8, 28, 25, 25, 0, 0, 150, 150)
+        p5.textSize(12)
+        p5.fill(255)
+        p5.text("x2", 12, 26)
+        return
+      }
+    }
+
+    if (ability.where === "DIA") {
+      // all dia are ele
+      p5.image(this.sheetAbilities, -12, 28, 23, 23, 150, 0, 150, 150)
+      this.renderEleIcon(p5, ability.con.ele!, 12, 28, 30)
+      return
+    }
+
+    if (ability.where === "ADJ") {
+      if (ability.con.special === "UNIQUEELE") {
+        p5.image(this.sheetAbilities, -10, 28, 25, 25, 0, 0, 150, 150)
+        p5.textSize(12)
+        p5.fill(255)
+        p5.text("UNI", 12, 26)
+        return
+      }
+      if (ability.con.special === "EMPTY") {
+        p5.image(this.sheetAbilities, -10, 28, 25, 25, 0, 0, 150, 150)
+        p5.textSize(12)
+        p5.fill(255)
+        p5.text("[X]", 10, 26)
+        return
+      }
+    }
+
+    if (ability.where === "ROW") {
+      if (ability.con.special === "UNIQUEELE") {
+        p5.image(this.sheetAbilities, -14, 28, 25, 25, 600, 0, 150, 150)
+        p5.textSize(12)
+        p5.fill(255)
+        p5.text("UNI", 12, 26)
+        return
+      }
+      p5.image(this.sheetAbilities, -12, 28, 25, 25, 600, 0, 150, 150)
+      p5.strokeWeight(1)
+      if (ability.con.force === "YANG") {
+        p5.stroke(30)
+        this.renderYang(15, 28, 8)
+      } else {
+        p5.stroke(250)
+        this.renderYin(15, 28, 8)
+      }
+      return
+    }
+
+    if (ability.where === "COL") {
+      if (ability.con.special === "UNIQUEELE") {
+        p5.image(this.sheetAbilities, -12, 28, 25, 25, 450, 0, 150, 150)
+        p5.textSize(12)
+        p5.fill(255)
+        p5.text("UNI", 12, 26)
+        return
+      }
+      p5.image(this.sheetAbilities, -10, 28, 25, 25, 450, 0, 150, 150)
+      p5.strokeWeight(1)
+      if (ability.con.force === "YANG") {
+        p5.stroke(30)
+        this.renderYang(12, 28, 8)
+      } else {
+        p5.stroke(250)
+        this.renderYin(12, 28, 8)
+      }
+      return
+    }
+  }
+
+  renderAnimalIcon(p5: P5, animal: Animal, x: number, y: number, s: number) {
+    p5.image(
+      this.sheetAnimals,
+      x,
+      y,
+      s,
+      s,
+      150 * this.animalsOrder.indexOf(animal),
+      0,
+      150,
+      150
+    )
+  }
+
+  renderEleIcon(p5: P5, ele: Ele, x: number, y: number, s: number) {
+    p5.image(
+      this.sheetEles,
+      x,
+      y,
+      s,
+      s,
+      150 * this.elesOrder.indexOf(ele),
+      0,
+      150,
+      150
+    )
+  }
+
   // card: 105 x 140
   renderTransformCard(
     card: Card,
@@ -896,11 +1055,7 @@ export default class Render {
       150,
       200
     )
-    p5.fill(255)
-    p5.stroke(0)
-    p5.strokeWeight(3)
-    p5.textSize(16)
-    p5.text("ability\nhere", 0, 40)
+    this.renderMiniAbility(p5, card)
     p5.pop()
   }
 

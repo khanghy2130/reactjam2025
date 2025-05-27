@@ -5,6 +5,7 @@ import Button from "./Button"
 import { Animal, Card, CARDS_TABLE, Ele } from "./cards"
 import { Translation } from "./locales"
 import { Collection, LogicPlayer } from "../logic"
+import scoringSoundPath from "../assets/scoring.mp3"
 
 interface Buttons {
   openShop: Button
@@ -46,6 +47,8 @@ export default class Render {
   animalsOrder: Animal[]
   elesOrder: Ele[]
 
+  scoreSound: HTMLAudioElement
+
   constructor(gameClient: GameClient) {
     this.gc = gameClient
     this.flashers = []
@@ -66,6 +69,7 @@ export default class Render {
       "PIG",
     ]
     this.elesOrder = ["WOOD", "FIRE", "EARTH", "METAL", "WATER", "FLUX"]
+    this.scoreSound = new Audio(scoringSoundPath)
   }
 
   getGridCenter(collection: Collection): [number, number] {
@@ -283,20 +287,22 @@ export default class Render {
               viewingPlayerState.isReady
             ) {
               const [pos1, pos2] = viewingPlayerState.playedPositions
-              if (
-                (pos1[0] === x && pos1[1] === y) ||
-                (pos2[0] === x && pos2[1] === y)
-              ) {
-                p5.strokeWeight(4)
-                p5.stroke(255)
-                p5.noFill()
-                p5.rect(ldx + 105 * x, ldy + 140 * y, 90, 125, 10)
-                p5.fill(255)
-                p5.noStroke()
-                p5.textSize(50)
-                p5.text("?", ldx + 105 * x, ldy + 140 * y)
+              if (gp.gs!.round < 6) {
+                if (
+                  (pos1[0] === x && pos1[1] === y) ||
+                  (pos2[0] === x && pos2[1] === y)
+                ) {
+                  p5.strokeWeight(4)
+                  p5.stroke(255)
+                  p5.noFill()
+                  p5.rect(ldx + 105 * x, ldy + 140 * y, 90, 125, 10)
+                  p5.fill(255)
+                  p5.noStroke()
+                  p5.textSize(50)
+                  p5.text("?", ldx + 105 * x, ldy + 140 * y)
 
-                continue
+                  continue
+                }
               }
             }
             this.renderTransformCard(
@@ -526,8 +532,14 @@ export default class Render {
       // render full desc
       p5.noStroke()
       p5.fill(255)
-      p5.textSize(30)
-      p5.text(tt.carddesc[card.id], 250, -100 + 210 * ap)
+      p5.textSize(26)
+      // correct tt.carddesc[card.id]
+      //// tt.carddesc[Math.floor((p5.frameCount * 0.05) % 36)]
+      p5.text(
+        `+${card.ability.num} ${card.isYin ? tt.short.yin : tt.short.yang} ${tt.carddesc[card.id]}`,
+        250,
+        -100 + 210 * ap
+      )
     }
 
     // scoring phase: update & render card sums
@@ -543,6 +555,10 @@ export default class Render {
           if (sc.triggerIndex < scoringCard.triggers.length) {
             const triggerPos = scoringCard.triggers[sc.triggerIndex]
             this.addFlasher(triggerPos[0], triggerPos[1])
+            // play scoring sound
+            this.scoreSound.pause()
+            this.scoreSound.currentTime = 0
+            this.scoreSound.play()
             scoringCard.sum += scoringCard.adder
             if (scoringCard.isYin) sc.yinSum += scoringCard.adder
             else sc.yangSum += scoringCard.adder
@@ -711,7 +727,7 @@ export default class Render {
       }
     }
 
-    /////
+    // test show cards
     // this.renderTransformCard(
     //   CARDS_TABLE[Math.floor((p5.frameCount * 0.05) % 36)],
     //   250,

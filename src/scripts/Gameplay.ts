@@ -316,7 +316,6 @@ export default class Gameplay {
 
   inspectCard(card: Card, ox: number, oy: number, os: number) {
     const ip = this.inspect
-
     if (ip.isOpened) return
 
     ip.card = card

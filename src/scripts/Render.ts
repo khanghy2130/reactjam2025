@@ -367,7 +367,7 @@ export default class Render {
           const pps = this.getPossiblePlacements(rows, cols)
           p5.noFill()
           p5.stroke(220, 220, 0)
-          p5.strokeWeight(5)
+          p5.strokeWeight(3)
           for (let i = 0; i < pps.length; i++) {
             const [x, y] = pps[i]
             const centerX = ldx + 105 * x
@@ -532,14 +532,23 @@ export default class Render {
       // render full desc
       p5.noStroke()
       p5.fill(255)
-      p5.textSize(26)
-      // correct tt.carddesc[card.id]
-      //// tt.carddesc[Math.floor((p5.frameCount * 0.05) % 36)]
+      p5.textSize(28)
+      const yyType = card.isYin ? tt.short.yin : tt.short.yang
       p5.text(
-        `+${card.ability.num} ${card.isYin ? tt.short.yin : tt.short.yang} ${tt.carddesc[card.id]}`,
+        `+${card.ability.num} ${yyType} ${tt.carddesc[card.id]}`,
         250,
         -100 + 210 * ap
       )
+
+      // render y/y type label
+      const yyLabelX = 600 - 350 * ap
+      p5.textSize(40)
+      p5.text(`${yyType}`, yyLabelX, 800)
+      p5.stroke(255)
+      p5.strokeWeight(5)
+      p5.line(yyLabelX, 770, yyLabelX, 710)
+      p5.line(yyLabelX + 15, 730, yyLabelX, 710)
+      p5.line(yyLabelX - 15, 730, yyLabelX, 710)
     }
 
     // scoring phase: update & render card sums
@@ -1117,6 +1126,9 @@ export default class Render {
     const buttons = this.buttons
     const mx = this.gc.mx
     const my = this.gc.my
+
+    //// test inspect specific card
+    // return gp.inspectCard(CARDS_TABLE[13], 250, 400, 1)
 
     // blocked by ending modal?
     if (gp.endingControl.isOpened) {

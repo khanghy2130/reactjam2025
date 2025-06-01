@@ -9,7 +9,7 @@ export default function runeInit(gameplay: Gameplay) {
       gameplay.gs = game // sync game state
 
       // new game? reset all
-      if (event?.name === "stateSync" && event.isNewGame) {
+      if (event?.name === "stateSync" && event.isNewGame && game.round === 1) {
         prevGS = undefined // force reset
         gameplay.myPlayerId = yourPlayerId // sync playerId
         // inital viewingPlayer (self, or first player if is spectator)

@@ -47,6 +47,9 @@ export default class Render {
   animalsOrder: Animal[]
   elesOrder: Ele[]
 
+  endingRatingAPs: number[]
+  prevRatingLetters: string[]
+
   scoreSound: HTMLAudioElement
 
   constructor(gameClient: GameClient) {
@@ -54,6 +57,8 @@ export default class Render {
     this.flashers = []
     this.dragHoveredPos = null
     this.playersInfo = {}
+    this.endingRatingAPs = [0, 0, 0, 0]
+    this.prevRatingLetters = ["F", "F", "F", "F"]
     this.animalsOrder = [
       "RAT",
       "OX",
@@ -70,6 +75,12 @@ export default class Render {
     ]
     this.elesOrder = ["WOOD", "FIRE", "EARTH", "METAL", "WATER", "FLUX"]
     this.scoreSound = new Audio(scoringSoundPath)
+  }
+
+  playSound(s: HTMLAudioElement) {
+    s.pause()
+    s.currentTime = 0
+    s.play()
   }
 
   getGridCenter(collection: Collection): [number, number] {
@@ -564,10 +575,7 @@ export default class Render {
           if (sc.triggerIndex < scoringCard.triggers.length) {
             const triggerPos = scoringCard.triggers[sc.triggerIndex]
             this.addFlasher(triggerPos[0], triggerPos[1])
-            // play scoring sound
-            this.scoreSound.pause()
-            this.scoreSound.currentTime = 0
-            this.scoreSound.play()
+            this.playSound(this.scoreSound)
             scoringCard.sum += scoringCard.adder
             if (scoringCard.isYin) sc.yinSum += scoringCard.adder
             else sc.yangSum += scoringCard.adder
@@ -665,9 +673,9 @@ export default class Render {
           this.renderYin(yinX, y, 40)
 
           const actualPoints = Math.min(p.yangPts, p.yinPts) // points here
-          const increaseFactor = Math.floor(
+          const unflooredIF =
             Math.sqrt(1 - Math.pow(ec.increaseAP - 1, 2)) * actualPoints
-          )
+          const increaseFactor = Math.floor(unflooredIF)
           p5.textSize(26)
           p5.fill(255)
           p5.rect(yangX - 30, y + 70, 60, 30)
@@ -690,29 +698,26 @@ export default class Render {
             p5.text(increaseFactor, 270, y - 4)
 
             // letter rating
-            p5.textSize(50)
-            p5.fill(0)
-            p5.strokeWeight(15)
             let letter = "F"
             let percentage = 0
-            if (increaseFactor < 60) {
-              percentage = increaseFactor / 60
+            if (unflooredIF < 60) {
+              percentage = unflooredIF / 60
               letter = "F"
               p5.stroke(150)
-            } else if (increaseFactor < 70) {
-              percentage = (increaseFactor - 60) / 10
+            } else if (unflooredIF < 70) {
+              percentage = (unflooredIF - 60) / 10
               letter = "D"
               p5.stroke(65, 200, 60)
-            } else if (increaseFactor < 80) {
-              percentage = (increaseFactor - 70) / 10
+            } else if (unflooredIF < 80) {
+              percentage = (unflooredIF - 70) / 10
               letter = "C"
               p5.stroke(23, 160, 227)
-            } else if (increaseFactor < 90) {
-              percentage = (increaseFactor - 80) / 10
+            } else if (unflooredIF < 90) {
+              percentage = (unflooredIF - 80) / 10
               letter = "B"
               p5.stroke(237, 190, 17)
-            } else if (increaseFactor < 100) {
-              percentage = (increaseFactor - 90) / 10
+            } else if (unflooredIF < 100) {
+              percentage = (unflooredIF - 90) / 10
               letter = "A"
               p5.stroke(240, 70, 60)
             } else {
@@ -720,6 +725,16 @@ export default class Render {
               letter = "S"
               p5.stroke(255)
             }
+            // trigger new letter effect
+            if (this.prevRatingLetters[i] !== letter) {
+              this.prevRatingLetters[i] = letter
+              this.endingRatingAPs[i] = 0
+              this.playSound(this.scoreSound)
+            }
+            this.endingRatingAPs[i] = Math.min(1, this.endingRatingAPs[i] + 0.1)
+            p5.textSize(80 - 30 * this.endingRatingAPs[i])
+            p5.fill(0)
+            p5.strokeWeight(15)
             p5.text(letter, 420, y)
             p5.strokeWeight(4)
             p5.noFill()

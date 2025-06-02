@@ -75,6 +75,15 @@ function checkToEndRound(game: GameState) {
   })
 
   game.round++ // update round
+
+  //// test: immediate end the game with random scores
+  // if (game.round === 6) return
+  // game.round = 6
+  // game.players.forEach((p) => {
+  //   const xx = Math.floor(Math.random() * 90 + 50)
+  //   p.yangPts = xx + Math.floor(Math.random() * 20)
+  //   p.yinPts = xx + Math.floor(Math.random() * 20)
+  // })
 }
 
 Rune.initLogic({

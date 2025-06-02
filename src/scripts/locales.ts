@@ -1,5 +1,6 @@
-export type Language = "en"
-/// | "ru" | "es" | "pt"   Español  Português
+export const allLanguages = ["en"] as const
+/// , "ru", "es", "pt"  Русский  Español  Português
+export type Language = (typeof allLanguages)[number]
 
 export type Translation = {
   langname: string

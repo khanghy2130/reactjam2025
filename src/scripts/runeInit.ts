@@ -1,6 +1,6 @@
 import { GameState } from "../logic"
 import Gameplay from "./Gameplay"
-import { translations } from "./locales"
+import { allLanguages, translations } from "./locales"
 
 export default function runeInit(gameplay: Gameplay) {
   Rune.initClient({
@@ -34,9 +34,11 @@ export default function runeInit(gameplay: Gameplay) {
         gameplay.langModal.isOpened = false
         gameplay.wheelModalIsOpened = false
 
+        // set language
         if (yourPlayerId !== undefined) {
           const savedLang = game.persisted[yourPlayerId].lang
-          if (savedLang) gameplay.gc.translatedTexts = translations[savedLang]
+          if (allLanguages.includes(savedLang))
+            gameplay.gc.translatedTexts = translations[savedLang]
           // open language modal if haven't set before
           else gameplay.openLangModal()
         }

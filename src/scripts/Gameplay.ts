@@ -367,6 +367,8 @@ export default class Gameplay {
       this.endingControl.yyAP = 0
       this.endingControl.increaseAP = 0
       this.render.buttons.closeShop.ap = 0
+      this.render.endingRatingAPs = [0, 0, 0, 0]
+      this.render.prevRatingLetters = ["F", "F", "F", "F"]
       return
     } else this.phase = "GET" // continue below
 

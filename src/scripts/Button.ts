@@ -1,6 +1,7 @@
 import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
+import Render from "./Render"
 
-function easeOutElastic(x: number, p5: P5) {
+export function easeOutElastic(x: number, p5: P5) {
   const c4 = (2 * 180) / 3
   return x === 0
     ? 0
@@ -24,6 +25,7 @@ export default class Button {
     [x, y, w, h]: [number, number, number, number],
     bc: P5.Color,
     p5: P5,
+    render: Render,
     renderContent: () => void,
     clicked: () => void
   ) {
@@ -36,6 +38,7 @@ export default class Button {
     this.bc2 = p5.lerpColor(bc, p5.color(0), 0.25)
     this.renderContent = renderContent
     this.clicked = () => {
+      render.playSound(render.clickingSound)
       this.ap = 0 // start animation
       clicked()
     }
@@ -53,9 +56,8 @@ export default class Button {
   }
 
   render(p5: P5) {
-    if (this.ap < 1) {
-      this.ap = Math.min(this.ap + 0.022, 1)
-    }
+    if (this.ap < 1) this.ap = Math.min(this.ap + 0.022, 1)
+
     // render button
     p5.push()
     p5.translate(this.x, this.y)

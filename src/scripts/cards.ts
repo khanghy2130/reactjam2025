@@ -108,7 +108,7 @@ export const CARDS_TABLE: Card[] = [
     ele: "FLUX",
     isYin: true,
     ability: {
-      num: 4,
+      num: 5,
       where: "SELF",
       con: {
         special: "FLUX",
@@ -134,7 +134,7 @@ export const CARDS_TABLE: Card[] = [
     ele: "FIRE",
     isYin: false,
     ability: {
-      num: 3,
+      num: 2,
       where: "ALL",
       con: {
         special: "DOUBLEADJ",
@@ -147,7 +147,7 @@ export const CARDS_TABLE: Card[] = [
     ele: "EARTH",
     isYin: true,
     ability: {
-      num: 3,
+      num: 2,
       where: "ALL",
       con: {
         special: "DOUBLEADJ",
@@ -186,7 +186,7 @@ export const CARDS_TABLE: Card[] = [
     ele: "FLUX",
     isYin: false,
     ability: {
-      num: 4,
+      num: 5,
       where: "SELF",
       con: {
         special: "FLUX",
@@ -264,7 +264,7 @@ export const CARDS_TABLE: Card[] = [
     ele: "FLUX",
     isYin: false,
     ability: {
-      num: 4,
+      num: 5,
       where: "SELF",
       con: {
         special: "FLUX",
@@ -342,7 +342,7 @@ export const CARDS_TABLE: Card[] = [
     ele: "FLUX",
     isYin: true,
     ability: {
-      num: 4,
+      num: 5,
       where: "SELF",
       con: {
         special: "FLUX",
@@ -420,7 +420,7 @@ export const CARDS_TABLE: Card[] = [
     ele: "FLUX",
     isYin: true,
     ability: {
-      num: 4,
+      num: 5,
       where: "SELF",
       con: {
         special: "FLUX",
@@ -498,7 +498,7 @@ export const CARDS_TABLE: Card[] = [
     ele: "FLUX",
     isYin: false,
     ability: {
-      num: 4,
+      num: 5,
       where: "SELF",
       con: {
         special: "FLUX",

@@ -1,11 +1,12 @@
 import type P5 from "react-p5/node_modules/@types/p5/index.d.ts"
 import GameClient from "./GameClient"
 import Gameplay from "./Gameplay"
-import Button from "./Button"
+import Button, { easeOutElastic } from "./Button"
 import { Animal, Card, CARDS_TABLE, Ele } from "./cards"
 import { Translation } from "./locales"
 import { Collection, LogicPlayer } from "../logic"
 import scoringSoundPath from "../assets/scoring.mp3"
+import clickingSoundPath from "../assets/click.mp3"
 
 interface Buttons {
   openShop: Button
@@ -50,13 +51,17 @@ export default class Render {
   endingRatingAPs: number[]
   prevRatingLetters: string[]
 
+  roundTextAP: number
+
   scoreSound: HTMLAudioElement
+  clickingSound: HTMLAudioElement
 
   constructor(gameClient: GameClient) {
     this.gc = gameClient
     this.flashers = []
     this.dragHoveredPos = null
     this.playersInfo = {}
+    this.roundTextAP = 0
     this.endingRatingAPs = [0, 0, 0, 0]
     this.prevRatingLetters = ["F", "F", "F", "F"]
     this.animalsOrder = [
@@ -75,6 +80,7 @@ export default class Render {
     ]
     this.elesOrder = ["WOOD", "FIRE", "EARTH", "METAL", "WATER", "FLUX"]
     this.scoreSound = new Audio(scoringSoundPath)
+    this.clickingSound = new Audio(clickingSoundPath)
   }
 
   playSound(s: HTMLAudioElement) {
@@ -146,13 +152,14 @@ export default class Render {
 
   renderPlayers(p5: P5, playersState: LogicPlayer[]) {
     const gp = this.gameplay
+    const isScoring = gp.phase === "SCORING"
+    const sc = gp.scoringControl
     // render players
     const avatars = playersState.map((p) => this.playersInfo[p.id].avatar)
     const displayPoints: [number, number][] = playersState.map((p, index) => {
       // not scoring phase? show current
-      if (gp.phase !== "SCORING") return [p.yangPts, p.yinPts]
+      if (!isScoring) return [p.yangPts, p.yinPts]
 
-      const sc = gp.scoringControl
       // if already past this player? show current
       if (sc.playerIndex > index) return [p.yangPts, p.yinPts]
       // if is not at this player yet? show past
@@ -185,6 +192,18 @@ export default class Render {
     p5.text(displayPoints[0][0], 160, 46)
     p5.fill(255)
     p5.text(displayPoints[0][1], 230, 46)
+    // current scoring sums
+    if (isScoring && sc.playerIndex === 0) {
+      p5.textSize(22)
+      p5.fill(255)
+      p5.rect(160, 80, 70, 30)
+      p5.fill(30)
+      p5.rect(230, 80, 70, 30)
+      p5.text("+" + sc.yangSum, 160, 76)
+      p5.fill(255)
+      p5.text("+" + sc.yinSum, 230, 76)
+      p5.textSize(32)
+    }
     if (avatars[0]) p5.image(avatars[0], 100, 50, 60, 60)
     if (playersState[0].isReady) {
       p5.fill(65, 230, 60)
@@ -200,6 +219,18 @@ export default class Render {
       p5.text(displayPoints[1][0], 370, 46)
       p5.fill(255)
       p5.text(displayPoints[1][1], 440, 46)
+      // current scoring sums
+      if (isScoring && sc.playerIndex === 1) {
+        p5.textSize(22)
+        p5.fill(255)
+        p5.rect(370, 80, 70, 30)
+        p5.fill(30)
+        p5.rect(440, 80, 70, 30)
+        p5.text("+" + sc.yangSum, 370, 76)
+        p5.fill(255)
+        p5.text("+" + sc.yinSum, 440, 76)
+        p5.textSize(32)
+      }
       if (avatars[1]) p5.image(avatars[1], 310, 50, 60, 60)
       if (playersState[1].isReady) {
         p5.fill(65, 230, 60)
@@ -216,6 +247,18 @@ export default class Render {
       p5.text(displayPoints[2][0], 160, 116)
       p5.fill(255)
       p5.text(displayPoints[2][1], 230, 116)
+      // current scoring sums
+      if (isScoring && sc.playerIndex === 2) {
+        p5.textSize(22)
+        p5.fill(255)
+        p5.rect(160, 150, 70, 30)
+        p5.fill(30)
+        p5.rect(230, 150, 70, 30)
+        p5.text("+" + sc.yangSum, 160, 146)
+        p5.fill(255)
+        p5.text("+" + sc.yinSum, 230, 146)
+        p5.textSize(32)
+      }
       if (avatars[2]) p5.image(avatars[2], 100, 120, 60, 60)
       if (playersState[2].isReady) {
         p5.fill(65, 230, 60)
@@ -232,6 +275,18 @@ export default class Render {
       p5.text(displayPoints[3][0], 370, 116)
       p5.fill(255)
       p5.text(displayPoints[3][1], 440, 116)
+      // current scoring sums
+      if (isScoring && sc.playerIndex === 3) {
+        p5.textSize(22)
+        p5.fill(255)
+        p5.rect(370, 150, 70, 30)
+        p5.fill(30)
+        p5.rect(440, 150, 70, 30)
+        p5.text("+" + sc.yangSum, 370, 146)
+        p5.fill(255)
+        p5.text("+" + sc.yinSum, 440, 146)
+        p5.textSize(32)
+      }
       if (avatars[3]) p5.image(avatars[3], 310, 120, 60, 60)
       if (playersState[3].isReady) {
         p5.fill(65, 230, 60)
@@ -377,7 +432,7 @@ export default class Render {
           // make a list of possible placements
           const pps = this.getPossiblePlacements(rows, cols)
           p5.noFill()
-          p5.stroke(220, 220, 0)
+          p5.stroke(240, 70, 60)
           p5.strokeWeight(3)
           for (let i = 0; i < pps.length; i++) {
             const [x, y] = pps[i]
@@ -495,71 +550,10 @@ export default class Render {
     p5.noStroke()
     for (let i = this.flashers.length - 1; i >= 0; i--) {
       const f = this.flashers[i]
-      p5.fill(255, 255, 0, (1 - f.ap) * 220)
+      p5.fill(240, 70, 60, (1 - f.ap) * 220)
       p5.rect(ldx + 105 * f.x, ldy + 140 * f.y, 105, 140, 10)
       f.ap += 0.1
       if (f.ap >= 1) this.flashers.splice(i, 1) // remove flasher
-    }
-
-    // render langModal
-    if (gp.langModal.isOpened) {
-      // modal bg
-      p5.noStroke()
-      p5.fill(0, 200)
-      const h = (p5.height / p5.width) * 500
-      p5.rect(250, h / 2, 500, h)
-      gp.langModal.optionButtons.forEach((b) => b.render(p5))
-    }
-
-    // card inspection
-    if (gp.inspect.isOpened) {
-      const ip = gp.inspect
-      const { card, ap, ox, oy, os } = ip
-
-      // update opening and closing animation
-      if (ip.isOpening) ip.ap = Math.min(1, ip.ap + 0.15)
-      else {
-        ip.ap = Math.max(0, ip.ap - 0.15)
-        if (ip.ap === 0) {
-          ip.isOpened = false // done closing
-        }
-      }
-
-      // render bg
-      p5.noStroke()
-      const h = (p5.height / p5.width) * 500
-      p5.fill(0, 220 * ap)
-      p5.rect(250, h / 2, 500, h)
-
-      // render card
-      this.renderTransformCard(
-        card,
-        ox + (250 - ox) * ap,
-        oy + (470 - oy) * ap,
-        os + (4 - os) * ap,
-        os + (4 - os) * ap
-      )
-
-      // render full desc
-      p5.noStroke()
-      p5.fill(255)
-      p5.textSize(28)
-      const yyType = card.isYin ? tt.short.yin : tt.short.yang
-      p5.text(
-        `+${card.ability.num} ${yyType} ${tt.carddesc[card.id]}`,
-        250,
-        -100 + 210 * ap
-      )
-
-      // render y/y type label
-      const yyLabelX = 600 - 350 * ap
-      p5.textSize(40)
-      p5.text(`${yyType}`, yyLabelX, 800)
-      p5.stroke(255)
-      p5.strokeWeight(5)
-      p5.line(yyLabelX, 770, yyLabelX, 710)
-      p5.line(yyLabelX + 15, 730, yyLabelX, 710)
-      p5.line(yyLabelX - 15, 730, yyLabelX, 710)
     }
 
     // scoring phase: update & render card sums
@@ -751,6 +745,84 @@ export default class Render {
       }
     }
 
+    // render langModal
+    if (gp.langModal.isOpened) {
+      // modal bg
+      p5.noStroke()
+      p5.fill(0, 200)
+      const h = (p5.height / p5.width) * 500
+      p5.rect(250, h / 2, 500, h)
+      gp.langModal.optionButtons.forEach((b) => b.render(p5))
+    }
+    // render round text
+    else if (this.roundTextAP < 1) {
+      const roundTextAP = this.roundTextAP
+      this.roundTextAP = Math.min(1, roundTextAP + 0.02)
+      const prgFactor =
+        roundTextAP < 0.2
+          ? p5.map(roundTextAP, 0, 0.2, 0, 1)
+          : roundTextAP > 0.8
+            ? p5.map(roundTextAP, 0.8, 1, 1, 0)
+            : 1
+      p5.noStroke()
+      p5.textSize(40)
+      p5.fill(0, 0, 0, prgFactor * 255)
+      p5.rect(250, 440, 500, prgFactor * 80)
+      p5.fill(255, 255, 255, prgFactor * 255)
+      p5.text(tt.short.round + " " + gp.gs.round, 250, 435)
+    }
+
+    // card inspection
+    if (gp.inspect.isOpened) {
+      const ip = gp.inspect
+      const { card, ap, ox, oy, os } = ip
+
+      // update opening and closing animation
+      if (ip.isOpening) ip.ap = Math.min(1, ip.ap + 0.15)
+      else {
+        ip.ap = Math.max(0, ip.ap - 0.15)
+        if (ip.ap === 0) {
+          ip.isOpened = false // done closing
+        }
+      }
+
+      // render bg
+      p5.noStroke()
+      const h = (p5.height / p5.width) * 500
+      p5.fill(0, 220 * ap)
+      p5.rect(250, h / 2, 500, h)
+
+      // render card
+      this.renderTransformCard(
+        card,
+        ox + (250 - ox) * ap,
+        oy + (470 - oy) * ap,
+        os + (4 - os) * ap,
+        os + (4 - os) * ap
+      )
+
+      // render full desc
+      p5.noStroke()
+      p5.fill(255)
+      p5.textSize(28)
+      const yyType = card.isYin ? tt.short.yin : tt.short.yang
+      p5.text(
+        `+${card.ability.num} ${yyType} ${tt.carddesc[card.id]}`,
+        250,
+        -100 + 210 * ap
+      )
+
+      // render y/y type label
+      const yyLabelX = 600 - 350 * ap
+      p5.textSize(40)
+      p5.text(`${yyType}`, yyLabelX, 800)
+      p5.stroke(255)
+      p5.strokeWeight(5)
+      p5.line(yyLabelX, 770, yyLabelX, 710)
+      p5.line(yyLabelX + 15, 730, yyLabelX, 710)
+      p5.line(yyLabelX - 15, 730, yyLabelX, 710)
+    }
+
     // test show cards
     // this.renderTransformCard(
     //   CARDS_TABLE[Math.floor((p5.frameCount * 0.05) % 36)],
@@ -835,6 +907,8 @@ export default class Render {
       } else {
         // flips is at 0, showing real card, keep at 0.5
         holder2.ap = Math.max(holder2.ap, 0.5)
+        this.playSound(this.scoreSound)
+        shop.revealBounceAP = 0
       }
     }
 
@@ -850,10 +924,33 @@ export default class Render {
       shop.holdersY.start,
       shop.holdersY.end
     )
+    // update revealBounceAP
+    if (shop.revealBounceAP < 1) {
+      shop.revealBounceAP = Math.min(shop.revealBounceAP + 0.022, 1)
+    }
+    if (shop.revealBounceAP < 0.08) shop.revealBounceAP = 0.08
+    let scaleFactor =
+      shop.revealBounceAP < 1 ? easeOutElastic(shop.revealBounceAP, p5) : 1
+    scaleFactor *= 0.4 // animated range
+    const xScale = 0.6 + scaleFactor
+    const yScale = 1.4 - scaleFactor
+
     const sx1 = (holder1.ap < 0.5 ? holder1.ap : 1 - holder1.ap) * 2
     const sx2 = (holder2.ap < 0.5 ? holder2.ap : 1 - holder2.ap) * 2
-    this.renderTransformCard(holder1.card, 140, realY, sx1 * 1.5, 1.5)
-    this.renderTransformCard(holder2.card, 360, realY, sx2 * 1.5, 1.5)
+    this.renderTransformCard(
+      holder1.card,
+      140,
+      realY,
+      sx1 * 1.5 * xScale,
+      1.5 * yScale
+    )
+    this.renderTransformCard(
+      holder2.card,
+      360,
+      realY,
+      sx2 * 1.5 * xScale,
+      1.5 * yScale
+    )
 
     // render other than holders if they are not flipping
     if (!isFlipping) {
@@ -1167,7 +1264,10 @@ export default class Render {
     }
 
     // clicked language menu?
-    if (p5.dist(mx, my, 35, 50) < 18) return gp.openLangModal()
+    if (p5.dist(mx, my, 35, 50) < 18) {
+      this.playSound(this.clickingSound)
+      return gp.openLangModal()
+    }
 
     // viewing a guest? go back button
     if (gp.viewingPlayer !== gp.myPlayerId) {
@@ -1193,6 +1293,7 @@ export default class Render {
             my > holdersYEnd - 100 &&
             my < holdersYEnd + 100
           ) {
+            this.playSound(this.clickingSound)
             gp.inspectCard(holder1.card, 140, holdersYEnd, 1.5)
             return
           } else if (
@@ -1201,6 +1302,7 @@ export default class Render {
             my > holdersYEnd - 100 &&
             my < holdersYEnd + 100
           ) {
+            this.playSound(this.clickingSound)
             gp.inspectCard(holder2.card, 360, holdersYEnd, 1.5)
             return
           }
@@ -1237,6 +1339,7 @@ export default class Render {
               my > holdersYAR - 100 &&
               my < holdersYAR + 100
             ) {
+              this.playSound(this.clickingSound)
               gp.inspectCard(
                 shop.rerollPreviews.yangPool[shop.rerollPreviews.showingIndex],
                 140,
@@ -1250,6 +1353,7 @@ export default class Render {
               my > holdersYAR - 100 &&
               my < holdersYAR + 100
             ) {
+              this.playSound(this.clickingSound)
               gp.inspectCard(
                 shop.rerollPreviews.yinPool[shop.rerollPreviews.showingIndex],
                 360,
@@ -1274,12 +1378,18 @@ export default class Render {
         // release dragged card
         if (lc1.isDragging) {
           lc1.isDragging = false
-          if (this.dragHoveredPos) gp.playCard(0, this.dragHoveredPos)
+          if (this.dragHoveredPos) {
+            this.playSound(this.scoreSound)
+            gp.playCard(0, this.dragHoveredPos)
+          }
           return
         }
         if (lc2.isDragging) {
           lc2.isDragging = false
-          if (this.dragHoveredPos) gp.playCard(1, this.dragHoveredPos)
+          if (this.dragHoveredPos) {
+            this.playSound(this.scoreSound)
+            gp.playCard(1, this.dragHoveredPos)
+          }
           return
         }
 
@@ -1321,6 +1431,7 @@ export default class Render {
           )
             return // cancel if this card is hidden for this guest
         }
+        this.playSound(this.clickingSound)
         return gp.inspectCard(
           CARDS_TABLE[cardId],
           gp.localDisplay.x + 105 * clickedCardX,
@@ -1333,20 +1444,16 @@ export default class Render {
     // clicked a player?
     const statePlayers = gp.gs.players
     if (mx > 70 && mx < 270) {
-      if (my > 20 && my < 80) {
-        return gp.setViewingPlayer(statePlayers[0].id)
-      }
-      if (statePlayers.length > 2 && my > 90 && my < 150) {
+      if (my > 20 && my < 80) return gp.setViewingPlayer(statePlayers[0].id)
+
+      if (statePlayers.length > 2 && my > 90 && my < 150)
         return gp.setViewingPlayer(statePlayers[2].id)
-      }
     }
     if (statePlayers.length > 1 && mx > 280 && mx < 480) {
-      if (my > 20 && my < 80) {
-        return gp.setViewingPlayer(statePlayers[1].id)
-      }
-      if (statePlayers.length > 3 && my > 90 && my < 150) {
+      if (my > 20 && my < 80) return gp.setViewingPlayer(statePlayers[1].id)
+
+      if (statePlayers.length > 3 && my > 90 && my < 150)
         return gp.setViewingPlayer(statePlayers[3].id)
-      }
     }
   }
 }

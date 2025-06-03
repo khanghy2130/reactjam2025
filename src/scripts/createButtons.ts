@@ -23,6 +23,7 @@ const createButtons = (
         [langOpX === 0 ? 140 : 360, 250 + 105 * langOpY, 180, 60],
         p5.color(180),
         p5,
+        render,
         function () {
           p5.fill(255)
           p5.stroke(0)
@@ -49,6 +50,7 @@ const createButtons = (
       [250, 805, 400, 70],
       p5.color(65, 150, 60),
       p5,
+      render,
       function () {
         p5.fill(255)
         p5.stroke(0)
@@ -69,6 +71,7 @@ const createButtons = (
       [250, 760, 400, 70],
       p5.color(65, 150, 60),
       p5,
+      render,
       function () {
         p5.fill(255)
         p5.stroke(0)
@@ -103,6 +106,7 @@ const createButtons = (
       [430, 70, 70, 50],
       p5.color(240, 70, 60),
       p5,
+      render,
       function () {
         p5.fill(255)
         p5.noStroke()
@@ -129,6 +133,7 @@ const createButtons = (
       [250, 500, 300, 50],
       p5.color(65, 150, 60),
       p5,
+      render,
       function () {
         p5.fill(255)
         p5.stroke(0)
@@ -163,6 +168,7 @@ const createButtons = (
       [250, 580, 300, 50],
       p5.color(65, 150, 60),
       p5,
+      render,
       function () {
         p5.fill(255)
         p5.stroke(0)
@@ -198,6 +204,7 @@ const createButtons = (
       [140, 760, 140, 60],
       p5.color(65, 150, 60),
       p5,
+      render,
       function () {
         p5.fill(255)
         p5.stroke(0)
@@ -243,6 +250,7 @@ const createButtons = (
       [360, 760, 140, 60],
       p5.color(240, 70, 60),
       p5,
+      render,
       function () {
         p5.fill(255)
         p5.stroke(0)
@@ -266,6 +274,7 @@ const createButtons = (
       [120, 805, 140, 60],
       p5.color(240, 70, 50),
       p5,
+      render,
       function () {
         p5.fill(255)
         p5.stroke(0)
@@ -281,6 +290,7 @@ const createButtons = (
       [350, 805, 200, 60],
       p5.color(65, 150, 60),
       p5,
+      render,
       function () {
         p5.fill(255)
         p5.stroke(0)
@@ -301,6 +311,7 @@ const createButtons = (
       [130, 805, 170, 60],
       p5.color(65, 150, 60),
       p5,
+      render,
       function () {
         p5.fill(255)
         p5.stroke(0)

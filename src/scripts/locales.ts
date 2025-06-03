@@ -21,6 +21,7 @@ export type Translation = {
     waiting: string
     yin: string
     yang: string
+    round: string
   }
   carddesc: string[]
 }
@@ -45,6 +46,7 @@ export const translations: Record<Language, Translation> = {
       waiting: "Waiting...",
       yin: "Yin",
       yang: "Yang",
+      round: "Round",
     },
     carddesc: [
       "points for each Yin\nanimal in this row.\nYin animals: ox, rabbit,\nsnake, goat, chicken, pig.",

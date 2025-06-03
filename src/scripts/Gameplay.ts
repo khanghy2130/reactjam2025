@@ -38,6 +38,7 @@ interface Shop {
     end: number
     ap: number // 0 to 1
   }
+  revealBounceAP: number
   rerollPreviews: {
     yinPool: Card[]
     yangPool: Card[]
@@ -136,6 +137,7 @@ export default class Gameplay {
         end: 0,
         ap: 0,
       },
+      revealBounceAP: 1,
       rerollPreviews: {
         yinPool: [],
         yangPool: [],
@@ -198,6 +200,7 @@ export default class Gameplay {
     if (playersState[sc.playerIndex].id !== this.viewingPlayer) {
       this.viewingPlayer = playersState[sc.playerIndex].id
       this.localDisplay.x = 1000
+      this.render.playSound(this.render.clickingSound)
     }
     sc.countdown = 20 // initial wait before starting to score first card
     sc.cardIndex = 0
@@ -310,8 +313,10 @@ export default class Gameplay {
 
     this.viewingPlayer = playerId
     this.localDisplay.x = 1000
-    this.render.buttons.goBack.ap = 0
-    this.render.buttons.ready.ap = 0
+    const r = this.render
+    r.buttons.goBack.ap = 0
+    r.buttons.ready.ap = 0
+    r.playSound(r.clickingSound)
   }
 
   inspectCard(card: Card, ox: number, oy: number, os: number) {
@@ -352,6 +357,8 @@ export default class Gameplay {
   }
 
   startGetPhase() {
+    if (this.gs && this.gs.round < 6) this.render.roundTextAP = 0 // trigger round text
+
     // spectator skips this and PLAY phases
     if (this.myPlayerId === undefined) {
       this.phase = "READY"
@@ -402,5 +409,6 @@ export default class Gameplay {
     shop.holdersY.ap = 0
     shop.flipYinPool = shop.yinPool
     shop.flipYangPool = shop.yangPool
+    shop.revealBounceAP = 1
   }
 }

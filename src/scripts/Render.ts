@@ -1444,16 +1444,26 @@ export default class Render {
     // clicked a player?
     const statePlayers = gp.gs.players
     if (mx > 70 && mx < 270) {
-      if (my > 20 && my < 80) return gp.setViewingPlayer(statePlayers[0].id)
+      if (my > 20 && my < 80) {
+        this.playSound(this.clickingSound)
+        return gp.setViewingPlayer(statePlayers[0].id)
+      }
 
-      if (statePlayers.length > 2 && my > 90 && my < 150)
+      if (statePlayers.length > 2 && my > 90 && my < 150) {
+        this.playSound(this.clickingSound)
         return gp.setViewingPlayer(statePlayers[2].id)
+      }
     }
     if (statePlayers.length > 1 && mx > 280 && mx < 480) {
-      if (my > 20 && my < 80) return gp.setViewingPlayer(statePlayers[1].id)
+      if (my > 20 && my < 80) {
+        this.playSound(this.clickingSound)
+        return gp.setViewingPlayer(statePlayers[1].id)
+      }
 
-      if (statePlayers.length > 3 && my > 90 && my < 150)
+      if (statePlayers.length > 3 && my > 90 && my < 150) {
+        this.playSound(this.clickingSound)
         return gp.setViewingPlayer(statePlayers[3].id)
+      }
     }
   }
 }

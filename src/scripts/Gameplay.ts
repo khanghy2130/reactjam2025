@@ -316,7 +316,6 @@ export default class Gameplay {
     const r = this.render
     r.buttons.goBack.ap = 0
     r.buttons.ready.ap = 0
-    r.playSound(r.clickingSound)
   }
 
   inspectCard(card: Card, ox: number, oy: number, os: number) {

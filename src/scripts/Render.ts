@@ -20,6 +20,7 @@ interface Buttons {
   undo: Button
   ready: Button
   goBack: Button
+  shareImage: Button
 }
 
 interface Flasher {
@@ -34,6 +35,10 @@ export default class Render {
   sheetEles!: P5.Image
   sheetAnimals!: P5.Image
   sheetAbilities!: P5.Image
+  shareAssets!: {
+    bgImage: P5.Image
+    runeImage: P5.Image
+  }
   p5!: P5
   gameplay!: Gameplay
 
@@ -742,6 +747,10 @@ export default class Render {
           // trigger game over
           if (ec.increaseAP === 1) Rune.actions.readyToEndGame()
         }
+      } else {
+        // share button (if viewing self)
+        if (gp.viewingPlayer === gp.myPlayerId)
+          this.buttons.shareImage.render(p5)
       }
     }
 
@@ -823,7 +832,7 @@ export default class Render {
       p5.line(yyLabelX - 15, 730, yyLabelX, 710)
     }
 
-    // test show cards
+    // test show many cards
     // this.renderTransformCard(
     //   CARDS_TABLE[Math.floor((p5.frameCount * 0.05) % 36)],
     //   250,
@@ -1231,7 +1240,7 @@ export default class Render {
   click(p5: P5) {
     const gp = this.gameplay
     // no input during scoring phase
-    if (!gp.gs || gp.phase === "SCORING") return
+    if (!gp || !gp.gs || gp.phase === "SCORING") return
     // if is inspecting card then exit
     if (gp.inspect.isOpening) return (gp.inspect.isOpening = false)
 
@@ -1274,7 +1283,9 @@ export default class Render {
       if (gp.myPlayerId) {
         if (buttons.goBack.checkHover(mx, my)) return buttons.goBack.clicked()
       }
-    } else {
+    }
+    // viewing self?
+    else {
       // phases
       if (gp.phase === "GET") {
         const shop = gp.shop
@@ -1398,6 +1409,9 @@ export default class Render {
           if (buttons.undo.checkHover(mx, my)) return buttons.undo.clicked()
           if (buttons.ready.checkHover(mx, my)) return buttons.ready.clicked()
         }
+      } else if (gp.phase === "ENDING") {
+        if (buttons.shareImage.checkHover(mx, my))
+          return buttons.shareImage.clicked()
       }
     }
 

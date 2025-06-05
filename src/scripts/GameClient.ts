@@ -9,6 +9,8 @@ import sheetPath from "../assets/sheet.webp"
 import sheetElesPath from "../assets/elementsSheet.webp"
 import sheetAnimalsPath from "../assets/animalsSheet.webp"
 import sheetAbilitiesPath from "../assets/abilitySheet.webp"
+import bgImagePath from "../assets/bgImage.webp"
+import runeImagePath from "../assets/runeLogo.webp"
 import fontPath from "../assets/font.ttf"
 import createButtons from "./createButtons.ts"
 import { Translation, translations } from "./locales.ts"
@@ -44,6 +46,10 @@ export default class GameClient {
       render.sheetEles = p5.loadImage(sheetElesPath)
       render.sheetAnimals = p5.loadImage(sheetAnimalsPath)
       render.sheetAbilities = p5.loadImage(sheetAbilitiesPath)
+      render.shareAssets = {
+        bgImage: p5.loadImage(bgImagePath),
+        runeImage: p5.loadImage(runeImagePath),
+      }
       globalFont = p5.loadFont(fontPath)
     }
 

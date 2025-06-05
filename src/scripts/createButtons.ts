@@ -323,6 +323,52 @@ const createButtons = (
         if (gameplay.myPlayerId) gameplay.setViewingPlayer(gameplay.myPlayerId)
       }
     ),
+
+    shareImage: new Button(
+      [250, 805, 200, 70],
+      p5.color(65, 150, 60),
+      p5,
+      render,
+      function () {
+        p5.fill(255)
+        p5.stroke(0)
+        p5.strokeWeight(8)
+        p5.textSize(36)
+        p5.text(gc.translatedTexts.short.share, 0, -8)
+      },
+      function () {
+        if (!gameplay.myPlayerId || !gameplay.gs) return
+        // take screenshot
+        const screenshot = p5.get(0, 0, p5.width, p5.width * 1.7) // HEIGHT RATIO
+        p5.image(render.shareAssets.bgImage, 250, 425, 500, 850)
+        p5.image(screenshot, 250, 425, 500, 850)
+
+        p5.noStroke()
+        p5.fill(100, 17, 157)
+        p5.rect(250, 815, 500, 120)
+        p5.image(render.shareAssets.runeImage, 90, 802, 150, 45)
+        render.renderYang(330, 803, 35)
+        render.renderYin(330, 803, 35)
+        p5.push()
+        p5.translate(455, 800)
+        p5.rotate(-20)
+        p5.image(render.playersInfo[gameplay.myPlayerId].avatar, 0, 0, 135, 135)
+        p5.stroke(0)
+        p5.strokeWeight(10)
+        p5.fill(65, 200, 60)
+        p5.textSize(46)
+        const playerState = gameplay.gs.players.find(
+          (p) => p.id === gameplay.myPlayerId
+        )!
+        p5.text(p5.min(playerState.yangPts, playerState.yinPts), -175, -70)
+        p5.pop()
+
+        Rune.showShareImage(
+          // @ts-ignore
+          p5.get(0, 0, p5.width, p5.width * 1.7).canvas.toDataURL()
+        )
+      }
+    ),
   }
 }
 

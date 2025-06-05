@@ -375,6 +375,7 @@ export default class Gameplay {
       this.render.buttons.closeShop.ap = 0
       this.render.endingRatingAPs = [0, 0, 0, 0]
       this.render.prevRatingLetters = ["F", "F", "F", "F"]
+      this.render.buttons.shareImage.ap = 0
       return
     } else this.phase = "GET" // continue below
 

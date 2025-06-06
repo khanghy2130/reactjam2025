@@ -505,6 +505,163 @@ export const CARDS_TABLE: Card[] = [
       },
     },
   },
+
+  {
+    id: 36,
+    animal: "RABBIT",
+    ele: "WOOD",
+    isYin: true,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 37,
+    animal: "DRAGON",
+    ele: "FIRE",
+    isYin: false,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 38,
+    animal: "SNAKE",
+    ele: "EARTH",
+    isYin: true,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 39,
+    animal: "RAT",
+    ele: "METAL",
+    isYin: false,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 40,
+    animal: "OX",
+    ele: "WATER",
+    isYin: true,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 41,
+    animal: "TIGER",
+    ele: "FLUX",
+    isYin: false,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 42,
+    animal: "MONKEY",
+    ele: "WOOD",
+    isYin: false,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 43,
+    animal: "GOAT",
+    ele: "FIRE",
+    isYin: true,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 44,
+    animal: "HORSE",
+    ele: "EARTH",
+    isYin: false,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 45,
+    animal: "PIG",
+    ele: "METAL",
+    isYin: true,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 46,
+    animal: "DOG",
+    ele: "WATER",
+    isYin: false,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
+  {
+    id: 47,
+    animal: "CHICKEN",
+    ele: "FLUX",
+    isYin: true,
+    ability: {
+      num: 5,
+      where: "SELF",
+      con: {
+        special: "FLUX",
+      },
+    },
+  },
 ]
 
 // returns triggering positions

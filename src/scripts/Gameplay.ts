@@ -43,7 +43,7 @@ interface Shop {
     yinPool: Card[]
     yangPool: Card[]
     countdown: number
-    showingIndex: 0 | 1
+    showingIndex: number
   }
   hasRerolled: boolean
   menuType: "DEFAULT" | "CHANGE_ELEMENT" | "CHANGE_TYPE"

@@ -880,17 +880,16 @@ export default class Render {
           if (holder1.flips > 0) {
             // make sure not repeating the same card
             const prevCard = holder1.card
-            while (holder1.card === prevCard) {
+            while (
+              holder1.card === prevCard ||
+              (holder1.flips === 1 && shop.availableCards![0] === holder1.card)
+            ) {
               holder1.card =
                 shop.flipYangPool[
                   Math.floor(shop.flipYangPool.length * Math.random())
                 ]
             }
-          } else {
-            if (shop.availableCards === null)
-              throw "shop has no available cards"
-            holder1.card = shop.availableCards[0]
-          }
+          } else holder1.card = shop.availableCards![0]
         }
       } else {
         // flips is at 0, showing real card, keep at 0.5
@@ -906,17 +905,16 @@ export default class Render {
           if (holder2.flips > 0) {
             // make sure not repeating the same card
             const prevCard = holder2.card
-            while (holder2.card === prevCard) {
+            while (
+              holder2.card === prevCard ||
+              (holder2.flips === 1 && shop.availableCards![1] === holder2.card)
+            ) {
               holder2.card =
                 shop.flipYinPool[
                   Math.floor(shop.flipYinPool.length * Math.random())
                 ]
             }
-          } else {
-            if (shop.availableCards === null)
-              throw "shop has no available cards"
-            holder2.card = shop.availableCards[1]
-          }
+          } else holder2.card = shop.availableCards![1]
         }
       } else {
         // flips is at 0 now, check if AP is at 0.5
@@ -1009,7 +1007,8 @@ export default class Render {
         // update changing previews
         if (rp.countdown-- < 0) {
           rp.countdown = 40
-          rp.showingIndex = rp.showingIndex === 0 ? 1 : 0
+          rp.showingIndex++
+          if (rp.showingIndex >= rp.yangPool.length) rp.showingIndex = 0
         }
         // render preview cards
         this.renderTransformCard(
@@ -1203,10 +1202,10 @@ export default class Render {
       0,
       105,
       140,
-      150 * (card.id - indexY * 6),
-      200 * indexY,
-      150,
-      200
+      210 * (card.id - indexY * 6),
+      280 * indexY,
+      210,
+      280
     )
     this.renderMiniAbility(p5, card)
     p5.pop()

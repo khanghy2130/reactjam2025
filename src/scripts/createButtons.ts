@@ -151,6 +151,7 @@ const createButtons = (
 
         const rp = shop.rerollPreviews
         rp.countdown = 29
+        rp.showingIndex = 0
         const yinCard = shop.availableCards![1]
         rp.yinPool = shop.yinPool.filter(
           (card) => card.animal === yinCard.animal && card !== yinCard
@@ -159,8 +160,8 @@ const createButtons = (
         rp.yangPool = shop.yangPool.filter(
           (card) => card.animal === yangCard.animal && card !== yangCard
         )
-        if (rp.yangPool.length !== 2 || rp.yinPool.length !== 2) {
-          throw "reroll pool size isn't 2"
+        if (rp.yangPool.length !== 3 || rp.yinPool.length !== 3) {
+          throw "reroll pool size isn't 3"
         }
       }
     ),
@@ -186,6 +187,7 @@ const createButtons = (
 
         const rp = shop.rerollPreviews
         rp.countdown = 29
+        rp.showingIndex = 0
         const yinCard = shop.availableCards![1]
         rp.yinPool = shop.yinPool.filter(
           (card) => card.ele === yinCard.ele && card !== yinCard
@@ -194,8 +196,8 @@ const createButtons = (
         rp.yangPool = shop.yangPool.filter(
           (card) => card.ele === yangCard.ele && card !== yangCard
         )
-        if (rp.yangPool.length !== 2 || rp.yinPool.length !== 2) {
-          throw "reroll pool size isn't 2"
+        if (rp.yangPool.length !== 3 || rp.yinPool.length !== 3) {
+          throw "reroll pool size isn't 3"
         }
       }
     ),

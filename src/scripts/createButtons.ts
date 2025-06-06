@@ -367,6 +367,9 @@ const createButtons = (
           // @ts-ignore
           p5.get(0, 0, p5.width, p5.width * 1.7).canvas.toDataURL()
         )
+
+        p5.clear(0, 0, 0, 0)
+        p5.image(screenshot, 250, 425, 500, 850)
       }
     ),
   }

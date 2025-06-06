@@ -60,6 +60,7 @@ export default class Render {
 
   scoreSound: HTMLAudioElement
   clickingSound: HTMLAudioElement
+  soundCountdown: number
 
   constructor(gameClient: GameClient) {
     this.gc = gameClient
@@ -86,9 +87,12 @@ export default class Render {
     this.elesOrder = ["WOOD", "FIRE", "EARTH", "METAL", "WATER", "FLUX"]
     this.scoreSound = new Audio(scoringSoundPath)
     this.clickingSound = new Audio(clickingSoundPath)
+    this.soundCountdown = 0
   }
 
   playSound(s: HTMLAudioElement) {
+    if (this.soundCountdown > 0) return // preventing playing sound rapidly
+    this.soundCountdown = 3
     s.pause()
     s.currentTime = 0
     s.play()
@@ -301,6 +305,7 @@ export default class Render {
   }
 
   draw() {
+    this.soundCountdown--
     const gp = this.gameplay
     if (!gp.gs) return
     const p5 = this.p5
@@ -743,7 +748,7 @@ export default class Render {
         // update ap
         if (ec.yyAP < 1) ec.yyAP = Math.min(1, ec.yyAP + 0.02)
         else if (ec.increaseAP < 1) {
-          ec.increaseAP = Math.min(1, ec.increaseAP + 0.007)
+          ec.increaseAP = Math.min(1, ec.increaseAP + 0.005)
           // trigger game over
           if (ec.increaseAP === 1) Rune.actions.readyToEndGame()
         }
@@ -914,10 +919,12 @@ export default class Render {
           }
         }
       } else {
-        // flips is at 0, showing real card, keep at 0.5
-        holder2.ap = Math.max(holder2.ap, 0.5)
-        this.playSound(this.scoreSound)
-        shop.revealBounceAP = 0
+        // flips is at 0 now, check if AP is at 0.5
+        if (holder2.ap <= 0.5) {
+          holder2.ap = 0.5
+          this.playSound(this.scoreSound)
+          shop.revealBounceAP = 0
+        }
       }
     }
 

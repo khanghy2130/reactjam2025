@@ -23,7 +23,7 @@ export interface Ability {
   con: {
     force?: "YIN" | "YANG"
     ele?: Ele
-    animals?: [Animal, Animal]
+    animals?: Animal[]
     special?: "EMPTY" | "UNIQUEELE" | "DOUBLEADJ" | "EDGE" | "FLUX"
   }
 }
@@ -291,9 +291,9 @@ export const CARDS_TABLE: Card[] = [
     isYin: true,
     ability: {
       num: 3,
-      where: "COL",
+      where: "ALL",
       con: {
-        special: "UNIQUEELE",
+        animals: ["PIG", "RABBIT", "GOAT"],
       },
     },
   },
@@ -512,10 +512,10 @@ export const CARDS_TABLE: Card[] = [
     ele: "WOOD",
     isYin: true,
     ability: {
-      num: 5,
-      where: "SELF",
+      num: 4,
+      where: "ADJ",
       con: {
-        special: "FLUX",
+        force: "YIN",
       },
     },
   },
@@ -525,10 +525,10 @@ export const CARDS_TABLE: Card[] = [
     ele: "FIRE",
     isYin: false,
     ability: {
-      num: 5,
-      where: "SELF",
+      num: 4,
+      where: "DIA",
       con: {
-        special: "FLUX",
+        force: "YANG",
       },
     },
   },
@@ -538,10 +538,10 @@ export const CARDS_TABLE: Card[] = [
     ele: "EARTH",
     isYin: true,
     ability: {
-      num: 5,
-      where: "SELF",
+      num: 3,
+      where: "ALL",
       con: {
-        special: "FLUX",
+        animals: ["SNAKE", "CHICKEN", "OX"],
       },
     },
   },
@@ -551,10 +551,10 @@ export const CARDS_TABLE: Card[] = [
     ele: "METAL",
     isYin: false,
     ability: {
-      num: 5,
-      where: "SELF",
+      num: 3,
+      where: "ALL",
       con: {
-        special: "FLUX",
+        animals: ["RAT", "DRAGON", "MONKEY"],
       },
     },
   },
@@ -564,10 +564,10 @@ export const CARDS_TABLE: Card[] = [
     ele: "WATER",
     isYin: true,
     ability: {
-      num: 5,
-      where: "SELF",
+      num: 4,
+      where: "DIA",
       con: {
-        special: "FLUX",
+        force: "YIN",
       },
     },
   },
@@ -590,10 +590,10 @@ export const CARDS_TABLE: Card[] = [
     ele: "WOOD",
     isYin: false,
     ability: {
-      num: 5,
-      where: "SELF",
+      num: 3,
+      where: "ALL",
       con: {
-        special: "FLUX",
+        ele: "FLUX",
       },
     },
   },
@@ -603,10 +603,10 @@ export const CARDS_TABLE: Card[] = [
     ele: "FIRE",
     isYin: true,
     ability: {
-      num: 5,
-      where: "SELF",
+      num: 3,
+      where: "ALL",
       con: {
-        special: "FLUX",
+        ele: "FLUX",
       },
     },
   },
@@ -616,10 +616,10 @@ export const CARDS_TABLE: Card[] = [
     ele: "EARTH",
     isYin: false,
     ability: {
-      num: 5,
-      where: "SELF",
+      num: 4,
+      where: "ADJ",
       con: {
-        special: "FLUX",
+        force: "YANG",
       },
     },
   },
@@ -629,10 +629,10 @@ export const CARDS_TABLE: Card[] = [
     ele: "METAL",
     isYin: true,
     ability: {
-      num: 5,
-      where: "SELF",
+      num: 3,
+      where: "COL",
       con: {
-        special: "FLUX",
+        special: "UNIQUEELE",
       },
     },
   },
@@ -642,10 +642,10 @@ export const CARDS_TABLE: Card[] = [
     ele: "WATER",
     isYin: false,
     ability: {
-      num: 5,
-      where: "SELF",
+      num: 3,
+      where: "ALL",
       con: {
-        special: "FLUX",
+        animals: ["DOG", "TIGER", "HORSE"],
       },
     },
   },

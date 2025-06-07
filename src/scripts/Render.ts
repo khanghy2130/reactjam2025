@@ -835,11 +835,20 @@ export default class Render {
       p5.line(yyLabelX, 770, yyLabelX, 710)
       p5.line(yyLabelX + 15, 730, yyLabelX, 710)
       p5.line(yyLabelX - 15, 730, yyLabelX, 710)
+
+      p5.strokeWeight(1)
+      if (card.isYin) {
+        p5.stroke(255)
+        this.renderYin(yyLabelX + 65, 750, 25)
+      } else {
+        p5.stroke(0)
+        this.renderYang(yyLabelX + 65, 750, 25)
+      }
     }
 
     // test show many cards
     // this.renderTransformCard(
-    //   CARDS_TABLE[Math.floor((p5.frameCount * 0.05) % 36)],
+    //   CARDS_TABLE[Math.floor((p5.frameCount * 0.06) % CARDS_TABLE.length)],
     //   250,
     //   400,
     //   4,
@@ -1067,8 +1076,15 @@ export default class Render {
 
     if (ability.where === "ALL") {
       if (ability.con.animals) {
-        this.renderAnimalIcon(p5, ability.con.animals[0], -15, 27, 35)
-        this.renderAnimalIcon(p5, ability.con.animals[1], 15, 27, 35)
+        const anis = ability.con.animals
+        if (anis.length === 2) {
+          this.renderAnimalIcon(p5, anis[0], -15, 27, 30)
+          this.renderAnimalIcon(p5, anis[1], 15, 27, 30)
+        } else if (anis.length === 3) {
+          this.renderAnimalIcon(p5, anis[0], -28, 27, 30)
+          this.renderAnimalIcon(p5, anis[1], 0, 27, 30)
+          this.renderAnimalIcon(p5, anis[2], 28, 27, 30)
+        }
         return
       }
       if (ability.con.ele) {
@@ -1091,13 +1107,37 @@ export default class Render {
     }
 
     if (ability.where === "DIA") {
-      // all dia are ele
       p5.image(this.sheetAbilities, -12, 28, 23, 23, 150, 0, 150, 150)
-      this.renderEleIcon(p5, ability.con.ele!, 12, 28, 30)
+      if (ability.con.ele) {
+        // ele
+        this.renderEleIcon(p5, ability.con.ele!, 12, 28, 30)
+      } else {
+        // force
+        p5.strokeWeight(1)
+        if (ability.con.force === "YANG") {
+          p5.stroke(30)
+          this.renderYang(15, 28, 8)
+        } else {
+          p5.stroke(250)
+          this.renderYin(15, 28, 8)
+        }
+      }
       return
     }
 
     if (ability.where === "ADJ") {
+      if (ability.con.force) {
+        p5.image(this.sheetAbilities, -10, 28, 25, 25, 0, 0, 150, 150)
+        p5.strokeWeight(1)
+        if (ability.con.force === "YANG") {
+          p5.stroke(30)
+          this.renderYang(15, 28, 8)
+        } else {
+          p5.stroke(250)
+          this.renderYin(15, 28, 8)
+        }
+        return
+      }
       if (ability.con.special === "UNIQUEELE") {
         p5.image(this.sheetAbilities, -10, 28, 25, 25, 0, 0, 150, 150)
         p5.textSize(12)
@@ -1255,7 +1295,7 @@ export default class Render {
     const my = this.gc.my
 
     //// test inspect specific card
-    // return gp.inspectCard(CARDS_TABLE[13], 250, 400, 1)
+    // return gp.inspectCard(CARDS_TABLE[0], 250, 400, 1)
 
     // blocked by ending modal?
     if (gp.endingControl.isOpened) {

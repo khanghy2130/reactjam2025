@@ -302,6 +302,48 @@ export default class Render {
         p5.circle(288, 98, 20)
       }
     }
+
+    // render preview sums
+    if (
+      !isScoring &&
+      gp.viewingPlayer === gp.myPlayerId &&
+      gp.yieldPreview.isShown
+    ) {
+      p5.textSize(22)
+      if (vp === playersState[0]?.id) {
+        p5.fill(255)
+        p5.rect(160, 80, 70, 30)
+        p5.fill(30)
+        p5.rect(230, 80, 70, 30)
+        p5.text("+" + gp.yieldPreview.yangSum, 160, 76)
+        p5.fill(255)
+        p5.text("+" + gp.yieldPreview.yinSum, 230, 76)
+      } else if (vp === playersState[1]?.id) {
+        p5.fill(255)
+        p5.rect(370, 80, 70, 30)
+        p5.fill(30)
+        p5.rect(440, 80, 70, 30)
+        p5.text("+" + gp.yieldPreview.yangSum, 370, 76)
+        p5.fill(255)
+        p5.text("+" + gp.yieldPreview.yinSum, 440, 76)
+      } else if (vp === playersState[2]?.id) {
+        p5.fill(255)
+        p5.rect(160, 150, 70, 30)
+        p5.fill(30)
+        p5.rect(230, 150, 70, 30)
+        p5.text("+" + gp.yieldPreview.yangSum, 160, 146)
+        p5.fill(255)
+        p5.text("+" + gp.yieldPreview.yinSum, 230, 146)
+      } else if (vp === playersState[3]?.id) {
+        p5.fill(255)
+        p5.rect(370, 150, 70, 30)
+        p5.fill(30)
+        p5.rect(440, 150, 70, 30)
+        p5.text("+" + gp.yieldPreview.yangSum, 370, 146)
+        p5.fill(255)
+        p5.text("+" + gp.yieldPreview.yinSum, 440, 146)
+      }
+    }
   }
 
   draw() {
@@ -312,11 +354,12 @@ export default class Render {
     const buttons = this.buttons
     const tt = this.gc.translatedTexts
     const playersState = gp.gs.players
+    const isViewingSelf = gp.viewingPlayer === gp.myPlayerId
+    const isNotScoring = gp.phase !== "SCORING"
 
     const viewingPlayerState = playersState.find(
       (p) => p.id === gp.viewingPlayer
     )!
-
     this.renderPlayers(p5, playersState)
 
     // render language menu button
@@ -327,12 +370,29 @@ export default class Render {
     p5.ellipse(35, 50, 15, 35)
     p5.ellipse(35, 50, 35, 15)
 
+    // render preview toggle
+    if (isViewingSelf && isNotScoring) {
+      p5.stroke(205, 133, 255)
+      p5.beginShape()
+      p5.vertex(52.5, 150)
+      p5.bezierVertex(40, 140, 30, 140, 17.5, 150)
+      p5.bezierVertex(30, 160, 40, 160, 52.5, 150)
+      p5.endShape()
+      if (!gp.yieldPreview.isShown) p5.line(17.5, 160, 52.5, 140)
+      p5.fill(205, 133, 255)
+      p5.noStroke()
+      p5.circle(35, 150, 10)
+    }
+
+    // render wheel modal button
+    p5.noStroke()
+    this.renderYang(35, 100, 17)
+    this.renderYin(35, 100, 17)
+
     // render collection
     const ld = gp.localDisplay
     const [rows, cols] = this.getGridCenter(
-      gp.viewingPlayer === gp.myPlayerId
-        ? ld.collection
-        : viewingPlayerState.collection
+      isViewingSelf ? ld.collection : viewingPlayerState.collection
     )
     // update grid position
     ld.x += (92.5 + (3 - rows) * 52.5 - ld.x) * 0.2
@@ -340,7 +400,7 @@ export default class Render {
     const ldx = ld.x
     const ldy = ld.y
 
-    if (gp.viewingPlayer === gp.myPlayerId) {
+    if (isViewingSelf) {
       // render self collection
       for (let y = 0; y < 4; y++) {
         for (let x = 0; x < 4; x++) {
@@ -349,6 +409,23 @@ export default class Render {
             const card = CARDS_TABLE[cardId]
             this.renderTransformCard(card, ldx + 105 * x, ldy + 140 * y, 1, 1)
           }
+        }
+      }
+      // render preview if not during scoring
+      if (isNotScoring && gp.yieldPreview.isShown) {
+        const sumsList = gp.yieldPreview.sumsList
+        p5.noStroke()
+        p5.strokeWeight(4)
+        p5.textSize(30)
+        for (let i = 0; i < sumsList.length; i++) {
+          const sumItem = sumsList[i]
+
+          p5.fill(sumItem.isYin ? 30 : 255)
+          const rx = ldx + 105 * sumItem.pos[0]
+          const ry = ldy + 140 * sumItem.pos[1]
+          p5.rect(rx, ry, 60, 35, 5)
+          p5.fill(sumItem.isYin ? 255 : 30)
+          p5.text("+" + sumItem.sum, rx, ry - 5)
         }
       }
     } else {
@@ -396,7 +473,7 @@ export default class Render {
     // viewing a guest?
     if (gp.viewingPlayer !== gp.myPlayerId) {
       // not spectator && not scoring phase? show go back button
-      if (gp.myPlayerId && gp.phase !== "SCORING") buttons.goBack.render(p5)
+      if (gp.myPlayerId && isNotScoring) buttons.goBack.render(p5)
       // watching guest-name text
       p5.textSize(24)
       p5.noStroke()
@@ -547,7 +624,7 @@ export default class Render {
           p5.pop()
         }
       } else if (gp.phase === "READY") {
-        if (gp.viewingPlayer === gp.myPlayerId) {
+        if (isViewingSelf) {
           p5.fill(255)
           p5.noStroke()
           p5.textSize(30)
@@ -567,7 +644,7 @@ export default class Render {
     }
 
     // scoring phase: update & render card sums
-    if (gp.phase === "SCORING") {
+    if (!isNotScoring) {
       const sc = gp.scoringControl
       if (sc.countdown-- < 0) {
         // go to next player?
@@ -704,24 +781,24 @@ export default class Render {
             // letter rating
             let letter = "F"
             let percentage = 0
-            if (unflooredIF < 60) {
-              percentage = unflooredIF / 60
+            if (unflooredIF < 70) {
+              percentage = unflooredIF / 70
               letter = "F"
               p5.stroke(150)
-            } else if (unflooredIF < 70) {
-              percentage = (unflooredIF - 60) / 10
-              letter = "D"
-              p5.stroke(65, 200, 60)
             } else if (unflooredIF < 80) {
               percentage = (unflooredIF - 70) / 10
-              letter = "C"
-              p5.stroke(23, 160, 227)
+              letter = "D"
+              p5.stroke(65, 200, 60)
             } else if (unflooredIF < 90) {
               percentage = (unflooredIF - 80) / 10
-              letter = "B"
-              p5.stroke(237, 190, 17)
+              letter = "C"
+              p5.stroke(23, 160, 227)
             } else if (unflooredIF < 100) {
               percentage = (unflooredIF - 90) / 10
+              letter = "B"
+              p5.stroke(237, 190, 17)
+            } else if (unflooredIF < 120) {
+              percentage = (unflooredIF - 100) / 20
               letter = "A"
               p5.stroke(240, 70, 60)
             } else {
@@ -754,8 +831,7 @@ export default class Render {
         }
       } else {
         // share button (if viewing self)
-        if (gp.viewingPlayer === gp.myPlayerId)
-          this.buttons.shareImage.render(p5)
+        if (isViewingSelf) this.buttons.shareImage.render(p5)
       }
     }
 
@@ -1285,6 +1361,7 @@ export default class Render {
 
   click(p5: P5) {
     const gp = this.gameplay
+    const isViewingSelf = gp.viewingPlayer === gp.myPlayerId
     // no input during scoring phase
     if (!gp || !gp.gs || gp.phase === "SCORING") return
     // if is inspecting card then exit
@@ -1322,6 +1399,16 @@ export default class Render {
     if (p5.dist(mx, my, 35, 50) < 18) {
       this.playSound(this.clickingSound)
       return gp.openLangModal()
+    }
+    // clicked wheel?
+    if (p5.dist(mx, my, 35, 100) < 18) {
+      this.playSound(this.clickingSound)
+      return console.log("wheel clicked")
+    }
+    // clicked preview?
+    if (isViewingSelf && p5.dist(mx, my, 35, 150) < 18) {
+      this.playSound(this.clickingSound)
+      return (gp.yieldPreview.isShown = !gp.yieldPreview.isShown)
     }
 
     // viewing a guest? go back button
@@ -1473,10 +1560,9 @@ export default class Render {
       const viewingPlayerState = gp.gs.players.find(
         (p) => p.id === gp.viewingPlayer
       )!
-      const collection =
-        gp.viewingPlayer === gp.myPlayerId
-          ? gp.localDisplay.collection
-          : viewingPlayerState.collection
+      const collection = isViewingSelf
+        ? gp.localDisplay.collection
+        : viewingPlayerState.collection
       const cardId = collection[clickedCardY][clickedCardX]
       if (cardId !== null) {
         if (

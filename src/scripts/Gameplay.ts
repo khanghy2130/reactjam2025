@@ -5,6 +5,17 @@ import Render from "./Render"
 import { Card, CARDS_TABLE, getTriggerPositions } from "./cards"
 import Button from "./Button"
 
+interface YieldPreview {
+  isShown: boolean
+  yangSum: number
+  yinSum: number
+  sumsList: {
+    pos: [number, number]
+    isYin: boolean
+    sum: number
+  }[]
+}
+
 interface Inspect {
   isOpened: boolean
   isOpening: boolean
@@ -86,6 +97,7 @@ export default class Gameplay {
 
   shop: Shop
   inspect: Inspect
+  yieldPreview: YieldPreview
   localCards: null | [LocalCard, LocalCard]
   // update directly collection, x & y
   localDisplay: {
@@ -156,6 +168,13 @@ export default class Gameplay {
       os: 0,
       ap: 0,
     }
+    this.yieldPreview = {
+      isShown: false,
+      yangSum: 0,
+      yinSum: 0,
+      sumsList: [],
+    }
+
     this.localDisplay = {
       collection: [
         [null, null, null, null],
@@ -181,6 +200,33 @@ export default class Gameplay {
   openLangModal() {
     this.langModal.isOpened = true
     this.langModal.optionButtons.forEach((b) => (b.ap = 0))
+  }
+
+  updateYieldPreview() {
+    const yp = this.yieldPreview
+    yp.sumsList = []
+    yp.yangSum = 0
+    yp.yinSum = 0
+    // update sumsList
+    const c = this.localDisplay.collection
+    for (let y = 0; y < 4; y++) {
+      for (let x = 0; x < 4; x++) {
+        const cardId = c[y][x]
+        if (cardId === null) continue
+        const card = CARDS_TABLE[cardId]
+        yp.sumsList.push({
+          pos: [x, y],
+          isYin: card.isYin,
+          sum: getTriggerPositions(c, [x, y]).length * card.ability.num,
+        })
+      }
+    }
+    // update total yy sums
+    for (let i = 0; i < yp.sumsList.length; i++) {
+      const sumItem = yp.sumsList[i]
+      if (sumItem.isYin) yp.yinSum += sumItem.sum
+      else yp.yangSum += sumItem.sum
+    }
   }
 
   nextPlayerToScore(isAtBeginning?: boolean) {
@@ -240,6 +286,7 @@ export default class Gameplay {
     const ld = this.localDisplay
     // reset collection
     ld.collection = stateCollection.map((row) => row.slice())
+    this.updateYieldPreview()
 
     for (let i = 0; i < this.localCards.length; i++) {
       const lc = this.localCards[i]
@@ -305,6 +352,7 @@ export default class Gameplay {
     this.render.addFlasher(x, y)
     this.render.buttons.undo.ap = 0
     this.render.buttons.ready.ap = 0
+    this.updateYieldPreview()
   }
 
   setViewingPlayer(playerId: PlayerId) {
@@ -386,6 +434,7 @@ export default class Gameplay {
     this.localDisplay.collection = thisPlayer.collection.map((row) =>
       row.slice()
     )
+    this.updateYieldPreview()
 
     this.localCards = null
     const shop = this.shop

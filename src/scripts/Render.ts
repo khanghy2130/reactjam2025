@@ -1215,27 +1215,27 @@ export default class Render {
         return
       }
       if (ability.con.special === "UNIQUEELE") {
-        p5.image(this.sheetAbilities, -10, 28, 25, 25, 0, 0, 150, 150)
+        p5.image(this.sheetAbilities, -20, 28, 25, 25, 0, 0, 150, 150)
+        p5.image(this.sheetAbilities, 5, 28, 25, 25, 900, 0, 150, 150)
         p5.textSize(12)
         p5.fill(255)
-        p5.text("UNI", 12, 26)
+        p5.text("x1", 22, 26)
         return
       }
       if (ability.con.special === "EMPTY") {
-        p5.image(this.sheetAbilities, -10, 28, 25, 25, 0, 0, 150, 150)
-        p5.textSize(12)
-        p5.fill(255)
-        p5.text("[X]", 10, 26)
+        p5.image(this.sheetAbilities, -12, 28, 25, 25, 0, 0, 150, 150)
+        p5.image(this.sheetAbilities, 12, 28, 25, 25, 750, 0, 150, 150)
         return
       }
     }
 
     if (ability.where === "ROW") {
       if (ability.con.special === "UNIQUEELE") {
-        p5.image(this.sheetAbilities, -14, 28, 25, 25, 600, 0, 150, 150)
+        p5.image(this.sheetAbilities, -20, 28, 25, 25, 600, 0, 150, 150)
+        p5.image(this.sheetAbilities, 5, 28, 25, 25, 900, 0, 150, 150)
         p5.textSize(12)
         p5.fill(255)
-        p5.text("UNI", 12, 26)
+        p5.text("x1", 22, 26)
         return
       }
       p5.image(this.sheetAbilities, -12, 28, 25, 25, 600, 0, 150, 150)
@@ -1252,10 +1252,11 @@ export default class Render {
 
     if (ability.where === "COL") {
       if (ability.con.special === "UNIQUEELE") {
-        p5.image(this.sheetAbilities, -12, 28, 25, 25, 450, 0, 150, 150)
+        p5.image(this.sheetAbilities, -20, 28, 25, 25, 450, 0, 150, 150)
+        p5.image(this.sheetAbilities, 5, 28, 25, 25, 900, 0, 150, 150)
         p5.textSize(12)
         p5.fill(255)
-        p5.text("UNI", 12, 26)
+        p5.text("x1", 22, 26)
         return
       }
       p5.image(this.sheetAbilities, -10, 28, 25, 25, 450, 0, 150, 150)
@@ -1372,7 +1373,7 @@ export default class Render {
     const my = this.gc.my
 
     //// test inspect specific card
-    // return gp.inspectCard(CARDS_TABLE[0], 250, 400, 1)
+    // return gp.inspectCard(CARDS_TABLE[0], 250, 400, 0)
 
     // blocked by ending modal?
     if (gp.endingControl.isOpened) {

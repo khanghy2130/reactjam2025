@@ -63,6 +63,7 @@ export const translations: Record<Language, Translation> = {
       "points for each\nchicken and monkey.",
       "points for each\nhorse and goat.",
       "points. Can be any\ncolor, but not a\nunique color.",
+
       "points for each\nadjacent missing animal\nthat could be placed there.",
       "points for each\nanimal on the edge.",
       "points for each\nrat and ox.",
@@ -75,6 +76,7 @@ export const translations: Record<Language, Translation> = {
       "points for each Yang\nanimal in this column.",
       "points for each unique\ncolor in this row.",
       "points. Can be any\ncolor, but not a\nunique color.",
+
       "points for each\ngreen (Wood) animal.",
       "points for each\nred (Fire) animal.",
       "points for each\nyellow (Earth) animal.",
@@ -97,7 +99,7 @@ export const translations: Record<Language, Translation> = {
       "points for each\ncolorful (Flux) animal.",
       "points for each\ncolorful (Flux) animal.",
       "points for each\nadjacent Yang animal.",
-      "points for each\npig, rabbit, or goat.",
+      "points for each unique\ncolor in this column.",
       "points for each\ndog, tiger, or horse.",
       "points. Can be any\ncolor, but not a\nunique color.",
     ],

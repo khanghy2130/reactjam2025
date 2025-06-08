@@ -98,7 +98,7 @@ export const CARDS_TABLE: Card[] = [
       num: 3,
       where: "ALL",
       con: {
-        animals: ["SNAKE", "DRAGON"],
+        animals: ["DRAGON", "SNAKE"],
       },
     },
   },
@@ -163,7 +163,7 @@ export const CARDS_TABLE: Card[] = [
       num: 3,
       where: "ALL",
       con: {
-        animals: ["CHICKEN", "MONKEY"],
+        animals: ["MONKEY", "CHICKEN"],
       },
     },
   },

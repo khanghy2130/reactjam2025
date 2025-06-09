@@ -387,19 +387,16 @@ export default class Gameplay {
       )!.collection.map((row) => row.slice())
     }
 
-    // skip scoring phase on 1st round
-    if (this.gs!.round === 1) {
-      this.startGetPhase()
-      return
-    }
-
-    this.phase = "SCORING"
     // close all modals
     this.shop.isOpened = false
     this.inspect.isOpened = false
     this.langModal.isOpened = false
     this.wheelModalIsOpened = false
 
+    // skip scoring phase on 1st round
+    if (this.gs!.round === 1) return this.startGetPhase()
+
+    this.phase = "SCORING"
     this.nextPlayerToScore(true)
   }
 

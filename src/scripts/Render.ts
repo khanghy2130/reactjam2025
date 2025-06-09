@@ -862,6 +862,148 @@ export default class Render {
       p5.text(tt.short.round + " " + gp.gs.round, 250, 435)
     }
 
+    // wheel modal
+    if (gp.wheelModalIsOpened) {
+      // modal bg
+      p5.noStroke()
+      p5.fill(0, 200)
+      const h = (p5.height / p5.width) * 500
+      p5.rect(250, h / 2, 500, h)
+
+      // wheel background
+      p5.noStroke()
+      p5.fill(220)
+      p5.circle(250, 350, 490)
+      p5.fill(60)
+      for (let i = 0; i < 12; i += 2) {
+        p5.arc(250, 350, 490, 490, i * 30, i * 30 + 30)
+      }
+
+      // yy
+      this.renderYang(250, 350, 80)
+      this.renderYin(250, 350, 80)
+
+      // animals
+      const elesOrder = this.elesOrder
+      for (let i = 0; i < 6; i++) {
+        const deg = i * 30 - 75
+        this.renderAnimalIcon(
+          p5,
+          this.animalsOrder[i],
+          p5.cos(deg) * 135 + 250,
+          p5.sin(deg) * 135 + 350,
+          80
+        )
+
+        this.renderEleIcon(
+          p5,
+          elesOrder[i],
+          p5.cos(deg - 8) * 225 + 250,
+          p5.sin(deg - 8) * 225 + 350,
+          46
+        )
+
+        this.renderEleIcon(
+          p5,
+          elesOrder[(i + 2) % 6],
+          p5.cos(deg - 3) * 195 + 250,
+          p5.sin(deg - 3) * 195 + 350,
+          46
+        )
+
+        this.renderEleIcon(
+          p5,
+          elesOrder[(i + 1) % 6],
+          p5.cos(deg + 3) * 225 + 250,
+          p5.sin(deg + 3) * 225 + 350,
+          46
+        )
+
+        this.renderEleIcon(
+          p5,
+          elesOrder[(i + 3) % 6],
+          p5.cos(deg + 8) * 195 + 250,
+          p5.sin(deg + 8) * 195 + 350,
+          46
+        )
+      }
+      for (let i = 6; i < 12; i++) {
+        const deg = i * 30 - 75
+        this.renderAnimalIcon(
+          p5,
+          this.animalsOrder[i],
+          p5.cos(deg) * 135 + 250,
+          p5.sin(deg) * 135 + 350,
+          80
+        )
+
+        const _i = 11 - i
+        this.renderEleIcon(
+          p5,
+          elesOrder[(_i + 3) % 6],
+          p5.cos(deg - 8) * 195 + 250,
+          p5.sin(deg - 8) * 195 + 350,
+          46
+        )
+
+        this.renderEleIcon(
+          p5,
+          elesOrder[(_i + 1) % 6],
+          p5.cos(deg - 3) * 225 + 250,
+          p5.sin(deg - 3) * 225 + 350,
+          46
+        )
+
+        this.renderEleIcon(
+          p5,
+          elesOrder[(_i + 2) % 6],
+          p5.cos(deg + 3) * 195 + 250,
+          p5.sin(deg + 3) * 195 + 350,
+          46
+        )
+
+        this.renderEleIcon(
+          p5,
+          elesOrder[_i],
+          p5.cos(deg + 8) * 225 + 250,
+          p5.sin(deg + 8) * 225 + 350,
+          46
+        )
+      }
+
+      // scoring guide
+      p5.noStroke()
+      this.renderYang(100, 650, 40)
+      this.renderYin(400, 650, 40)
+      p5.textSize(30)
+      p5.fill(255)
+      p5.rect(90, 720, 70, 40)
+      p5.fill(30)
+      p5.text(100, 90, 716)
+      p5.fill(30)
+      p5.rect(410, 720, 70, 40)
+      p5.fill(255)
+      p5.text(100, 410, 716)
+
+      this.renderYang(250, 760, 50)
+      this.renderYin(250, 760, 50)
+      p5.textSize(48)
+      p5.fill(65, 200, 60)
+      p5.stroke(30)
+      p5.strokeWeight(10)
+      p5.text(100, 250, 670)
+
+      p5.stroke(255)
+      p5.strokeWeight(5)
+      p5.line(100, 770, 160, 770)
+      p5.line(150, 760, 160, 770)
+      p5.line(150, 780, 160, 770)
+
+      p5.line(400, 770, 340, 770)
+      p5.line(350, 760, 340, 770)
+      p5.line(350, 780, 340, 770)
+    }
+
     // card inspection
     if (gp.inspect.isOpened) {
       const ip = gp.inspect
@@ -922,7 +1064,7 @@ export default class Render {
       }
     }
 
-    // test show many cards
+    /// TEST show many cards
     // this.renderTransformCard(
     //   CARDS_TABLE[Math.floor((p5.frameCount * 0.06) % CARDS_TABLE.length)],
     //   250,
@@ -1359,9 +1501,13 @@ export default class Render {
     p5.fill(255)
     p5.circle(x, y + r / 2, r * 0.4)
   }
-
+  /// xm!: number
   click(p5: P5) {
     const gp = this.gameplay
+
+    //// TEST-VIEW-CARDS cycle cards
+    // if (this.xm !== undefined) return (gp.inspect.card = CARDS_TABLE[this.xm++])
+
     const isViewingSelf = gp.viewingPlayer === gp.myPlayerId
     // no input during scoring phase
     if (!gp || !gp.gs || gp.phase === "SCORING") return
@@ -1372,8 +1518,9 @@ export default class Render {
     const mx = this.gc.mx
     const my = this.gc.my
 
-    //// test inspect specific card
-    // return gp.inspectCard(CARDS_TABLE[0], 250, 400, 0)
+    //// TEST-VIEW-CARDS inspect specific card
+    // if (this.xm === undefined) this.xm = 0
+    // return gp.inspectCard(CARDS_TABLE[this.xm++], 250, 400, 0)
 
     // blocked by ending modal?
     if (gp.endingControl.isOpened) {
@@ -1396,20 +1543,9 @@ export default class Render {
       return
     }
 
-    // clicked language menu?
-    if (p5.dist(mx, my, 35, 50) < 18) {
-      this.playSound(this.clickingSound)
-      return gp.openLangModal()
-    }
-    // clicked wheel?
-    if (p5.dist(mx, my, 35, 100) < 18) {
-      this.playSound(this.clickingSound)
-      return console.log("wheel clicked")
-    }
-    // clicked preview?
-    if (isViewingSelf && p5.dist(mx, my, 35, 150) < 18) {
-      this.playSound(this.clickingSound)
-      return (gp.yieldPreview.isShown = !gp.yieldPreview.isShown)
+    // blocked by wheel modal?
+    if (gp.wheelModalIsOpened) {
+      return (gp.wheelModalIsOpened = false)
     }
 
     // viewing a guest? go back button
@@ -1547,6 +1683,23 @@ export default class Render {
         if (buttons.shareImage.checkHover(mx, my))
           return buttons.shareImage.clicked()
       }
+    }
+
+    // clicked language menu?
+    if (p5.dist(mx, my, 35, 50) < 18) {
+      this.playSound(this.clickingSound)
+      return gp.openLangModal()
+    }
+    // clicked wheel?
+    if (p5.dist(mx, my, 35, 100) < 18) {
+      this.playSound(this.clickingSound)
+      gp.wheelModalIsOpened = true
+      return
+    }
+    // clicked preview?
+    if (isViewingSelf && p5.dist(mx, my, 35, 150) < 18) {
+      this.playSound(this.clickingSound)
+      return (gp.yieldPreview.isShown = !gp.yieldPreview.isShown)
     }
 
     // inspect card in collection

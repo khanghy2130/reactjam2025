@@ -121,10 +121,6 @@ const createButtons = (
           return
         }
 
-        if (gameplay.wheelModalIsOpened) {
-          return (gameplay.wheelModalIsOpened = false)
-        }
-
         shop.isOpened = false
         render.buttons.closeShop.ap = 1
       }

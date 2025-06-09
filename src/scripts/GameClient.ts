@@ -110,6 +110,13 @@ export default class GameClient {
     }
 
     this.touchStarted = () => {
+      if (
+        gameplay.shop.isOpened ||
+        gameplay.wheelModalIsOpened ||
+        gameplay.langModal.isOpened ||
+        gameplay.inspect.isOpened
+      )
+        return
       this.isPressing = true
     }
 

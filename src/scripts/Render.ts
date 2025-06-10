@@ -797,8 +797,8 @@ export default class Render {
               percentage = (unflooredIF - 90) / 10
               letter = "B"
               p5.stroke(237, 190, 17)
-            } else if (unflooredIF < 120) {
-              percentage = (unflooredIF - 100) / 20
+            } else if (unflooredIF < 110) {
+              percentage = (unflooredIF - 100) / 10
               letter = "A"
               p5.stroke(240, 70, 60)
             } else {

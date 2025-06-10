@@ -1041,7 +1041,9 @@ export default class Render {
       p5.text(
         `+${card.ability.num} ${yyType} ${tt.carddesc[card.id]}`,
         250,
-        -100 + 210 * ap
+        -100 + 210 * ap,
+        450,
+        500
       )
 
       // render y/y type label
@@ -1063,15 +1065,6 @@ export default class Render {
         this.renderYang(yyLabelX + 65, 750, 25)
       }
     }
-
-    /// TEST show many cards
-    // this.renderTransformCard(
-    //   CARDS_TABLE[Math.floor((p5.frameCount * 0.06) % CARDS_TABLE.length)],
-    //   250,
-    //   400,
-    //   4,
-    //   4
-    // )
   }
 
   easeOutElastic(x: number) {
@@ -1501,7 +1494,7 @@ export default class Render {
     p5.fill(255)
     p5.circle(x, y + r / 2, r * 0.4)
   }
-  /// xm!: number
+  //xm!: number
   click(p5: P5) {
     const gp = this.gameplay
 

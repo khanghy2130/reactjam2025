@@ -423,9 +423,9 @@ export default class Render {
           p5.fill(sumItem.isYin ? 30 : 255)
           const rx = ldx + 105 * sumItem.pos[0]
           const ry = ldy + 140 * sumItem.pos[1]
-          p5.rect(rx, ry, 60, 35, 5)
+          p5.rect(rx, ry - 10, 60, 35, 5)
           p5.fill(sumItem.isYin ? 255 : 30)
-          p5.text("+" + sumItem.sum, rx, ry - 5)
+          p5.text("+" + sumItem.sum, rx, ry - 15)
         }
       }
     } else {
@@ -716,10 +716,10 @@ export default class Render {
         p5.scale(sc.ap < 0.3 ? this.easeOutElastic(scaleFactor) : scaleFactor)
         if (i === sc.cardIndex) p5.stroke(240, 70, 60)
         p5.fill(scoringCard.isYin ? 30 : 255)
-        p5.rect(0, 0, 60, 35, 5)
+        p5.rect(0, -10, 60, 35, 5)
         p5.noStroke()
         p5.fill(scoringCard.isYin ? 255 : 30)
-        p5.text("+" + scoringCard.sum, 0, -5)
+        p5.text("+" + scoringCard.sum, 0, -15)
         p5.pop()
       }
     }

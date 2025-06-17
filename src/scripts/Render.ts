@@ -825,7 +825,7 @@ export default class Render {
         // update ap
         if (ec.yyAP < 1) ec.yyAP = Math.min(1, ec.yyAP + 0.02)
         else if (ec.increaseAP < 1) {
-          ec.increaseAP = Math.min(1, ec.increaseAP + 0.005)
+          ec.increaseAP = Math.min(1, ec.increaseAP + 0.007)
           // trigger game over
           if (ec.increaseAP === 1) Rune.actions.readyToEndGame()
         }

@@ -278,9 +278,9 @@ export const CARDS_TABLE: Card[] = [
     isYin: false,
     ability: {
       num: 4,
-      where: "ADJ",
+      where: "COL",
       con: {
-        force: "YANG",
+        force: "YIN",
       },
     },
   },
@@ -617,9 +617,9 @@ export const CARDS_TABLE: Card[] = [
     isYin: false,
     ability: {
       num: 4,
-      where: "COL",
+      where: "ADJ",
       con: {
-        force: "YIN",
+        force: "YANG",
       },
     },
   },

@@ -8,6 +8,8 @@ export default function runeInit(gameplay: Gameplay) {
       let prevGS: GameState | undefined = gameplay.gs
       gameplay.gs = game // sync game state
 
+      let doPromptLang = false
+
       // new game? reset all
       if (event?.name === "stateSync" && event.isNewGame && game.round === 1) {
         prevGS = undefined // force reset
@@ -35,13 +37,7 @@ export default function runeInit(gameplay: Gameplay) {
         gameplay.wheelModalIsOpened = false
 
         // set language
-        if (yourPlayerId !== undefined) {
-          const savedLang = game.persisted[yourPlayerId].lang
-          if (allLanguages.includes(savedLang))
-            gameplay.gc.translatedTexts = translations[savedLang]
-          // open language modal if haven't set before
-          else gameplay.openLangModal()
-        }
+        if (yourPlayerId !== undefined) doPromptLang = true
       }
 
       const viewingPlayerState = game.players.find(
@@ -65,6 +61,15 @@ export default function runeInit(gameplay: Gameplay) {
       // round changed? start scoring phase
       if (prevGS === undefined || prevGS.round !== game.round) {
         gameplay.startScoringPhase()
+      }
+
+      // prompt lang
+      if (doPromptLang && yourPlayerId) {
+        const savedLang = game.persisted[yourPlayerId].lang
+        if (allLanguages.includes(savedLang))
+          gameplay.gc.translatedTexts = translations[savedLang]
+        // open language modal if haven't set before
+        else gameplay.openLangModal()
       }
     },
   })

@@ -169,7 +169,7 @@ export default class Gameplay {
       ap: 0,
     }
     this.yieldPreview = {
-      isShown: false,
+      isShown: true,
       yangSum: 0,
       yinSum: 0,
       sumsList: [],

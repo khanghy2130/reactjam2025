@@ -176,7 +176,7 @@ export default class Render {
       // is at this player? show past + sc total
       return [p.prevYangPts + sc.yangSum, p.prevYinPts + sc.yinSum]
     })
-    p5.textSize(32)
+    p5.textSize(24)
 
     // render selected viewingPlayer outline
     const vp = gp.viewingPlayer
@@ -203,15 +203,15 @@ export default class Render {
     p5.text(displayPoints[0][1], 230, 46)
     // current scoring sums
     if (isScoring && sc.playerIndex === 0) {
-      p5.textSize(22)
+      p5.textSize(20)
       p5.fill(255)
-      p5.rect(160, 80, 70, 30)
+      p5.rect(160, 80, 70, 30, 0, 0, 0, 10)
       p5.fill(30)
-      p5.rect(230, 80, 70, 30)
+      p5.rect(230, 80, 70, 30, 0, 0, 10, 0)
       p5.text("+" + sc.yangSum, 160, 76)
       p5.fill(255)
       p5.text("+" + sc.yinSum, 230, 76)
-      p5.textSize(32)
+      p5.textSize(24)
     }
     if (avatars[0]) p5.image(avatars[0], 100, 50, 60, 60)
     if (playersState[0].isReady) {
@@ -230,15 +230,15 @@ export default class Render {
       p5.text(displayPoints[1][1], 440, 46)
       // current scoring sums
       if (isScoring && sc.playerIndex === 1) {
-        p5.textSize(22)
+        p5.textSize(20)
         p5.fill(255)
-        p5.rect(370, 80, 70, 30)
+        p5.rect(370, 80, 70, 30, 0, 0, 0, 10)
         p5.fill(30)
-        p5.rect(440, 80, 70, 30)
+        p5.rect(440, 80, 70, 30, 0, 0, 10, 0)
         p5.text("+" + sc.yangSum, 370, 76)
         p5.fill(255)
         p5.text("+" + sc.yinSum, 440, 76)
-        p5.textSize(32)
+        p5.textSize(24)
       }
       if (avatars[1]) p5.image(avatars[1], 310, 50, 60, 60)
       if (playersState[1].isReady) {
@@ -258,15 +258,15 @@ export default class Render {
       p5.text(displayPoints[2][1], 230, 116)
       // current scoring sums
       if (isScoring && sc.playerIndex === 2) {
-        p5.textSize(22)
+        p5.textSize(20)
         p5.fill(255)
-        p5.rect(160, 150, 70, 30)
+        p5.rect(160, 150, 70, 30, 0, 0, 0, 10)
         p5.fill(30)
-        p5.rect(230, 150, 70, 30)
+        p5.rect(230, 150, 70, 30, 0, 0, 10, 0)
         p5.text("+" + sc.yangSum, 160, 146)
         p5.fill(255)
         p5.text("+" + sc.yinSum, 230, 146)
-        p5.textSize(32)
+        p5.textSize(24)
       }
       if (avatars[2]) p5.image(avatars[2], 100, 120, 60, 60)
       if (playersState[2].isReady) {
@@ -286,15 +286,15 @@ export default class Render {
       p5.text(displayPoints[3][1], 440, 116)
       // current scoring sums
       if (isScoring && sc.playerIndex === 3) {
-        p5.textSize(22)
+        p5.textSize(20)
         p5.fill(255)
-        p5.rect(370, 150, 70, 30)
+        p5.rect(370, 150, 70, 30, 0, 0, 0, 10)
         p5.fill(30)
-        p5.rect(440, 150, 70, 30)
+        p5.rect(440, 150, 70, 30, 0, 0, 10, 0)
         p5.text("+" + sc.yangSum, 370, 146)
         p5.fill(255)
         p5.text("+" + sc.yinSum, 440, 146)
-        p5.textSize(32)
+        p5.textSize(24)
       }
       if (avatars[3]) p5.image(avatars[3], 310, 120, 60, 60)
       if (playersState[3].isReady) {
@@ -309,36 +309,36 @@ export default class Render {
       gp.viewingPlayer === gp.myPlayerId &&
       gp.yieldPreview.isShown
     ) {
-      p5.textSize(22)
+      p5.textSize(20)
       if (vp === playersState[0]?.id) {
         p5.fill(255)
-        p5.rect(160, 80, 70, 30)
+        p5.rect(160, 80, 70, 30, 0, 0, 0, 10)
         p5.fill(30)
-        p5.rect(230, 80, 70, 30)
+        p5.rect(230, 80, 70, 30, 0, 0, 10, 0)
         p5.text("+" + gp.yieldPreview.yangSum, 160, 76)
         p5.fill(255)
         p5.text("+" + gp.yieldPreview.yinSum, 230, 76)
       } else if (vp === playersState[1]?.id) {
         p5.fill(255)
-        p5.rect(370, 80, 70, 30)
+        p5.rect(370, 80, 70, 30, 0, 0, 0, 10)
         p5.fill(30)
-        p5.rect(440, 80, 70, 30)
+        p5.rect(440, 80, 70, 30, 0, 0, 10, 0)
         p5.text("+" + gp.yieldPreview.yangSum, 370, 76)
         p5.fill(255)
         p5.text("+" + gp.yieldPreview.yinSum, 440, 76)
       } else if (vp === playersState[2]?.id) {
         p5.fill(255)
-        p5.rect(160, 150, 70, 30)
+        p5.rect(160, 150, 70, 30, 0, 0, 0, 10)
         p5.fill(30)
-        p5.rect(230, 150, 70, 30)
+        p5.rect(230, 150, 70, 30, 0, 0, 10, 0)
         p5.text("+" + gp.yieldPreview.yangSum, 160, 146)
         p5.fill(255)
         p5.text("+" + gp.yieldPreview.yinSum, 230, 146)
       } else if (vp === playersState[3]?.id) {
         p5.fill(255)
-        p5.rect(370, 150, 70, 30)
+        p5.rect(370, 150, 70, 30, 0, 0, 0, 10)
         p5.fill(30)
-        p5.rect(440, 150, 70, 30)
+        p5.rect(440, 150, 70, 30, 0, 0, 10, 0)
         p5.text("+" + gp.yieldPreview.yangSum, 370, 146)
         p5.fill(255)
         p5.text("+" + gp.yieldPreview.yinSum, 440, 146)
@@ -411,21 +411,21 @@ export default class Render {
           }
         }
       }
-      // render preview if not during scoring
+      // render yield preview on cards if not during scoring
       if (isNotScoring && gp.yieldPreview.isShown) {
         const sumsList = gp.yieldPreview.sumsList
         p5.noStroke()
         p5.strokeWeight(4)
-        p5.textSize(30)
+        p5.textSize(24)
         for (let i = 0; i < sumsList.length; i++) {
           const sumItem = sumsList[i]
 
           p5.fill(sumItem.isYin ? 30 : 255)
           const rx = ldx + 105 * sumItem.pos[0]
           const ry = ldy + 140 * sumItem.pos[1]
-          p5.rect(rx, ry - 10, 60, 35, 5)
+          p5.rect(rx, ry - 10, 70, 30, 5)
           p5.fill(sumItem.isYin ? 255 : 30)
-          p5.text("+" + sumItem.sum, rx, ry - 15)
+          p5.text("+" + sumItem.sum, rx, ry - 13)
         }
       }
     } else {
@@ -687,7 +687,7 @@ export default class Render {
       sc.ap = Math.min(1, sc.ap + 0.02)
       p5.noStroke()
       p5.strokeWeight(4)
-      p5.textSize(30)
+      p5.textSize(24)
       for (let i = 0; i < sc.scoresList.length; i++) {
         const scoringCard = sc.scoresList[i]
 
@@ -716,10 +716,10 @@ export default class Render {
         p5.scale(sc.ap < 0.3 ? this.easeOutElastic(scaleFactor) : scaleFactor)
         if (i === sc.cardIndex) p5.stroke(240, 70, 60)
         p5.fill(scoringCard.isYin ? 30 : 255)
-        p5.rect(0, -10, 60, 35, 5)
+        p5.rect(0, -10, 70, 30, 5)
         p5.noStroke()
         p5.fill(scoringCard.isYin ? 255 : 30)
-        p5.text("+" + scoringCard.sum, 0, -15)
+        p5.text("+" + scoringCard.sum, 0, -13)
         p5.pop()
       }
     }
@@ -781,24 +781,24 @@ export default class Render {
             // letter rating
             let letter = "F"
             let percentage = 0
-            if (unflooredIF < 70) {
-              percentage = unflooredIF / 70
+            if (unflooredIF < 700) {
+              percentage = unflooredIF / 700
               letter = "F"
               p5.stroke(150)
-            } else if (unflooredIF < 80) {
-              percentage = (unflooredIF - 70) / 10
+            } else if (unflooredIF < 800) {
+              percentage = (unflooredIF - 700) / 100
               letter = "D"
               p5.stroke(65, 200, 60)
-            } else if (unflooredIF < 90) {
-              percentage = (unflooredIF - 80) / 10
+            } else if (unflooredIF < 900) {
+              percentage = (unflooredIF - 800) / 100
               letter = "C"
               p5.stroke(23, 160, 227)
-            } else if (unflooredIF < 100) {
-              percentage = (unflooredIF - 90) / 10
+            } else if (unflooredIF < 1000) {
+              percentage = (unflooredIF - 900) / 100
               letter = "B"
               p5.stroke(237, 190, 17)
-            } else if (unflooredIF < 110) {
-              percentage = (unflooredIF - 100) / 10
+            } else if (unflooredIF < 1100) {
+              percentage = (unflooredIF - 1000) / 100
               letter = "A"
               p5.stroke(240, 70, 60)
             } else {
@@ -977,13 +977,13 @@ export default class Render {
       this.renderYin(400, 650, 40)
       p5.textSize(30)
       p5.fill(255)
-      p5.rect(90, 720, 70, 40)
+      p5.rect(90, 720, 90, 40)
       p5.fill(30)
-      p5.text(100, 90, 716)
+      p5.text(1000, 90, 716)
       p5.fill(30)
-      p5.rect(410, 720, 70, 40)
+      p5.rect(410, 720, 90, 40)
       p5.fill(255)
-      p5.text(100, 410, 716)
+      p5.text(1000, 410, 716)
 
       this.renderYang(250, 760, 50)
       this.renderYin(250, 760, 50)
@@ -991,7 +991,7 @@ export default class Render {
       p5.fill(65, 200, 60)
       p5.stroke(30)
       p5.strokeWeight(10)
-      p5.text(100, 250, 670)
+      p5.text(1000, 250, 670)
 
       p5.stroke(255)
       p5.strokeWeight(5)
@@ -1002,6 +1002,8 @@ export default class Render {
       p5.line(400, 770, 340, 770)
       p5.line(350, 760, 340, 770)
       p5.line(350, 780, 340, 770)
+
+      this.buttons.closeShop.render(p5)
     }
 
     // card inspection
@@ -1268,18 +1270,18 @@ export default class Render {
   renderMiniAbility(p5: P5, card: Card) {
     const ability = card.ability
     p5.noStroke()
-    p5.textSize(16)
+    p5.textSize(12)
     const numY = 48
     if (card.isYin) {
       p5.fill(30)
-      p5.rect(0, numY, 25, 15)
+      p5.rect(0, numY, 28, 15, 2)
       p5.fill(255)
-      p5.text("+" + ability.num, 0, numY - 2)
+      p5.text("+" + ability.num, 0, numY - 1.5)
     } else {
       p5.fill(255)
-      p5.rect(0, numY, 25, 15)
+      p5.rect(0, numY, 28, 15, 2)
       p5.fill(30)
-      p5.text("+" + ability.num, 0, numY - 2)
+      p5.text("+" + ability.num, 0, numY - 1.5)
     }
 
     // flux
@@ -1538,7 +1540,214 @@ export default class Render {
 
     // blocked by wheel modal?
     if (gp.wheelModalIsOpened) {
-      return (gp.wheelModalIsOpened = false)
+      if (buttons.closeShop.checkHover(mx, my)) {
+        return buttons.closeShop.clicked()
+      }
+      // check clicked on ele
+      const clickedDeg = p5.atan2(my - 350, mx - 250)
+
+      let animalIndex = Math.floor(clickedDeg / 30) + 3
+      if (animalIndex < 0) animalIndex = 12 + animalIndex
+
+      const deg = animalIndex * 30 - 75
+      if (animalIndex < 6) {
+        // ele #1
+        if (
+          p5.dist(
+            mx,
+            my,
+            p5.cos(deg - 8) * 225 + 250,
+            p5.sin(deg - 8) * 225 + 350
+          ) < 15
+        ) {
+          this.playSound(this.clickingSound)
+          const card = CARDS_TABLE.find(
+            (c) =>
+              c.animal === this.animalsOrder[animalIndex] &&
+              c.ele === this.elesOrder[animalIndex]
+          )
+          if (card)
+            gp.inspectCard(
+              card,
+              p5.cos(deg - 8) * 225 + 250,
+              p5.sin(deg - 8) * 225 + 350,
+              0
+            )
+          return
+        }
+        // ele #2
+        else if (
+          p5.dist(
+            mx,
+            my,
+            p5.cos(deg - 3) * 195 + 250,
+            p5.sin(deg - 3) * 195 + 350
+          ) < 15
+        ) {
+          this.playSound(this.clickingSound)
+          const card = CARDS_TABLE.find(
+            (c) =>
+              c.animal === this.animalsOrder[animalIndex] &&
+              c.ele === this.elesOrder[(animalIndex + 2) % 6]
+          )
+          if (card)
+            gp.inspectCard(
+              card,
+              p5.cos(deg - 3) * 195 + 250,
+              p5.sin(deg - 3) * 195 + 350,
+              0
+            )
+          return
+        }
+        // ele #3
+        else if (
+          p5.dist(
+            mx,
+            my,
+            p5.cos(deg + 3) * 225 + 250,
+            p5.sin(deg + 3) * 225 + 350
+          ) < 15
+        ) {
+          this.playSound(this.clickingSound)
+          const card = CARDS_TABLE.find(
+            (c) =>
+              c.animal === this.animalsOrder[animalIndex] &&
+              c.ele === this.elesOrder[(animalIndex + 1) % 6]
+          )
+          if (card)
+            gp.inspectCard(
+              card,
+              p5.cos(deg + 3) * 225 + 250,
+              p5.sin(deg + 3) * 225 + 350,
+              0
+            )
+          return
+        }
+        // ele #4
+        else if (
+          p5.dist(
+            mx,
+            my,
+            p5.cos(deg + 8) * 195 + 250,
+            p5.sin(deg + 8) * 195 + 350
+          ) < 15
+        ) {
+          this.playSound(this.clickingSound)
+          const card = CARDS_TABLE.find(
+            (c) =>
+              c.animal === this.animalsOrder[animalIndex] &&
+              c.ele === this.elesOrder[(animalIndex + 3) % 6]
+          )
+          if (card)
+            gp.inspectCard(
+              card,
+              p5.cos(deg + 8) * 195 + 250,
+              p5.sin(deg + 8) * 195 + 350,
+              0
+            )
+          return
+        }
+      } else {
+        const _i = 11 - animalIndex
+        // ele #1
+        if (
+          p5.dist(
+            mx,
+            my,
+            p5.cos(deg - 8) * 195 + 250,
+            p5.sin(deg - 8) * 195 + 350
+          ) < 15
+        ) {
+          this.playSound(this.clickingSound)
+          const card = CARDS_TABLE.find(
+            (c) =>
+              c.animal === this.animalsOrder[animalIndex] &&
+              c.ele === this.elesOrder[(_i + 3) % 6]
+          )
+          if (card)
+            gp.inspectCard(
+              card,
+              p5.cos(deg - 8) * 195 + 250,
+              p5.sin(deg - 8) * 195 + 350,
+              0
+            )
+          return
+        }
+        // ele #2
+        else if (
+          p5.dist(
+            mx,
+            my,
+            p5.cos(deg - 3) * 225 + 250,
+            p5.sin(deg - 3) * 225 + 350
+          ) < 15
+        ) {
+          this.playSound(this.clickingSound)
+          const card = CARDS_TABLE.find(
+            (c) =>
+              c.animal === this.animalsOrder[animalIndex] &&
+              c.ele === this.elesOrder[(_i + 1) % 6]
+          )
+          if (card)
+            gp.inspectCard(
+              card,
+              p5.cos(deg - 3) * 225 + 250,
+              p5.sin(deg - 3) * 225 + 350,
+              0
+            )
+          return
+        }
+        // ele #3
+        else if (
+          p5.dist(
+            mx,
+            my,
+            p5.cos(deg + 3) * 195 + 250,
+            p5.sin(deg + 3) * 195 + 350
+          ) < 15
+        ) {
+          this.playSound(this.clickingSound)
+          const card = CARDS_TABLE.find(
+            (c) =>
+              c.animal === this.animalsOrder[animalIndex] &&
+              c.ele === this.elesOrder[(_i + 2) % 6]
+          )
+          if (card)
+            gp.inspectCard(
+              card,
+              p5.cos(deg + 3) * 195 + 250,
+              p5.sin(deg + 3) * 195 + 350,
+              0
+            )
+          return
+        }
+        // ele #4
+        else if (
+          p5.dist(
+            mx,
+            my,
+            p5.cos(deg + 8) * 225 + 250,
+            p5.sin(deg + 8) * 225 + 350
+          ) < 15
+        ) {
+          this.playSound(this.clickingSound)
+          const card = CARDS_TABLE.find(
+            (c) =>
+              c.animal === this.animalsOrder[animalIndex] &&
+              c.ele === this.elesOrder[_i]
+          )
+          if (card)
+            gp.inspectCard(
+              card,
+              p5.cos(deg + 8) * 225 + 250,
+              p5.sin(deg + 8) * 225 + 350,
+              0
+            )
+          return
+        }
+      }
+
+      return
     }
 
     // viewing a guest? go back button
@@ -1687,6 +1896,7 @@ export default class Render {
     if (p5.dist(mx, my, 35, 100) < 18) {
       this.playSound(this.clickingSound)
       gp.wheelModalIsOpened = true
+      this.buttons.closeShop.ap = 0
       return
     }
     // clicked preview?

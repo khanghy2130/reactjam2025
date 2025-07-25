@@ -39,12 +39,6 @@ declare global {
   const Rune: RuneClient<GameState, GameActions, Persisted>
 }
 
-// randomness for each player per round
-const generateRNG = () => {
-  const r = Math.random
-  return [r(), r(), r(), r()]
-}
-
 function checkToEndRound(game: GameState) {
   // exit if someone is not ready
   if (game.players.some((p) => !p.isReady)) return
@@ -52,9 +46,12 @@ function checkToEndRound(game: GameState) {
   if (game.round >= 6) return // game is already over
 
   // update all players
+  const r = Math.random
+  const globalR1 = r()
+  const globalR2 = r()
   game.players.forEach((p) => {
     p.isReady = false
-    p.rng = generateRNG()
+    p.rng = [globalR1, globalR2, r(), r()]
     p.prevYangPts = p.yangPts
     p.prevYinPts = p.yinPts
 
@@ -89,27 +86,32 @@ Rune.initLogic({
   persistPlayerData: true,
   minPlayers: 1,
   maxPlayers: 4,
-  setup: (allPlayerIds) => ({
-    round: 1,
-    players: allPlayerIds.map(
-      (playerId): LogicPlayer => ({
-        id: playerId,
-        prevYinPts: 0,
-        prevYangPts: 0,
-        yinPts: 0,
-        yangPts: 0,
-        isReady: false,
-        rng: generateRNG(),
-        collection: [
-          [null, null, null, null],
-          [null, null, null, null],
-          [null, null, null, null],
-          [null, null, null, null],
-        ],
-        playedPositions: null,
-      })
-    ),
-  }),
+  setup: (allPlayerIds) => {
+    const r = Math.random
+    const globalR1 = r()
+    const globalR2 = r()
+    return {
+      round: 1,
+      players: allPlayerIds.map(
+        (playerId): LogicPlayer => ({
+          id: playerId,
+          prevYinPts: 0,
+          prevYangPts: 0,
+          yinPts: 0,
+          yangPts: 0,
+          isReady: false,
+          rng: [globalR1, globalR2, r(), r()],
+          collection: [
+            [null, null, null, null],
+            [null, null, null, null],
+            [null, null, null, null],
+            [null, null, null, null],
+          ],
+          playedPositions: null,
+        })
+      ),
+    }
+  },
   actions: {
     becomeReady: (payload, { game, playerId }) => {
       if (game.round >= 6) throw Rune.invalidAction() // game is already over
